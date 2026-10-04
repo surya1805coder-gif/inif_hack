@@ -247,7 +247,8 @@ let allTeams = [];
     btnCloseEval.addEventListener('click', () => modalEval.classList.remove('is-open'));
 
     btnSaveScore.addEventListener('click', async () => {
-      if (!activeEvaluatingTeam) return;
+      if (!activeEvaluatingTeam || btnSaveScore.disabled) return;
+      btnSaveScore.disabled = true;
       btnSaveScore.textContent = 'Saving to R2...';
 
       const inno = parseFloat(scoreInno.value) || 0;
@@ -275,14 +276,17 @@ let allTeams = [];
           return;
         }
         const data = await res.json();
-        if (data.success) {
+        if (res.ok && data.success) {
           activeEvaluatingTeam.scores = data.scores;
           modalEval.classList.remove('is-open');
           renderTeams();
+        } else {
+          throw new Error(data.error || 'Failed to save scores.');
         }
       } catch (e) {
         alert('Error saving marks: ' + e.message);
       } finally {
+        btnSaveScore.disabled = false;
         btnSaveScore.textContent = 'CONFIRM & COMMIT MARKS TO R2';
       }
     });

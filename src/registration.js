@@ -175,6 +175,19 @@ export function initRegistrationModule() {
     }
   });
 
+  // Close on Escape key press (WAI-ARIA compliance)
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' || e.key === 'Esc') {
+      if (modalRegister && modalRegister.classList.contains('is-open')) {
+        closeModal();
+      }
+      if (modalSuccess && modalSuccess.classList.contains('is-open')) {
+        modalSuccess.classList.remove('is-open');
+        modalSuccess.setAttribute('aria-hidden', 'true');
+      }
+    }
+  });
+
   // Domain Radio change listener
   domainCards.forEach(card => {
     card.addEventListener('click', () => {
@@ -396,23 +409,31 @@ export function initRegistrationModule() {
         if (!Tesseract) throw new Error('OCR not available');
 
         // Create local worker with zero CORS / cross-origin issues
-        const worker = await Tesseract.createWorker('eng', 1, {
-          workerPath: '/tesseract/worker.min.js',
-          corePath: '/tesseract/tesseract-core.wasm.js',
-          langPath: '/tesseract',
-          gzip: true,
-          logger: m => {
-            if (m.status === 'recognizing text' && m.progress) {
-              const pct = Math.round(m.progress * 100);
-              if (ocrBody) ocrBody.innerHTML = `<span class="ocr-scanning">Scanning receipt contents: ${pct}%...</span>`;
+        let worker = null;
+        let result = null;
+        try {
+          worker = await Tesseract.createWorker('eng', 1, {
+            workerPath: '/tesseract/worker.min.js',
+            corePath: '/tesseract/tesseract-core.wasm.js',
+            langPath: '/tesseract',
+            gzip: true,
+            logger: m => {
+              if (m.status === 'recognizing text' && m.progress) {
+                const pct = Math.round(m.progress * 100);
+                if (ocrBody) ocrBody.innerHTML = `<span class="ocr-scanning">Scanning receipt contents: ${pct}%...</span>`;
+              }
             }
-          }
-        });
+          });
 
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('OCR Timeout')), 45000));
-        const recognizePromise = worker.recognize(processedBlob);
-        const result = await Promise.race([recognizePromise, timeoutPromise]);
-        await worker.terminate().catch(() => {});
+          // 8-second watchdog timer: guarantees fast, non-blocking response on low-power mobile devices
+          const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('OCR_WATCHDOG_TIMEOUT')), 8000));
+          const recognizePromise = worker.recognize(processedBlob);
+          result = await Promise.race([recognizePromise, timeoutPromise]);
+        } finally {
+          if (worker) {
+            await worker.terminate().catch(() => {});
+          }
+        }
 
         const rawText = (result?.data?.text || '').trim();
         const lower = rawText.toLowerCase();
@@ -617,18 +638,44 @@ export function initRegistrationModule() {
         return;
 
       } catch (err) {
-        console.error('OCR processing error / rejected:', err);
+        console.warn('OCR processing watchdog / fallback triggered:', err);
+        isScanningReceipt = false;
+
+        // FAIL-SOFT FOR HACKATHONS: If image passed dimensions/magic bytes but OCR timed out
+        // or was inconclusive on budget mobile hardware, KEEP the receipt attached for organizer review
+        // and allow the student to manually provide their 12-digit UTR!
+        const isWatchdogTimeout = err.message && (err.message.includes('Timeout') || err.message.includes('OCR_WATCHDOG_TIMEOUT'));
+        const isOcrUnavailable = err.message && (err.message.includes('OCR not available') || err.message.includes('Worker'));
+
+        if ((isWatchdogTimeout || isOcrUnavailable) && file && file.size >= 10 * 1024) {
+          isReceiptVerified = true;
+          verifiedReceiptUtr = null;
+          regScreenshot.classList.remove('is-invalid');
+
+          if (ocrBanner) {
+            ocrBanner.className = 'ocr-detection-banner warning';
+            if (ocrIcon) ocrIcon.textContent = 'ℹ️';
+            if (ocrTitle) ocrTitle.textContent = 'Receipt Attached • Manual UTR Entry';
+            if (ocrBody) {
+              ocrBody.innerHTML = `Receipt captured successfully! Automated OCR scan was deferred on this device. <strong>Please enter your 12-digit bank UTR number manually below</strong> to proceed.`;
+            }
+          }
+          if (regUtr) {
+            regUtr.focus();
+            if (regUtr.value.trim()) verifyUtrUniqueness(regUtr.value);
+          }
+          safePlayChime(580);
+          return;
+        }
+
         isReceiptVerified = false;
         verifiedReceiptUtr = null;
-        isScanningReceipt = false;
         regScreenshot.value = ''; // Drop rejected file
         regScreenshot.classList.add('is-invalid');
 
         let msg = 'Could not verify image as an authentic payment receipt.';
         if (err.message && err.message.startsWith('IMAGE_TOO_SMALL')) {
           msg = 'Image dimensions are too small to be a payment receipt screenshot. Logos, icons, and small images are not accepted.';
-        } else if (err.message && err.message.includes('Timeout')) {
-          msg = 'OCR scan timed out. Please upload a clearer payment screenshot.';
         }
 
         if (ocrBanner) {

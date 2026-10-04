@@ -51,9 +51,12 @@
     }
     window.scrollTo(0, 0);
   </script>
-  <script type="module" crossorigin src="/assets/main-Dz6qRdal.js"></script>
+  <script type="module" crossorigin src="/assets/main-B3ZZCl3T.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="stylesheet" crossorigin href="/assets/main-Bf42MKk7.css">
+  <link rel="modulepreload" crossorigin href="/assets/three-vendor-D5YnKyrC.js">
+  <link rel="modulepreload" crossorigin href="/assets/gsap-vendor-SFc2wnMY.js">
+  <link rel="modulepreload" crossorigin href="/assets/ogl-vendor-CvCRX4L3.js">
+  <link rel="stylesheet" crossorigin href="/assets/main-B2PsEhLz.css">
 </head>
 
 <body class="theme-obsidian">
@@ -743,7 +746,7 @@
        REGISTRATION MODAL
        ========================================================================= -->
   <div class="modal-backdrop" id="modal-register" aria-hidden="true">
-    <div class="modal-dialog modal-register-dialog">
+    <div class="modal-dialog modal-register-dialog" role="dialog" aria-modal="true" aria-labelledby="reg-modal-title">
       <button class="modal-close-btn" id="btn-close-register" aria-label="Close Modal">✕</button>
 
       <div class="modal-header">
@@ -751,7 +754,7 @@
           <span class="pulse-dot"></span>
           <span class="mono-label" id="reg-domain-badge">DOMAIN: MIND STONE // INTELLIGENCE</span>
         </div>
-        <h2 class="modal-title">REGISTER SQUAD</h2>
+        <h2 class="modal-title" id="reg-modal-title">REGISTER SQUAD</h2>
         <p class="modal-sub">Forge your 3-4 member team and lock in your chosen Infinity Domain.</p>
       </div>
 
@@ -1039,9 +1042,9 @@
        REGISTRATION SUCCESS CONFIRMATION MODAL
        ========================================================================= -->
   <div class="modal-backdrop" id="modal-success" aria-hidden="true">
-    <div class="modal-dialog modal-success-dialog">
+    <div class="modal-dialog modal-success-dialog" role="dialog" aria-modal="true" aria-labelledby="suc-modal-title">
       <div class="success-icon-wrap">✦</div>
-      <h2 class="modal-title" style="color: #ffd000;">SQUAD COMMISSIONED!</h2>
+      <h2 class="modal-title" id="suc-modal-title" style="color: #ffd000;">SQUAD COMMISSIONED!</h2>
       <p class="modal-sub">Your team has successfully wielded the singularity and registered with Cloudflare R2
         persistence.</p>
 

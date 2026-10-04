@@ -33,6 +33,7 @@ export default defineConfig({
     },
   ],
   build: {
+    chunkSizeWarningLimit: 800,
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
@@ -40,6 +41,19 @@ export default defineConfig({
         coordinator: resolve(__dirname, 'coordinator.html'),
         judges: resolve(__dirname, 'judges.html'),
         leader: resolve(__dirname, 'leader.html'),
+      },
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/three')) {
+            return 'three-vendor';
+          }
+          if (id.includes('node_modules/gsap')) {
+            return 'gsap-vendor';
+          }
+          if (id.includes('node_modules/ogl')) {
+            return 'ogl-vendor';
+          }
+        },
       },
     },
   },

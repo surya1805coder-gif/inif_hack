@@ -266,6 +266,10 @@ let allTeams = [];
               window.location.reload();
               return;
             }
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+              throw new Error(data.error || 'Failed to update status.');
+            }
             // Update local state
             const target = allTeams.find(t => t.id === teamId);
             if (target) {
@@ -282,6 +286,7 @@ let allTeams = [];
             console.error('Error saving checkmark:', err);
             input.checked = !value;
             label.classList.toggle('checked', !value);
+            alert(err.message || 'Error updating status');
           }
         });
       });

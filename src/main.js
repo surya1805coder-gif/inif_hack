@@ -28,20 +28,39 @@ class InfinityScrollShowcase {
 
     this.clock = new THREE.Clock();
     this.infoCard = document.getElementById('info-card');
+    this.isSceneVisible = true;
+    this.isContextLost = false;
+    this.animationFrameId = null;
 
-    this.initMoltenMetalBg();
-    this.initThree();
-    this.initCosmicEnvironment();
-    this.initStones();
-    this.initPostProcessing();
-    this.initControls();
+    this.isWebGLAvailable = this.hasWebGLSupport();
+
+    if (this.isWebGLAvailable) {
+      try {
+        this.initMoltenMetalBg();
+        this.initThree();
+        this.initCosmicEnvironment();
+        this.initStones();
+        this.initPostProcessing();
+        this.initControls();
+        this.initVisibilityAndPerformanceGovernance();
+        this.startAnimation();
+      } catch (err) {
+        console.warn('⚠️ WebGL initialization encountered an issue. Activating 2D cosmic fallback:', err);
+        this.isWebGLAvailable = false;
+        document.body.classList.add('webgl-fallback-active');
+      }
+    } else {
+      console.warn('ℹ️ WebGL is not supported on this browser/hardware. 2D cosmic fallback engaged.');
+      document.body.classList.add('webgl-fallback-active');
+    }
+
     this.initUI();
     this.initCountdownTimer();
     this.initTimeline();
     this.initScrollAndGestures();
     this.initEventListeners();
     initRegistrationModule();
-    this.animate();
+    this.initServiceWorker();
 
     // Reset window scroll to top
     if ('scrollRestoration' in history) {
@@ -64,8 +83,24 @@ class InfinityScrollShowcase {
     });
   }
 
+  hasWebGLSupport() {
+    try {
+      const canvas = document.createElement('canvas');
+      return Boolean(window.WebGLRenderingContext && (canvas.getContext('webgl2') || canvas.getContext('webgl')));
+    } catch (_) {
+      return false;
+    }
+  }
+
   isMobile() {
     return window.innerWidth <= 1024 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+
+  isLowPowerDevice() {
+    const isTouchMobile = this.isMobile();
+    const cores = navigator.hardwareConcurrency || 4;
+    const memory = navigator.deviceMemory || 4;
+    return isTouchMobile || cores <= 4 || memory <= 4;
   }
 
   /* --------------------------------------------------------------------------
@@ -75,13 +110,16 @@ class InfinityScrollShowcase {
     const bgContainer = document.getElementById('molten-metal-bg');
     if (!bgContainer) return;
 
+    const isMobile = this.isMobile();
+    const isLowPower = this.isLowPowerDevice();
+
     this.moltenMetal = initMoltenMetal(bgContainer, {
       color1: '#5227FF',
       color2: '#FF9FFC',
       color3: '#FFFFFF',
-      speed: 0.35,
+      speed: isMobile ? 0.22 : 0.35,
       scale: 4,
-      detail: 3,
+      detail: isLowPower ? 1 : 2,
       glow: 1.6,
       coreSize: 0.1,
       swirl: 1,
@@ -89,12 +127,13 @@ class InfinityScrollShowcase {
       blackPoint: 0.05,
       brightness: 1.3,
       colorMode: 'molten',
-      grain: true,
+      grain: !isMobile,
       grainIntensity: 0.05,
-      mouseInteraction: true,
+      mouseInteraction: !isMobile,
       mouseStrength: 0.3,
       opacity: 1.0,
-      backgroundColor: '#030305'
+      backgroundColor: '#030305',
+      dpr: isMobile ? 0.85 : 1.25
     });
   }
 
@@ -115,13 +154,17 @@ class InfinityScrollShowcase {
     // Initial camera position - focused on left-center stone stage
     this.updateCameraForViewport();
 
-    const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
-    const maxPixelRatio = isMobile ? Math.min(window.devicePixelRatio, 1.25) : Math.min(window.devicePixelRatio, 2);
+    const isMobile = this.isMobile();
+    const isLowPower = this.isLowPowerDevice();
+    const maxPixelRatio = isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.75);
 
     this.renderer = new THREE.WebGLRenderer({
-      powerPreference: isMobile ? 'default' : 'high-performance',
+      powerPreference: isMobile ? 'low-power' : 'high-performance',
       antialias: !isMobile,
-      alpha: true
+      alpha: true,
+      precision: isLowPower ? 'mediump' : 'highp',
+      stencil: false,
+      depth: true
     });
     this.renderer.setClearColor(0x000000, 0);
     this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -133,12 +176,14 @@ class InfinityScrollShowcase {
     this.renderer.domElement.addEventListener('webglcontextlost', (event) => {
       event.preventDefault();
       console.warn('⚠️ WebGL context lost. Pausing render loop to recover...');
-      if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+      this.isContextLost = true;
+      this.stopAnimation();
     }, false);
 
     this.renderer.domElement.addEventListener('webglcontextrestored', () => {
       console.log('✅ WebGL context restored. Resuming render loop.');
-      this.animate();
+      this.isContextLost = false;
+      this.startAnimation();
     }, false);
 
     this.container.appendChild(this.renderer.domElement);
@@ -257,7 +302,7 @@ class InfinityScrollShowcase {
     sCtx.fillRect(0, 0, 64, 64);
     const starTexture = new THREE.CanvasTexture(starCanvas);
 
-    const starCount = 2000;
+    const starCount = this.isMobile() ? 650 : 2000;
     const starGeo = new THREE.BufferGeometry();
     const starPos = new Float32Array(starCount * 3);
     const starColor = new Float32Array(starCount * 3);
@@ -342,9 +387,14 @@ class InfinityScrollShowcase {
     renderPass.clearAlpha = 0;
     this.composer.addPass(renderPass);
 
+    const isMobile = this.isMobile();
+    const bloomResolution = isMobile
+      ? new THREE.Vector2(Math.floor(window.innerWidth * 0.5), Math.floor(window.innerHeight * 0.5))
+      : new THREE.Vector2(window.innerWidth, window.innerHeight);
+
     this.bloomPass = new UnrealBloomPass(
-      new THREE.Vector2(window.innerWidth, window.innerHeight),
-      0.55, // Rich luminous aura on specular glints
+      bloomResolution,
+      isMobile ? 0.42 : 0.55, // Rich luminous aura on specular glints
       0.45, // Soft bloom radius
       0.72  // Threshold for radiant crystal sparkle
     );
@@ -1450,10 +1500,20 @@ class InfinityScrollShowcase {
      12. EVENT LISTENERS & SHORTCUTS
      -------------------------------------------------------------------------- */
   initEventListeners() {
-    // Window Resize
+    // Window Resize with mobile address-bar hide/show debounce
+    let lastWidth = window.innerWidth;
+    let lastHeight = window.innerHeight;
+
     window.addEventListener('resize', () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
+
+      // Prevent mobile address bar show/hide scroll stutter (ignore height jitter < 80px when width is unchanged)
+      if (this.isMobile() && Math.abs(width - lastWidth) < 2 && Math.abs(height - lastHeight) < 80) {
+        return;
+      }
+      lastWidth = width;
+      lastHeight = height;
 
       this.camera.aspect = width / height;
       this.camera.updateProjectionMatrix();
@@ -1469,7 +1529,7 @@ class InfinityScrollShowcase {
       if (cur && !this.isConvergenceActive) {
         cur.group.scale.set(targetScale, targetScale, targetScale);
       }
-    });
+    }, { passive: true });
 
     // Audio Button Toggle (Safely guarded if element is present)
     const btnAudio = document.getElementById('btn-audio');
@@ -1603,11 +1663,58 @@ class InfinityScrollShowcase {
     });
   }
 
+  initVisibilityAndPerformanceGovernance() {
+    const showcaseSection = document.getElementById('showcase-section');
+    if (showcaseSection && 'IntersectionObserver' in window) {
+      this.sceneObserver = new IntersectionObserver(([entry]) => {
+        this.isSceneVisible = entry.isIntersecting;
+        if (this.isSceneVisible) {
+          this.startAnimation();
+        } else {
+          this.stopAnimation();
+        }
+      }, { threshold: 0.02 });
+      this.sceneObserver.observe(showcaseSection);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        this.stopAnimation();
+      } else if (this.isSceneVisible) {
+        this.startAnimation();
+      }
+    });
+  }
+
+  startAnimation() {
+    if (!this.isWebGLAvailable || !this.renderer || this.isContextLost || !this.isSceneVisible || document.hidden) return;
+    if (this.animationFrameId !== null) return;
+    this.clock.start();
+    this.animate();
+  }
+
+  stopAnimation() {
+    if (this.animationFrameId !== null) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+  }
+
   /* --------------------------------------------------------------------------
      13. RENDER & ANIMATION LOOP
      -------------------------------------------------------------------------- */
   animate() {
-    requestAnimationFrame(() => this.animate());
+    if (!this.isWebGLAvailable || !this.renderer || !this.composer) {
+      this.animationFrameId = null;
+      return;
+    }
+
+    if (this.isContextLost || !this.isSceneVisible || document.hidden) {
+      this.animationFrameId = null;
+      return;
+    }
+
+    this.animationFrameId = requestAnimationFrame(() => this.animate());
 
     const delta = this.clock.getDelta();
     const elapsedTime = this.clock.getElapsedTime();
@@ -1619,7 +1726,7 @@ class InfinityScrollShowcase {
 
     // Update active stone animations
     this.stones.forEach((stone, i) => {
-      if (stone.group.visible) {
+      if (stone && stone.group && stone.group.visible) {
         stone.update(elapsedTime, delta);
 
         // Lively vertical levitation on the hero stage
@@ -1629,8 +1736,20 @@ class InfinityScrollShowcase {
       }
     });
 
-    this.controls.update();
-    this.composer.render();
+    if (this.controls) this.controls.update();
+    if (this.composer) this.composer.render();
+  }
+
+  initServiceWorker() {
+    if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(() => {
+          console.log('✅ Infinity PWA Service Worker active. Offline venue resilience enabled.');
+        }).catch((err) => {
+          console.debug('Service worker registration note:', err);
+        });
+      });
+    }
   }
 }
 

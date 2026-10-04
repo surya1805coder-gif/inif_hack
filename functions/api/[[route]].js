@@ -377,6 +377,29 @@ export function timingSafeEqualString(a, b) {
   return result === 0;
 }
 
+// Ephemeral single-use export tickets (60s lifetime, bounded cache)
+const exportTickets = new Map();
+
+function createExportTicket(role = 'admin') {
+  const ticket = crypto.randomUUID();
+  exportTickets.set(ticket, { role, expiresAt: Date.now() + 60000 });
+  // Evict expired tickets if cache grows
+  if (exportTickets.size > 100) {
+    const now = Date.now();
+    for (const [k, v] of exportTickets.entries()) {
+      if (v.expiresAt < now) exportTickets.delete(k);
+    }
+  }
+  return ticket;
+}
+
+function redeemExportTicket(ticket, requiredRole = 'admin') {
+  if (!ticket || !exportTickets.has(ticket)) return false;
+  const entry = exportTickets.get(ticket);
+  exportTickets.delete(ticket); // Strict single use!
+  return entry.role === requiredRole && entry.expiresAt >= Date.now();
+}
+
 // Helper: Verify role authorization token or secret
 async function verifyRoleAuth(request, url, role, secret) {
   const authHeader = request.headers.get('Authorization') || '';
@@ -385,7 +408,8 @@ async function verifyRoleAuth(request, url, role, secret) {
   const token = tokenFromHeader || tokenFromQuery;
 
   if (!token || !secret) return false;
-  if (timingSafeEqualString(token, secret)) return true; // Direct role secret / passphrase fallback
+  // Only accept raw secret / passphrase from Authorization header, NEVER from URL query string
+  if (tokenFromHeader && timingSafeEqualString(tokenFromHeader, secret)) return true;
 
   try {
     const decoded = atob(token);
@@ -425,6 +449,11 @@ async function verifyRoleAuth(request, url, role, secret) {
 }
 
 async function verifyAdminAuth(request, url, secret) {
+  // Support ephemeral single-use download tickets for safe file downloads
+  const ticket = (url.searchParams.get('ticket') || '').trim();
+  if (ticket && redeemExportTicket(ticket, 'admin')) {
+    return true;
+  }
   return verifyRoleAuth(request, url, 'admin', secret);
 }
 
@@ -1692,6 +1721,13 @@ export async function onRequest(context) {
           };
         }
 
+        // Partitioned attendance snapshot in R2 (Zero-lock isolated write)
+        if (env && env.BUCKET) {
+          env.BUCKET.put(`attendance/${teamId}.json`, JSON.stringify({ food: team.food, reviews: team.reviews, updatedAt: new Date().toISOString() }, null, 2), {
+            httpMetadata: { contentType: 'application/json' }
+          }).catch(() => {});
+        }
+
         return { team };
       });
 
@@ -2103,6 +2139,19 @@ export async function onRequest(context) {
         success: true,
         message: 'Payment QR codes restored to default.',
         paymentQrs: result.paymentQrs,
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Admin Ephemeral Export Ticket Generator (Single-use, 60s ttl)
+    // -------------------------------------------------------------
+    if (pathname === '/api/admin/export-ticket' && method === 'POST') {
+      const ticket = createExportTicket('admin');
+      return jsonResponse({
+        success: true,
+        ticket,
+        expiresInSeconds: 60,
+        message: 'Single-use export ticket created. Valid for 60 seconds.'
       });
     }
 

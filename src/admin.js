@@ -182,9 +182,44 @@ function authHeaders(extra = {}) {
         allDomains = domainsData.domains || [];
 
         const btnExcel = document.querySelector('.btn-excel');
-        if (btnExcel) {
-          const token = getAdminToken();
-          btnExcel.href = `/api/admin/export${token ? '?token=' + encodeURIComponent(token) : ''}`;
+        if (btnExcel && !btnExcel.dataset.bound) {
+          btnExcel.dataset.bound = 'true';
+          btnExcel.removeAttribute('href');
+          btnExcel.style.cursor = 'pointer';
+          btnExcel.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const token = getAdminToken();
+            if (!token) {
+              alert('Organizer clearance required.');
+              return;
+            }
+            const originalText = btnExcel.textContent;
+            try {
+              btnExcel.style.opacity = '0.6';
+              btnExcel.textContent = 'Preparing Workbook...';
+              const res = await fetch('/api/admin/export-ticket', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                }
+              });
+              const data = await res.json();
+              if (data.success && data.ticket) {
+                // Single-use ticket expires in 60s and cannot be replayed from history
+                window.location.href = `/api/admin/export?ticket=${encodeURIComponent(data.ticket)}`;
+              } else {
+                alert('Export failed: ' + (data.error || 'Could not generate export clearance ticket'));
+              }
+            } catch (err) {
+              alert('Export error: ' + err.message);
+            } finally {
+              setTimeout(() => {
+                btnExcel.style.opacity = '1';
+                btnExcel.textContent = originalText;
+              }, 1200);
+            }
+          });
         }
 
         renderTable();
