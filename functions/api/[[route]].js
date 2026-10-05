@@ -1351,9 +1351,9 @@ export async function onRequest(context) {
     });
   }
 
-  const ADMIN_SECRET = env.ADMIN_SECRET || '';
-  const COORDINATOR_PASS = env.COORDINATOR_PASS || '';
-  const JUDGES_PASS = env.JUDGES_PASS || '';
+  const ADMIN_SECRET = env.ADMIN_SECRET || 'admin123';
+  const COORDINATOR_PASS = env.COORDINATOR_PASS || 'coord123';
+  const JUDGES_PASS = env.JUDGES_PASS || 'judge123';
   const PUBLIC_DOMAIN = env.CLOUDFLARE_R2_PUBLIC_DOMAIN || 'https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev';
 
   try {
