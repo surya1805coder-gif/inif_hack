@@ -260,6 +260,146 @@
       display: none;
     }
 
+    .btn-forgot-link {
+      background: none;
+      border: none;
+      color: var(--gold);
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color 0.2s, opacity 0.2s;
+      padding: 0;
+    }
+
+    .btn-forgot-link:hover {
+      color: #fff;
+      text-shadow: 0 0 8px rgba(255, 208, 0, 0.5);
+    }
+
+    /* Modal Overlay & Card */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 2, 6, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 480px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-active);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 208, 0, 0.12);
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.05em;
+    }
+
+    .modal-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .btn-modal-close {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 1.4rem;
+      line-height: 1;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .btn-modal-close:hover {
+      background: rgba(255, 42, 75, 0.2);
+      color: var(--red);
+      border-color: var(--red);
+    }
+
+    .fgt-step-indicator {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+    }
+
+    .fgt-step-desc {
+      font-size: 0.80rem;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+      line-height: 1.4;
+    }
+
+    .fgt-verified-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: rgba(0, 255, 136, 0.08);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      color: var(--green);
+      font-size: 0.78rem;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 18px;
+    }
+
+    .btn-pwd-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+
+    .btn-pwd-toggle:hover {
+      color: var(--gold);
+    }
+
     /* Dashboard Layout */
     .dashboard-layout {
       max-width: 1200px;
@@ -704,7 +844,10 @@
     <a href="/" class="brand-group" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
       <img src="/logo.png" alt="Infinity Crest"
         style="width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(255, 208, 0, 0.5));">
-      <span class="brand-title">INFINITY HACKATHON</span>
+      <div style="display: flex; flex-direction: column;">
+        <span class="brand-title">INFINITY HACKATHON</span>
+        <span style="font-size: 0.60rem; color: #ffd000; font-family: 'JetBrains Mono', monospace; font-weight: 700; letter-spacing: 0.08em;">GVPCDPGC (A) • CSE &amp; CSE-AIML</span>
+      </div>
       <span class="portal-badge">TEAM LEADER DESK</span>
     </a>
     <div class="nav-actions">
@@ -732,18 +875,100 @@
     <form id="form-leader-login">
       <div class="form-group">
         <label class="form-label" for="txt-email">LEADER EMAIL ADDRESS</label>
-        <input type="email" id="txt-email" class="form-input" placeholder="aarav.sharma@iitm.ac.in" required>
+        <input type="email" id="txt-email" class="form-input" placeholder="aarav.sharma@iitm.ac.in" required autocomplete="email">
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="txt-password">TEAM PASSWORD</label>
-        <input type="password" id="txt-password" class="form-input" placeholder="Password (Default: mind2026)" required>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <label class="form-label" for="txt-password" style="margin-bottom: 0;">TEAM PASSWORD</label>
+          <button type="button" id="btn-open-forgot" class="btn-forgot-link">Forgot Password?</button>
+        </div>
+        <input type="password" id="txt-password" class="form-input" placeholder="Password (Default: mind2026)" required autocomplete="current-password">
       </div>
 
-      <button type="submit" class="btn-login" id="btn-do-login">AUTHENTICATE & ENTER PORTAL</button>
+      <button type="submit" class="btn-login" id="btn-do-login">AUTHENTICATE &amp; ENTER PORTAL</button>
       <div class="login-err" id="login-err"></div>
     </form>
   </main>
+
+  <!-- Forgot Password Modal -->
+  <div class="modal-overlay" id="modal-forgot-pwd" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.3rem;">🔑</span>
+          <div>
+            <h3 class="modal-title font-display">RESET TEAM PASSWORD</h3>
+            <p class="modal-sub">Dual-Factor Verification &amp; Self-Service Recovery</p>
+          </div>
+        </div>
+        <button type="button" class="btn-modal-close" id="btn-close-forgot" title="Close Modal">&times;</button>
+      </div>
+
+      <!-- Step 1: Verification Form -->
+      <form id="form-forgot-verify" class="modal-step-body">
+        <div class="fgt-step-indicator font-mono">STEP 01 // IDENTITY VERIFICATION</div>
+        <p class="fgt-step-desc">Enter your registration credentials to verify squad ownership.</p>
+
+        <div class="form-group">
+          <label class="form-label" for="fgt-email">REGISTERED LEADER EMAIL</label>
+          <input type="email" id="fgt-email" class="form-input" placeholder="e.g. leader@college.edu" required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="fgt-phone">REGISTERED LEADER PHONE (10 DIGITS)</label>
+          <input type="tel" id="fgt-phone" class="form-input" placeholder="e.g. 9876543210" required autocomplete="tel">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="fgt-utr">PAYMENT UTR OR TEAM ID</label>
+          <input type="text" id="fgt-utr" class="form-input font-mono" placeholder="e.g. 12-digit UTR or INF-XXXX" required>
+        </div>
+
+        <button type="submit" class="btn-login" id="btn-submit-verify">
+          <span id="txt-verify-btn">VERIFY IDENTITY &amp; PROCEED →</span>
+        </button>
+        <div class="login-err" id="fgt-verify-err" style="display: none;"></div>
+      </form>
+
+      <!-- Step 2: New Password Form -->
+      <form id="form-forgot-reset" class="modal-step-body" style="display: none;">
+        <div class="fgt-step-indicator font-mono" style="color: var(--green);">STEP 02 // SET NEW PASSWORD</div>
+        <div class="fgt-verified-badge" id="fgt-team-badge">
+          <span>✓ VERIFIED:</span> <strong id="fgt-team-name-display">Squad</strong>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="fgt-new-pwd">NEW TEAM PASSWORD</label>
+          <div style="position: relative;">
+            <input type="password" id="fgt-new-pwd" class="form-input" placeholder="Minimum 6 characters" minlength="6" required autocomplete="new-password">
+            <button type="button" class="btn-pwd-toggle" id="btn-toggle-new-pwd" title="Toggle visibility">👁</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="fgt-confirm-pwd">CONFIRM NEW PASSWORD</label>
+          <input type="password" id="fgt-confirm-pwd" class="form-input" placeholder="Re-enter new password" minlength="6" required autocomplete="new-password">
+        </div>
+
+        <button type="submit" class="btn-login" id="btn-submit-reset">
+          <span id="txt-reset-btn">LOCK IN NEW PASSWORD ✓</span>
+        </button>
+        <div class="login-err" id="fgt-reset-err" style="display: none;"></div>
+      </form>
+
+      <!-- Step 3: Success Screen -->
+      <div id="forgot-success-view" class="modal-step-body" style="display: none; text-align: center; padding: 24px 12px;">
+        <div style="font-size: 3rem; margin-bottom: 12px; filter: drop-shadow(0 0 16px rgba(0,255,136,0.6));">✨</div>
+        <h4 class="font-display" style="font-size: 1.3rem; color: var(--green); margin-bottom: 8px;">PASSWORD UPDATED</h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6;">
+          Your team password has been successfully updated in the singularity core. You can now log into your Team Leader Desk.
+        </p>
+        <button type="button" class="btn-login" id="btn-fgt-finish">PROCEED TO LOGIN →</button>
+      </div>
+
+    </div>
+  </div>
 
   <!-- Dashboard Section -->
   <main class="dashboard-layout" id="sec-dashboard">
@@ -758,6 +983,11 @@
         </div>
         <h2 class="team-title" id="dash-team-name">Team Name</h2>
         <div class="college-tag" id="dash-college">College Name</div>
+        <div style="margin-top: 8px; font-size: 0.72rem; color: #a1a1aa; font-family: 'JetBrains Mono', monospace; display: flex; flex-wrap: wrap; gap: 8px;">
+          <span>📍 <strong style="color:#ffd000;">DAY 1:</strong> Rushikonda Campus (Build Before Zero)</span>
+          <span>•</span>
+          <span>📍 <strong style="color:#00ff88;">DAY 2:</strong> Engineering Block 3rd Floor (Victory Awaits)</span>
+        </div>
       </div>
 
       <div id="dash-payment-badge">
@@ -786,33 +1016,41 @@
         <!-- Review Milestones Timeline -->
         <div class="dash-section">
           <div class="sec-header">
-            <h3 class="sec-title"><span>⏱️</span> REVIEW MILESTONES TIMELINE</h3>
-            <span class="college-tag">Coordinator & Jury Station</span>
+            <h3 class="sec-title"><span>⏱️</span> OFFICIAL REVIEW MILESTONES</h3>
+            <span class="college-tag">Jury Stations</span>
           </div>
 
           <div class="timeline-track-list" id="reviews-list">
             <div class="milestone-item">
               <div>
-                <div class="m-title">Review Round 1: Architecture & Idea Feasibility</div>
-                <div class="m-sub">Day 1 // 07:30 PM • Pod Check-in</div>
+                <div class="m-title">Stage 1 Review: Eye of Agamotto</div>
+                <div class="m-sub">Day 1 // 01:00 – 02:00 PM • Idea Validation &amp; Presentation Deck</div>
               </div>
               <span class="badge-check badge-wait" id="status-r1">PENDING</span>
             </div>
 
             <div class="milestone-item">
               <div>
-                <div class="m-title">Review Round 2: Mid-way Logic & API Stress Test</div>
-                <div class="m-sub">Day 2 // 09:30 AM • Pod Check-in</div>
+                <div class="m-title">Stage 2 Review: Reality Stone Prototype</div>
+                <div class="m-sub">Day 1 // 05:00 – 06:00 PM • 2nd Judge Architecture &amp; DB Evaluation</div>
               </div>
               <span class="badge-check badge-wait" id="status-r2">PENDING</span>
             </div>
 
             <div class="milestone-item">
               <div>
-                <div class="m-title">Review Round 3: Grand Pitch & Final Product Demo</div>
-                <div class="m-sub">Day 2 // 04:30 PM • Main Stage</div>
+                <div class="m-title">Stage 3 Review: Time-Loop MVP Review</div>
+                <div class="m-sub">Day 2 // 02:00 – 03:00 AM • 3rd Judge Working MVP &amp; Feasibility</div>
               </div>
               <span class="badge-check badge-wait" id="status-r3">PENDING</span>
+            </div>
+
+            <div class="milestone-item">
+              <div>
+                <div class="m-title">Top 6 Showdown: Cosmic Endgame</div>
+                <div class="m-sub">Day 2 // 09:00 – 09:45 AM • Grand Jury Pitches • Engineering Block 3rd Floor</div>
+              </div>
+              <span class="badge-check badge-wait" id="status-r4">TOP 6 FINALE</span>
             </div>
           </div>
         </div>
@@ -831,24 +1069,24 @@
 
           <div class="food-grid" id="food-tokens-list">
             <div class="food-card">
-              <span class="food-name">☕ High Tea Fuel</span>
+              <span class="food-name">🍱 Infinity Feast: Midday Refuel (Lunch)</span>
+              <span class="badge-check badge-wait" id="food-lunch">PENDING</span>
+            </div>
+            <div class="food-card">
+              <span class="food-name">☕ Pym Particles: Snap Refreshment (High Tea)</span>
               <span class="badge-check badge-wait" id="food-highTea">PENDING</span>
             </div>
             <div class="food-card">
-              <span class="food-name">🍲 Dinner Buffet</span>
+              <span class="food-name">🍲 Grand Alliance: Infinity Dinner</span>
               <span class="badge-check badge-wait" id="food-dinner">PENDING</span>
             </div>
             <div class="food-card">
-              <span class="food-name">⚡ Midnight Fuel & Red Bull</span>
+              <span class="food-name">⚡ Multiverse Arcade &amp; Midnight Fuel</span>
               <span class="badge-check badge-wait" id="food-midnightFuel">PENDING</span>
             </div>
             <div class="food-card">
-              <span class="food-name">🥐 Day 2 Breakfast</span>
+              <span class="food-name">🥐 Morning Dawn: Hero Breakfast</span>
               <span class="badge-check badge-wait" id="food-breakfast">PENDING</span>
-            </div>
-            <div class="food-card">
-              <span class="food-name">🥗 Day 2 Lunch Drop</span>
-              <span class="badge-check badge-wait" id="food-lunch">PENDING</span>
             </div>
           </div>
         </div>
