@@ -507,6 +507,243 @@
       border-color: var(--red);
     }
 
+    /* Admin Filters Bar */
+    .admin-filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      background: rgba(14, 14, 22, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+    }
+
+    .filter-left-controls {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.66rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .segmented-control {
+      display: inline-flex;
+      background: #08080d;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .filter-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .filter-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .filter-btn.active {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .filter-btn-3mem.active {
+      background: rgba(255, 208, 0, 0.15) !important;
+      color: var(--gold) !important;
+      border-color: var(--gold) !important;
+      box-shadow: 0 0 12px rgba(255, 208, 0, 0.25) !important;
+    }
+
+    .filter-btn-4mem.active {
+      background: rgba(0, 210, 255, 0.15) !important;
+      color: var(--cyan) !important;
+      border-color: var(--cyan) !important;
+      box-shadow: 0 0 12px rgba(0, 210, 255, 0.25) !important;
+    }
+
+    .filter-badge {
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: inherit;
+    }
+
+    .badge-gold {
+      background: rgba(255, 208, 0, 0.2);
+      color: var(--gold);
+    }
+
+    .badge-cyan {
+      background: rgba(0, 210, 255, 0.2);
+      color: var(--cyan);
+    }
+
+    .date-filter-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .date-select-input {
+      padding: 7px 30px 7px 10px !important;
+      font-size: 0.76rem !important;
+      border-radius: 8px !important;
+      height: 34px;
+      min-width: 220px;
+    }
+
+    .date-picker-input {
+      color-scheme: dark;
+      background-color: #0e0e16;
+      border: 1px solid var(--border-subtle);
+      color: #fff;
+      border-radius: 8px;
+      padding: 6px 10px;
+      outline: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.74rem;
+      height: 34px;
+      transition: border-color 0.2s;
+    }
+
+    .date-picker-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 10px rgba(0, 210, 255, 0.25);
+    }
+
+    .payment-select-input {
+      padding: 7px 30px 7px 10px !important;
+      font-size: 0.76rem !important;
+      border-radius: 8px !important;
+      height: 34px;
+      min-width: 140px;
+    }
+
+    .btn-clear-date {
+      height: 34px;
+      padding: 0 10px;
+      border-radius: 6px;
+      background: rgba(255, 42, 75, 0.15);
+      border: 1px solid var(--red);
+      color: #ff6b81;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-clear-date:hover {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .filter-meta-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .filter-count-feedback {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .filter-count-feedback strong {
+      color: #fff;
+    }
+
+    .btn-reset-filters {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: rgba(255, 42, 75, 0.12);
+      border: 1px solid var(--red);
+      color: #ff8598;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-reset-filters:hover {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(255, 42, 75, 0.4);
+    }
+
+    .badge-size-pill {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .size-3mem {
+      background: rgba(255, 208, 0, 0.12);
+      border: 1px solid rgba(255, 208, 0, 0.4);
+      color: var(--gold);
+    }
+
+    .size-4mem {
+      background: rgba(0, 210, 255, 0.12);
+      border: 1px solid rgba(0, 210, 255, 0.4);
+      color: var(--cyan);
+    }
+
+    .kpi-sub {
+      font-size: 0.66rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
     /* Master Teams Table */
     .table-container {
       background: var(--bg-surface);
@@ -950,7 +1187,7 @@
       }
     }
   </style>
-  <script type="module" crossorigin src="/assets/admin-BVF5iZof.js"></script>
+  <script type="module" crossorigin src="/assets/admin-XueVQJ9r.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
 </head>
 
@@ -1009,6 +1246,7 @@
       <div class="kpi-card">
         <div class="kpi-val" id="kpi-total-teams">0</div>
         <div class="kpi-lbl">TOTAL SQUADS</div>
+        <div class="kpi-sub font-mono" id="kpi-sub-teams">3-Mem: 0 • 4-Mem: 0</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-val" id="kpi-total-fees">₹0</div>
@@ -1043,6 +1281,61 @@
 
       <input type="text" id="admin-search" class="search-box"
         placeholder="🔍 Search squad, college, UTR, leader email...">
+    </div>
+
+    <!-- Master Squads Filter Bar -->
+    <div class="admin-filter-bar">
+      <div class="filter-left-controls">
+        <!-- Team Size Segmented Control: 3 vs 4 Members -->
+        <div class="filter-group">
+          <label class="filter-label">MEMBERS IN TEAM</label>
+          <div class="segmented-control" id="filter-team-size-group">
+            <button type="button" class="filter-btn active" data-size="all" id="btn-filter-size-all" title="Show squads of all sizes">
+              <span>ALL SIZES</span>
+              <span class="filter-badge" id="badge-count-all">0</span>
+            </button>
+            <button type="button" class="filter-btn filter-btn-3mem" data-size="3" id="btn-filter-size-3" title="Filter squads with 3 members">
+              <span>3 MEMBERS</span>
+              <span class="filter-badge badge-gold" id="badge-count-3">0</span>
+            </button>
+            <button type="button" class="filter-btn filter-btn-4mem" data-size="4" id="btn-filter-size-4" title="Filter squads with 4 members">
+              <span>4 MEMBERS</span>
+              <span class="filter-badge badge-cyan" id="badge-count-4">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Search by Registration Date Input -->
+        <div class="filter-group">
+          <label class="filter-label">SEARCH BY DATE</label>
+          <div class="date-filter-wrap">
+            <input type="date" id="filter-date-picker" class="date-picker-input" title="Search squads registered on this date">
+            <span id="date-match-badge" class="filter-badge badge-cyan font-mono" style="display:none;"></span>
+            <button type="button" id="btn-clear-date" class="btn-clear-date" title="Clear Date Filter" style="display:none;">✕</button>
+          </div>
+        </div>
+
+        <!-- Payment Verification Filter -->
+        <div class="filter-group">
+          <label class="filter-label">PAYMENT</label>
+          <select id="filter-payment-status" class="form-input custom-select font-mono payment-select-input" title="Filter by payment status">
+            <option value="all">ALL PAYMENTS</option>
+            <option value="verified">VERIFIED ONLY</option>
+            <option value="pending">PENDING ONLY</option>
+            <option value="rejected">REJECTED ONLY</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Filter Metadata & Reset -->
+      <div class="filter-meta-wrap">
+        <div class="filter-count-feedback font-mono" id="filter-count-feedback">
+          Showing <strong>0</strong> of 0 squads
+        </div>
+        <button type="button" id="btn-reset-filters" class="btn-reset-filters" style="display: none;" title="Reset all search & filters">
+          ↺ RESET FILTERS
+        </button>
+      </div>
     </div>
 
     <!-- Master Teams Table -->

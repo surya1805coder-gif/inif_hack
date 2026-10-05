@@ -1,6 +1,9 @@
 let allTeams = [];
 let allDomains = [];
 let searchQuery = '';
+let filterTeamSize = 'all'; // 'all', '3', '4'
+let filterDate = 'all'; // 'all' or 'YYYY-MM-DD'
+let filterPayment = 'all'; // 'all', 'verified', 'pending', 'rejected'
 let editingTeam = null;
 
 function escapeHTML(str) {
@@ -69,6 +72,21 @@ function authHeaders(extra = {}) {
 
     const tbody = document.getElementById('admin-tbody');
     const searchInput = document.getElementById('admin-search');
+
+    // Filter Elements
+    const btnFilterSizeAll = document.getElementById('btn-filter-size-all');
+    const btnFilterSize3 = document.getElementById('btn-filter-size-3');
+    const btnFilterSize4 = document.getElementById('btn-filter-size-4');
+    const badgeCountAll = document.getElementById('badge-count-all');
+    const badgeCount3 = document.getElementById('badge-count-3');
+    const badgeCount4 = document.getElementById('badge-count-4');
+    const filterDatePicker = document.getElementById('filter-date-picker');
+    const dateMatchBadge = document.getElementById('date-match-badge');
+    const btnClearDate = document.getElementById('btn-clear-date');
+    const filterPaymentSelect = document.getElementById('filter-payment-status');
+    const filterCountFeedback = document.getElementById('filter-count-feedback');
+    const btnResetFilters = document.getElementById('btn-reset-filters');
+    const kpiSubTeams = document.getElementById('kpi-sub-teams');
 
     const modalEdit = document.getElementById('modal-edit-team');
     const btnCloseEdit = document.getElementById('btn-close-edit');
@@ -224,6 +242,7 @@ function authHeaders(extra = {}) {
 
         renderTable();
         updateKPIs();
+        updateDailyRegistrationsTelemetry();
       } catch (e) {
         console.error('Error loading admin data:', e);
       }
@@ -249,21 +268,234 @@ function authHeaders(extra = {}) {
       document.getElementById('kpi-total-hackers').textContent = totalHackers;
     }
 
-    function renderTable() {
-      const q = searchQuery.toLowerCase();
-      const filtered = allTeams.filter(t => {
-        return !q ||
-          t.teamName.toLowerCase().includes(q) ||
-          t.id.toLowerCase().includes(q) ||
-          (t.college && t.college.toLowerCase().includes(q)) ||
-          (t.leader?.email && t.leader.email.toLowerCase().includes(q)) ||
-          (t.payment?.utr && t.payment.utr.toLowerCase().includes(q));
+    function getTeamDateKey(team) {
+      if (!team || !team.createdAt) return 'Unknown Date';
+      try {
+        const d = new Date(team.createdAt);
+        if (isNaN(d.getTime())) return 'Unknown Date';
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      } catch (e) {
+        return 'Unknown Date';
+      }
+    }
+
+    function formatDateDisplay(dateKey) {
+      if (!dateKey || dateKey === 'all') return 'All Dates';
+      if (dateKey === 'Unknown Date') return 'Unknown Date';
+      try {
+        const parts = dateKey.split('-');
+        if (parts.length !== 3) return dateKey;
+        const [y, m, d] = parts.map(Number);
+        const dateObj = new Date(y, m - 1, d);
+        return dateObj.toLocaleDateString('en-IN', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        });
+      } catch (e) {
+        return dateKey;
+      }
+    }
+
+    function formatRegistrationTimestamp(isoString) {
+      if (!isoString) return '';
+      try {
+        const d = new Date(isoString);
+        if (isNaN(d.getTime())) return '';
+        return d.toLocaleDateString('en-IN', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function setTeamSizeFilter(size) {
+      filterTeamSize = size || 'all';
+      [btnFilterSizeAll, btnFilterSize3, btnFilterSize4].forEach(btn => {
+        if (!btn) return;
+        const btnSize = btn.getAttribute('data-size');
+        btn.classList.toggle('active', btnSize === filterTeamSize);
+      });
+      renderTable();
+    }
+
+    function toggleTeamSizeFilter(size) {
+      if (filterTeamSize === size && size !== 'all') {
+        setTeamSizeFilter('all');
+      } else {
+        setTeamSizeFilter(size);
+      }
+    }
+
+    function setDateFilter(dateVal) {
+      filterDate = dateVal || 'all';
+      if (filterDatePicker) {
+        filterDatePicker.value = (filterDate !== 'all' && filterDate !== 'Unknown Date') ? filterDate : '';
+      }
+      if (filterDate !== 'all') {
+        const count = allTeams.filter(t => getTeamDateKey(t) === filterDate).length;
+        if (dateMatchBadge) {
+          dateMatchBadge.textContent = `${count} squad${count === 1 ? '' : 's'}`;
+          dateMatchBadge.style.display = 'inline-block';
+        }
+        if (btnClearDate) btnClearDate.style.display = 'inline-flex';
+      } else {
+        if (dateMatchBadge) dateMatchBadge.style.display = 'none';
+        if (btnClearDate) btnClearDate.style.display = 'none';
+      }
+      renderTable();
+    }
+
+    function resetAllFilters() {
+      searchQuery = '';
+      if (searchInput) searchInput.value = '';
+      setTeamSizeFilter('all');
+      setDateFilter('all');
+      filterPayment = 'all';
+      if (filterPaymentSelect) filterPaymentSelect.value = 'all';
+      renderTable();
+    }
+    window.__resetAdminFilters = resetAllFilters;
+
+    // Bind Filter Controls
+    if (btnFilterSizeAll) {
+      btnFilterSizeAll.addEventListener('click', () => setTeamSizeFilter('all'));
+    }
+    if (btnFilterSize3) {
+      btnFilterSize3.addEventListener('click', () => toggleTeamSizeFilter('3'));
+    }
+    if (btnFilterSize4) {
+      btnFilterSize4.addEventListener('click', () => toggleTeamSizeFilter('4'));
+    }
+    if (filterDatePicker) {
+      filterDatePicker.addEventListener('change', (e) => {
+        const val = e.target.value;
+        setDateFilter(val ? val : 'all');
+      });
+      filterDatePicker.addEventListener('input', (e) => {
+        const val = e.target.value;
+        if (val) setDateFilter(val);
+      });
+    }
+    if (btnClearDate) {
+      btnClearDate.addEventListener('click', () => setDateFilter('all'));
+    }
+    if (filterPaymentSelect) {
+      filterPaymentSelect.addEventListener('change', (e) => {
+        filterPayment = e.target.value || 'all';
+        renderTable();
+      });
+    }
+    if (btnResetFilters) {
+      btnResetFilters.addEventListener('click', () => resetAllFilters());
+    }
+
+    function updateDailyRegistrationsTelemetry() {
+      updateFilterBadges();
+    }
+
+    function updateFilterBadges() {
+      let count3 = 0;
+      let count4 = 0;
+
+      allTeams.forEach(t => {
+        const size = t.teamSize || 4;
+        if (size === 3) count3++;
+        else if (size === 4) count4++;
       });
 
+      // Update Size Badges
+      if (badgeCountAll) badgeCountAll.textContent = allTeams.length;
+      if (badgeCount3) badgeCount3.textContent = count3;
+      if (badgeCount4) badgeCount4.textContent = count4;
+      if (kpiSubTeams) kpiSubTeams.textContent = `3-Mem: ${count3} • 4-Mem: ${count4}`;
+
+      if (filterDate !== 'all') {
+        const count = allTeams.filter(t => getTeamDateKey(t) === filterDate).length;
+        if (dateMatchBadge) {
+          dateMatchBadge.textContent = `${count} squad${count === 1 ? '' : 's'}`;
+          dateMatchBadge.style.display = 'inline-block';
+        }
+      } else {
+        if (dateMatchBadge) dateMatchBadge.style.display = 'none';
+      }
+    }
+
+    function renderTable() {
+      const q = searchQuery.toLowerCase().trim();
+      const filtered = allTeams.filter(t => {
+        // 1. Search Query
+        if (q) {
+          const teamDate = getTeamDateKey(t).toLowerCase();
+          const teamDateDisplay = formatDateDisplay(teamDate).toLowerCase();
+          const regTimestamp = formatRegistrationTimestamp(t.createdAt).toLowerCase();
+
+          const matchSearch =
+            (t.teamName && t.teamName.toLowerCase().includes(q)) ||
+            (t.id && t.id.toLowerCase().includes(q)) ||
+            (t.college && t.college.toLowerCase().includes(q)) ||
+            (t.leader?.name && t.leader.name.toLowerCase().includes(q)) ||
+            (t.leader?.email && t.leader.email.toLowerCase().includes(q)) ||
+            (t.payment?.utr && t.payment.utr.toLowerCase().includes(q)) ||
+            (t.payment?.phone && t.payment.phone.toLowerCase().includes(q)) ||
+            teamDate.includes(q) ||
+            teamDateDisplay.includes(q) ||
+            regTimestamp.includes(q);
+          if (!matchSearch) return false;
+        }
+
+        // 2. Team Size Filter ("how many members in team 3 or 4")
+        if (filterTeamSize !== 'all') {
+          const size = String(t.teamSize || 4);
+          if (size !== filterTeamSize) return false;
+        }
+
+        // 3. Search By Date Filter
+        if (filterDate !== 'all') {
+          const teamDate = getTeamDateKey(t);
+          if (teamDate !== filterDate) return false;
+        }
+
+        // 4. Payment Status Filter
+        if (filterPayment !== 'all') {
+          const payStatus = t.payment?.status || 'pending';
+          if (payStatus !== filterPayment) return false;
+        }
+
+        return true;
+      });
+
+      // Update Feedback Counter & Reset button visibility
+      const isFiltered = (q !== '') || (filterTeamSize !== 'all') || (filterDate !== 'all') || (filterPayment !== 'all');
+      if (filterCountFeedback) {
+        if (isFiltered) {
+          const dateNotice = filterDate !== 'all' ? ` • ${formatDateDisplay(filterDate)}` : '';
+          const sizeNotice = filterTeamSize !== 'all' ? ` • ${filterTeamSize} Members` : '';
+          filterCountFeedback.innerHTML = `Showing <strong>${filtered.length}</strong> of ${allTeams.length} squads <span style="color:var(--gold); font-size:0.68rem; font-weight:700;">(FILTERED${sizeNotice}${dateNotice})</span>`;
+        } else {
+          filterCountFeedback.innerHTML = `Showing <strong>${filtered.length}</strong> of ${allTeams.length} squads`;
+        }
+      }
+      if (btnResetFilters) {
+        btnResetFilters.style.display = isFiltered ? 'inline-flex' : 'none';
+      }
+
       if (filtered.length === 0) {
-        const emptyMsg = allTeams.length === 0
-          ? 'No squads registered yet. The system is clean and ready for live registrations.'
-          : 'No teams match the search criteria.';
+        let emptyMsg = '';
+        if (allTeams.length === 0) {
+          emptyMsg = 'No squads registered yet. The system is clean and ready for live registrations.';
+        } else {
+          emptyMsg = `No squads match the selected filters. <button type="button" class="btn-clear-date" style="display:inline-flex; margin-left:8px; height:24px; padding:0 8px; font-size:0.68rem;" onclick="window.__resetAdminFilters()">Reset Filters</button>`;
+        }
         tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:45px 20px; color:#888; font-family:'JetBrains Mono', monospace; font-size:0.8rem; letter-spacing:0.04em;">${emptyMsg}</td></tr>`;
         return;
       }
@@ -290,20 +522,27 @@ function authHeaders(extra = {}) {
         if (payStatus === 'verified') statusBadge = `<span class="badge-status badge-verified">VERIFIED</span>`;
         if (payStatus === 'rejected') statusBadge = `<span class="badge-status badge-rejected">REJECTED</span>`;
 
+        const size = t.teamSize || 4;
+        const sizeClass = size === 3 ? 'size-3mem' : 'size-4mem';
+        const regTime = formatRegistrationTimestamp(t.createdAt);
+
         html += `
           <tr>
             <td>
               <strong>${escapeHTML(t.teamName)}</strong>
-              <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:var(--red);">${escapeHTML(t.id)}</div>
-              <div style="font-size:0.7rem; color:var(--text-muted);">${escapeHTML(t.college)}</div>
+              <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:var(--red); font-weight:600;">${escapeHTML(t.id)}</div>
+              <div style="font-size:0.7rem; color:var(--text-muted);">${escapeHTML(t.college || '')}</div>
+              ${regTime ? `<div style="font-family:'JetBrains Mono'; font-size:0.67rem; color:#777; margin-top:3px;"><span style="color:#555;">Registered:</span> ${escapeHTML(regTime)}</div>` : ''}
             </td>
             <td>
               <span class="portal-badge font-mono">${escapeHTML((t.preferredDomain || 'MIND').toUpperCase())}</span>
-              <div style="font-size:0.68rem; color:#888;">${escapeHTML(t.teamSize || 4)} Members</div>
+              <div style="margin-top:4px;">
+                <span class="badge-size-pill ${sizeClass}">${size} MEMBERS</span>
+              </div>
             </td>
             <td>
               ${statusBadge}
-              <div style="font-size:0.7rem; color:#aaa; margin-top:2px;">₹${pay.amount || (t.teamSize || 4) * 349}</div>
+              <div style="font-size:0.7rem; color:#aaa; margin-top:2px;">₹${pay.amount || (size * 349)}</div>
             </td>
             <td>
               <div class="font-mono" style="font-size:0.72rem;">${escapeHTML(pay.utr || 'N/A')}</div>
@@ -362,6 +601,7 @@ function authHeaders(extra = {}) {
               if (idx >= 0) allTeams[idx] = data.team;
               renderTable();
               updateKPIs();
+              updateDailyRegistrationsTelemetry();
             } else {
               alert('Failed to update status: ' + (data.error || 'Unknown error'));
               renderTable();
@@ -394,6 +634,7 @@ function authHeaders(extra = {}) {
                 allTeams = allTeams.filter(t => t.id !== tId);
                 renderTable();
                 updateKPIs();
+                updateDailyRegistrationsTelemetry();
               }
             } catch (err) {
               alert('Error deleting squad: ' + err.message);
@@ -528,6 +769,7 @@ function authHeaders(extra = {}) {
           modalEdit.classList.remove('is-open');
           renderTable();
           updateKPIs();
+          updateDailyRegistrationsTelemetry();
         }
       } catch (err) {
         alert('Error updating team: ' + err.message);
