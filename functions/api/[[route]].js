@@ -340,7 +340,7 @@ function makeJsonResponse(data, status = 200, extraHeaders = {}, request = null,
     status,
     headers: {
       'Content-Type': 'application/json',
-      'X-RateLimit-Limit': '120',
+      'X-RateLimit-Limit': '600',
       ...corsHeaders,
       ...extraHeaders,
     },
@@ -988,21 +988,325 @@ function getClientIp(request) {
 
 const apiRateLimiter = new MemoryRateLimiter({
   windowMs: 60 * 1000,
-  maxRequests: 120,
+  maxRequests: 600,
   message: 'API rate limit exceeded. Please slow down.'
 });
 
 const authRateLimiter = new MemoryRateLimiter({
-  windowMs: 15 * 60 * 1000,
-  maxRequests: 5,
-  message: 'Too many failed login attempts. Access temporarily locked. Please wait 15 minutes before trying again.'
+  windowMs: 5 * 60 * 1000,
+  maxRequests: 30,
+  message: 'Too many failed login attempts. Access temporarily locked. Please wait 5 minutes before trying again.'
 });
 
 const regRateLimiter = new MemoryRateLimiter({
   windowMs: 15 * 60 * 1000,
-  maxRequests: 5,
-  message: 'Registration rate limit reached. Please wait 15 minutes before submitting another registration.'
+  maxRequests: 50,
+  message: 'Registration rate limit reached. Please wait a few minutes before submitting another registration.'
 });
+
+export function escapeEmailHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinity.akao.in', env = {} }) {
+  const leader = team.leader || {};
+  const leaderEmail = (leader.email || '').trim().toLowerCase();
+  if (!leaderEmail || !leaderEmail.includes('@')) {
+    throw new Error(`Squad ${team.id} (${team.teamName}) has no valid leader email address.`);
+  }
+
+  const teamMembers = Array.isArray(team.members) ? team.members : [];
+  const memberEmails = teamMembers
+    .map(m => (m.email || '').trim().toLowerCase())
+    .filter(e => e && e.includes('@') && e !== leaderEmail);
+
+  const teamId = escapeEmailHtml(team.id);
+  const teamName = escapeEmailHtml(team.teamName);
+  const college = escapeEmailHtml(team.college || 'N/A');
+  const domain = escapeEmailHtml((team.preferredDomain || 'intelligence').toUpperCase());
+  const room = escapeEmailHtml(team.roomAllocated || 'Lab Block 3 (CS-301)');
+  const utr = escapeEmailHtml(team.payment?.utr || 'VERIFIED');
+  const amount = escapeEmailHtml(team.payment?.amount || (team.teamSize || 4) * 349);
+  const size = escapeEmailHtml(team.teamSize || (teamMembers.length + 1));
+
+  let rosterRows = `
+    <tr>
+      <td style="padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.05); width:80px;">
+        <span style="display:inline-block; padding:2px 7px; border-radius:4px; background:rgba(0,255,136,0.08); border:1px solid rgba(0,255,136,0.25); color:#00ff88; font-size:10px; font-weight:600; font-family:monospace;">CAPTAIN</span>
+      </td>
+      <td style="padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.05); color:#ffffff; font-weight:500; font-size:13px;">
+        ${escapeEmailHtml(leader.name || 'Captain')}
+      </td>
+      <td style="padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.05); color:#71717a; font-size:12px; font-family:monospace;">
+        ${escapeEmailHtml(leader.email || '')}
+      </td>
+    </tr>
+  `;
+
+  teamMembers.forEach((m, idx) => {
+    const isLast = idx === teamMembers.length - 1;
+    const borderStyle = isLast ? '' : 'border-bottom:1px solid rgba(255,255,255,0.05);';
+    rosterRows += `
+      <tr>
+        <td style="padding:10px 14px; ${borderStyle} width:80px;">
+          <span style="display:inline-block; padding:2px 7px; border-radius:4px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); color:#a1a1aa; font-size:10px; font-weight:600; font-family:monospace;">MEMBER</span>
+        </td>
+        <td style="padding:10px 14px; ${borderStyle} color:#e4e4e7; font-weight:500; font-size:13px;">
+          ${escapeEmailHtml(m.name || 'Squad Member')}
+        </td>
+        <td style="padding:10px 14px; ${borderStyle} color:#71717a; font-size:12px; font-family:monospace;">
+          ${escapeEmailHtml(m.email || '')}
+        </td>
+      </tr>
+    `;
+  });
+
+  const subject = `⚡ Pass — Infinity Hackathon 2026 | Squad ${team.teamName} [${team.id}]`;
+  const cleanAppUrl = (appUrl || 'https://infinity.akao.in').replace(/\/$/, '');
+
+  const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="margin:0; padding:0; background-color:#08090d; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#ffffff; -webkit-font-smoothing:antialiased;">
+  <!-- Outer Wrapper Table -->
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#08090d; min-height:100vh; padding:32px 12px;">
+    <tr>
+      <td align="center">
+        <!-- Main Minimal Container -->
+        <table role="presentation" width="100%" style="max-width:560px; background-color:#111219; border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden; box-shadow:0 12px 36px rgba(0,0,0,0.5); margin:0 auto;" cellspacing="0" cellpadding="0" border="0">
+          
+          <!-- Subtle Top Accent Line -->
+          <tr>
+            <td style="height:2px; background:linear-gradient(90deg, #ffd000 0%, #00d2ff 50%, #00ff88 100%); line-height:2px; font-size:1px;">&nbsp;</td>
+          </tr>
+
+          <!-- Header Section -->
+          <tr>
+            <td style="padding:28px 24px 20px 24px; text-align:center; border-bottom:1px solid rgba(255,255,255,0.06);">
+              <div style="font-size:10px; font-weight:700; letter-spacing:0.2em; color:#7d8294; text-transform:uppercase; margin-bottom:6px;">DEPARTMENT OF CSE &bull; CHENNAI</div>
+              <div style="font-size:18px; font-weight:800; letter-spacing:0.06em; color:#ffffff; text-transform:uppercase; margin-bottom:14px;">INFINITY HACKATHON 2026</div>
+              
+              <!-- Minimalist Pass Badge -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto 12px auto;">
+                <tr>
+                  <td style="padding:4px 14px; border-radius:9999px; background:rgba(0,255,136,0.06); border:1px solid rgba(0,255,136,0.25); color:#00ff88; font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,sans-serif;">
+                    ✓ PASS &bull; VERIFIED
+                  </td>
+                </tr>
+              </table>
+
+              <h1 style="margin:0 0 6px 0; font-size:22px; font-weight:700; color:#ffffff; letter-spacing:-0.01em;">Squad ${teamName}</h1>
+              <p style="margin:0 auto; font-size:13px; color:#8e94a8; line-height:1.6; max-width:440px;">
+                Registration payment is verified. Your official squad pass is ready for hackathon check-in.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Ticket Pass Section -->
+          <tr>
+            <td style="padding:20px 24px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#14151e; border:1px solid rgba(255,255,255,0.07); border-radius:10px; overflow:hidden;">
+                
+                <!-- Ticket Header -->
+                <tr>
+                  <td style="padding:14px 18px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td align="left">
+                          <span style="font-size:10px; font-weight:600; color:#6b7280; letter-spacing:0.12em; text-transform:uppercase;">PASS ID</span>
+                          <div style="font-size:18px; font-weight:800; color:#ffd000; font-family:monospace; margin-top:2px;">${teamId}</div>
+                        </td>
+                        <td align="right">
+                          <span style="display:inline-block; padding:4px 10px; border-radius:4px; background:rgba(0,210,255,0.08); border:1px solid rgba(0,210,255,0.2); color:#00d2ff; font-size:11px; font-weight:600; font-family:monospace;">${size} MEMBERS</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Specs -->
+                <tr>
+                  <td style="padding:12px 18px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="6" border="0" style="font-size:12px;">
+                      <tr>
+                        <td style="color:#6b7280; font-weight:500; width:34%;">Institution</td>
+                        <td style="color:#ffffff; font-weight:500;">${college}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#6b7280; font-weight:500;">Track</td>
+                        <td style="color:#00d2ff; font-weight:600;">${domain}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#6b7280; font-weight:500;">Venue</td>
+                        <td style="color:#ffffff; font-weight:500;">${room}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#6b7280; font-weight:500;">Bank UTR</td>
+                        <td style="color:#a1a1aa; font-family:monospace;">${utr}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#6b7280; font-weight:500;">Verified Fee</td>
+                        <td style="color:#00ff88; font-weight:600;">₹${amount}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Roster Section -->
+          <tr>
+            <td style="padding:0 24px 20px 24px;">
+              <div style="font-size:11px; font-weight:600; letter-spacing:0.1em; color:#7d8294; text-transform:uppercase; margin-bottom:8px;">
+                Squad Members
+              </div>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#14151e; border:1px solid rgba(255,255,255,0.07); border-radius:10px; overflow:hidden;">
+                ${rosterRows}
+              </table>
+            </td>
+          </tr>
+
+          <!-- Check-In Guidelines Note -->
+          <tr>
+            <td style="padding:0 24px 22px 24px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#14151e; border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:14px 16px;">
+                <tr>
+                  <td>
+                    <div style="font-size:11px; font-weight:600; color:#cbd5e1; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:6px;">
+                      Check-in Guidelines
+                    </div>
+                    <ul style="margin:0; padding-left:16px; color:#8e94a8; font-size:12px; line-height:1.6;">
+                      <li>Reporting time: <strong style="color:#ffffff;">08:30 AM</strong> at the Main Campus Innovation Arena.</li>
+                      <li>Bring original college ID cards, personal laptops, and chargers.</li>
+                      <li>Problem statements will unlock on your Leader Portal on hackathon morning.</li>
+                    </ul>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Portal CTA Button -->
+          <tr>
+            <td style="padding:0 24px 28px 24px; text-align:center;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto;">
+                <tr>
+                  <td align="center" style="border-radius:6px; background:#ffd000;">
+                    <a href="${cleanAppUrl}/leader" target="_blank" rel="noopener noreferrer" style="display:inline-block; padding:12px 28px; font-size:12px; font-weight:700; color:#0a0a0f; text-decoration:none; text-transform:uppercase; letter-spacing:0.06em;">
+                      Access Squad Portal &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <div style="margin-top:10px; font-size:11px; color:#6b7280;">
+                Pass ID: <strong style="color:#ffd000; font-family:monospace;">${teamId}</strong> &bull; Log in with your squad password.
+              </div>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#0d0e14; padding:20px 24px; text-align:center; border-top:1px solid rgba(255,255,255,0.06); font-size:11px; color:#52525b; line-height:1.6;">
+              <p style="margin:0 0 4px 0; color:#71717a; font-weight:500;">Infinity Hackathon 2026 &bull; Department of Computer Science &amp; Engineering</p>
+              <p style="margin:0;">Need assistance? Contact <a href="mailto:support@infinity.akao.in" style="color:#8e94a8; text-decoration:underline;">support@infinity.akao.in</a></p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  const resendApiKey = env.RESEND_API_KEY;
+  const brevoApiKey = env.BREVO_API_KEY;
+  const emailFrom = env.EMAIL_FROM || 'Infinity Hackathon 2026 <hackathon@infinity.akao.in>';
+
+  // 1. Resend API
+  if (resendApiKey && resendApiKey.trim()) {
+    const payload = {
+      from: emailFrom,
+      to: [leaderEmail],
+      reply_to: 'support@infinity.akao.in',
+      subject,
+      html: htmlContent,
+    };
+    if (memberEmails.length > 0) {
+      payload.cc = memberEmails;
+    }
+
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendApiKey.trim()}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const resData = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      let errMsg = resData.message || resData.error || `HTTP ${res.status}`;
+      if (errMsg.includes('only send testing emails to your own email address')) {
+        errMsg = `Resend Free Sandbox restriction: To send confirmation emails to all student addresses, please verify your domain at resend.com/domains. (For testing now, you can send to your registered email: white018899@gmail.com).`;
+      }
+      throw new Error(`Resend email dispatch: ${errMsg}`);
+    }
+    return { success: true, provider: 'resend', id: resData.id };
+  }
+
+  // 2. Brevo API
+  if (brevoApiKey && brevoApiKey.trim()) {
+    const senderParts = emailFrom.match(/^(.*)<(.*)>$/) || [null, 'Infinity Hackathon 2026', emailFrom];
+    const senderName = (senderParts[1] || 'Infinity Hackathon 2026').trim();
+    const senderEmail = (senderParts[2] || emailFrom).trim();
+
+    const payload = {
+      sender: { name: senderName, email: senderEmail },
+      to: [{ email: leaderEmail, name: leader.name || 'Captain' }],
+      subject,
+      htmlContent
+    };
+    if (memberEmails.length > 0) {
+      payload.cc = memberEmails.map(email => ({ email }));
+    }
+
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'api-key': brevoApiKey.trim(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const resData = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const errMsg = resData.message || `HTTP ${res.status}`;
+      throw new Error(`Brevo email dispatch error: ${errMsg}`);
+    }
+    return { success: true, provider: 'brevo', id: resData.messageId };
+  }
+
+  // 3. Simulated Dev Mode
+  console.log(`[EMAIL SIMULATION] Verification Email Dispatched to ${leaderEmail} for Squad ${team.id} (${team.teamName})`);
+  return {
+    success: true,
+    simulated: true,
+    message: 'Simulated email logged. Configure RESEND_API_KEY for live delivery (3,000 free/mo).'
+  };
+}
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -1036,7 +1340,7 @@ export async function onRequest(context) {
 
   const clientIp = getClientIp(request);
 
-  // Global API Rate Limiting (120 req / min)
+  // Global API Rate Limiting (600 req / min)
   const globalCheck = apiRateLimiter.isLimited(`${clientIp}:api`);
   if (globalCheck.limited) {
     return jsonResponse({
@@ -1045,7 +1349,7 @@ export async function onRequest(context) {
       retryAfter: globalCheck.retryAfter
     }, 429, {
       'Retry-After': String(globalCheck.retryAfter),
-      'X-RateLimit-Limit': '120',
+      'X-RateLimit-Limit': '600',
       'X-RateLimit-Remaining': '0'
     });
   }
@@ -1462,9 +1766,13 @@ export async function onRequest(context) {
         team: {
           id: result.newTeam.id,
           teamName: result.newTeam.teamName,
+          college: result.newTeam.college,
           preferredDomain: result.newTeam.preferredDomain,
+          leader: result.newTeam.leader,
+          members: result.newTeam.members,
           leaderEmail: result.newTeam.leader.email,
           amount: result.calculatedAmount,
+          utr: result.newTeam.payment.utr,
         },
       });
     }
@@ -2260,6 +2568,101 @@ export async function onRequest(context) {
     }
 
     // -------------------------------------------------------------
+    // Admin Send Payment Verification Email to Single Squad
+    // -------------------------------------------------------------
+    if (pathname === '/api/admin/send-verification-mail' && method === 'POST') {
+      const { teamId } = await request.json().catch(() => ({}));
+      if (!teamId) {
+        return jsonResponse({ success: false, error: 'teamId is required' }, 400);
+      }
+
+      let mailResult = null;
+      const { result } = await updateDb(env, async (db) => {
+        const idx = db.teams.findIndex((t) => t.id === teamId);
+        if (idx === -1) {
+          const err = new Error(`Squad ${teamId} not found.`);
+          err.statusCode = 404;
+          throw err;
+        }
+
+        const team = db.teams[idx];
+        const appUrl = env.APP_URL || new URL(request.url).origin;
+
+        mailResult = await sendPaymentVerifiedEmail({ team, appUrl, env });
+
+        const now = new Date().toISOString();
+        db.teams[idx] = {
+          ...team,
+          payment: {
+            ...team.payment,
+            status: 'verified',
+            verifiedAt: team.payment?.verifiedAt || now,
+            mailSent: true,
+            mailSentAt: now,
+          },
+        };
+
+        const copy = { ...db.teams[idx] };
+        delete copy.teamPassword;
+        copy.hasPassword = Boolean(db.teams[idx].teamPassword);
+        return { team: copy };
+      });
+
+      return jsonResponse({
+        success: true,
+        message: mailResult?.simulated
+          ? 'Verification email simulated (configure RESEND_API_KEY for live delivery).'
+          : 'Payment verified email sent successfully!',
+        simulated: Boolean(mailResult?.simulated),
+        mailSentAt: result.team.payment?.mailSentAt,
+        team: result.team,
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Admin Send Payment Verification Emails to All Verified Squads
+    // -------------------------------------------------------------
+    if (pathname === '/api/admin/send-all-verification-mails' && method === 'POST') {
+      const { force } = await request.json().catch(() => ({}));
+      let sentCount = 0;
+      let failCount = 0;
+      let isSimulated = false;
+
+      await updateDb(env, async (db) => {
+        const appUrl = env.APP_URL || new URL(request.url).origin;
+        const verifiedTeams = db.teams.filter((t) => {
+          if (t.payment?.status !== 'verified') return false;
+          if (!force && t.payment?.mailSent) return false;
+          return true;
+        });
+
+        for (const t of verifiedTeams) {
+          try {
+            const mRes = await sendPaymentVerifiedEmail({ team: t, appUrl, env });
+            if (mRes.simulated) isSimulated = true;
+            const now = new Date().toISOString();
+            t.payment.mailSent = true;
+            t.payment.mailSentAt = now;
+            sentCount++;
+          } catch (mErr) {
+            console.error(`Failed to send mail to ${t.id}:`, mErr.message);
+            failCount++;
+          }
+        }
+
+        return { total: verifiedTeams.length, sentCount, failCount };
+      });
+
+      return jsonResponse({
+        success: true,
+        message: `Processed ${sentCount} squad emails (${failCount} failed).`,
+        sentCount,
+        failCount,
+        simulated: isSimulated,
+      });
+    }
+
+    // -------------------------------------------------------------
     // Admin Ephemeral Export Ticket Generator (Single-use, 60s ttl)
     // -------------------------------------------------------------
     if (pathname === '/api/admin/export-ticket' && method === 'POST') {
@@ -2288,6 +2691,8 @@ export async function onRequest(context) {
         'Team Size': t.teamSize || (t.members ? t.members.length + 1 : 4),
         'Fee Amount (₹)': t.payment?.amount || (349 * (t.teamSize || 4)),
         'Payment Status': sanitizeCsvFormula((t.payment?.status || 'pending').toUpperCase()),
+        'Confirmation Mail Sent': t.payment?.mailSent ? 'YES' : 'NO',
+        'Mail Sent At': t.payment?.mailSentAt ? new Date(t.payment.mailSentAt).toLocaleString() : 'N/A',
         'UTR / Transaction No': sanitizeCsvFormula(t.payment?.utr || 'N/A'),
         'Payer Phone': sanitizeCsvFormula(t.payment?.phone || 'N/A'),
         'Leader Email': sanitizeCsvFormula(t.leader?.email || ''),

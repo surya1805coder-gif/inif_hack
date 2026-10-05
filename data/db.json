@@ -46,7 +46,7 @@
           ]
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab"
+      "roomAllocated": "Lab Block 3 (CS-301)"
     },
     {
       "id": "connectivity",
@@ -83,7 +83,7 @@
           ]
         }
       ],
-      "roomAllocated": "Lab Block 2 - IoT Lab 204"
+      "roomAllocated": "Lab Block 2 (IoT-204)"
     },
     {
       "id": "digital",
@@ -120,7 +120,7 @@
           ]
         }
       ],
-      "roomAllocated": "Lab Block 1 - WebXR Studio 102"
+      "roomAllocated": "Lab Block 1 (AI-102)"
     },
     {
       "id": "automation",
@@ -157,7 +157,7 @@
           ]
         }
       ],
-      "roomAllocated": "Mech Block - Robotics 01"
+      "roomAllocated": "Mechanical Block (Robo-01)"
     },
     {
       "id": "analytics",
@@ -194,7 +194,7 @@
           ]
         }
       ],
-      "roomAllocated": "CS Block - Big Data 401"
+      "roomAllocated": "CS Block (DataLab-401)"
     },
     {
       "id": "impact",
@@ -231,7 +231,7 @@
           ]
         }
       ],
-      "roomAllocated": "Main Auditorium / Hall 2"
+      "roomAllocated": "Seminar Hall 2"
     }
   ],
   "teams": [
@@ -271,7 +271,7 @@
           "phone": "+91 97890 11226"
         }
       ],
-      "roomAllocated": "Lab Block 1 - WebXR Studio 102",
+      "roomAllocated": "Lab Block 1 (AI-102)",
       "selectedProblemStatement": {
         "id": "ps-dig-01",
         "code": "PS-DIG-01",
@@ -285,7 +285,10 @@
         "screenshotUrl": "/placeholder-receipt.png",
         "submittedAt": "2026-09-29T19:30:00.000Z",
         "amount": 1560,
-        "status": "verified"
+        "status": "verified",
+        "verifiedAt": "2026-10-05T14:16:51.421Z",
+        "mailSent": true,
+        "mailSentAt": "2026-10-05T14:16:51.421Z"
       },
       "reviews": {
         "r1": {
@@ -368,7 +371,7 @@
           "phone": "+91 99441 55669"
         }
       ],
-      "roomAllocated": "Main Auditorium / Hall 2",
+      "roomAllocated": "Seminar Hall 2",
       "selectedProblemStatement": {
         "id": "ps-imp-01",
         "code": "PS-IMP-01",
@@ -382,7 +385,9 @@
         "screenshotUrl": "/placeholder-receipt.png",
         "submittedAt": "2026-09-29T20:15:00.000Z",
         "amount": 1170,
-        "status": "verified"
+        "status": "verified",
+        "mailSent": true,
+        "mailSentAt": "2026-10-05T14:17:53.304Z"
       },
       "reviews": {
         "r1": {
@@ -460,7 +465,7 @@
           "phone": "09985252395"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "424102044729",
@@ -468,7 +473,9 @@
         "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1790825333200-o3ua6y.jpeg",
         "submittedAt": "2026-10-01T03:28:53.829Z",
         "amount": 1047,
-        "status": "verified"
+        "status": "verified",
+        "mailSent": true,
+        "mailSentAt": "2026-10-05T14:17:53.305Z"
       },
       "reviews": {
         "r1": {
@@ -545,7 +552,7 @@
           "phone": "9265018057"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": {
         "id": "ps-intel-01",
         "code": "PS-INTEL-01",
@@ -636,7 +643,7 @@
           "phone": "9253933857"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": {
         "id": "ps-intel-01",
         "code": "PS-INTEL-01",
@@ -727,7 +734,7 @@
           "phone": "9264691992"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "UTR17908372054571",
@@ -812,7 +819,7 @@
           "phone": "9284673342"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "UTR17908372065002",
@@ -897,7 +904,7 @@
           "phone": "9224325794"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "UTR17908372078183",
@@ -982,7 +989,7 @@
           "phone": "9261812759"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "UTR17908372090314",
@@ -1067,7 +1074,7 @@
           "phone": "2345665432"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "912498993636",
@@ -1152,7 +1159,7 @@
           "phone": "1234432234"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "385017766706",
@@ -1237,7 +1244,7 @@
           "phone": "1236549873"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "315975523799",
@@ -1322,7 +1329,7 @@
           "phone": "9398548045"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "081594841782",
@@ -1396,7 +1403,7 @@
           "phone": "9441913964"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "792210874930",
@@ -1481,7 +1488,7 @@
           "phone": "1223688759"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "5123348992",
@@ -1489,7 +1496,9 @@
         "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791192160765-t0fu4l.jpg",
         "submittedAt": "2026-10-05T09:22:41.073Z",
         "amount": 1047,
-        "status": "verified"
+        "status": "verified",
+        "mailSent": true,
+        "mailSentAt": "2026-10-05T14:17:53.305Z"
       },
       "reviews": {
         "r1": {
@@ -1566,7 +1575,7 @@
           "phone": "1928353822"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "627868468471",
@@ -1651,7 +1660,7 @@
           "phone": "9701552324"
         }
       ],
-      "roomAllocated": "Mech Block - Robotics 01",
+      "roomAllocated": "Mechanical Block (Robo-01)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "416505991235",
@@ -1736,7 +1745,7 @@
           "phone": "9959226954"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "517440337338",
@@ -1744,7 +1753,9 @@
         "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791192304201-kxc19i.jpg",
         "submittedAt": "2026-10-05T09:25:04.453Z",
         "amount": 1047,
-        "status": "verified"
+        "status": "verified",
+        "mailSent": true,
+        "mailSentAt": "2026-10-05T14:17:53.305Z"
       },
       "reviews": {
         "r1": {
@@ -1821,7 +1832,7 @@
           "phone": "9391137726"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "573034810447",
@@ -1829,7 +1840,9 @@
         "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791192320966-yrl00c.jpg",
         "submittedAt": "2026-10-05T09:25:21.489Z",
         "amount": 1047,
-        "status": "verified"
+        "status": "verified",
+        "mailSent": true,
+        "mailSentAt": "2026-10-05T14:17:53.305Z"
       },
       "reviews": {
         "r1": {
@@ -1906,7 +1919,7 @@
           "phone": "9998765432"
         }
       ],
-      "roomAllocated": "Main Auditorium / Hall 2",
+      "roomAllocated": "Seminar Hall 2",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "368308744269",
@@ -1991,7 +2004,7 @@
           "phone": "9865321478"
         }
       ],
-      "roomAllocated": "Lab Block 1 - WebXR Studio 102",
+      "roomAllocated": "Lab Block 1 (AI-102)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "664703374493",
@@ -2076,7 +2089,7 @@
           "phone": "9985252393"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "615261604561",
@@ -2161,7 +2174,7 @@
           "phone": "9236468677"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "098765432112",
@@ -2246,7 +2259,7 @@
           "phone": "9842461912"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "512738268912",
@@ -2254,7 +2267,10 @@
         "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791194220982-6cqezo.jpg",
         "submittedAt": "2026-10-05T09:57:02.172Z",
         "amount": 1047,
-        "status": "pending"
+        "status": "verified",
+        "verifiedAt": "2026-10-05T14:21:10.926Z",
+        "mailSent": true,
+        "mailSentAt": "2026-10-05T14:21:10.926Z"
       },
       "reviews": {
         "r1": {
@@ -2331,7 +2347,7 @@
           "phone": "7398548046"
         }
       ],
-      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "roomAllocated": "Lab Block 3 (CS-301)",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "081456765436",
@@ -2339,7 +2355,9 @@
         "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791194776961-omcy07.jpg",
         "submittedAt": "2026-10-05T10:06:17.656Z",
         "amount": 1047,
-        "status": "verified"
+        "status": "verified",
+        "mailSent": true,
+        "mailSentAt": "2026-10-05T14:17:53.305Z"
       },
       "reviews": {
         "r1": {
@@ -2405,7 +2423,7 @@
           "phone": "1234567894"
         }
       ],
-      "roomAllocated": "Main Auditorium / Hall 2",
+      "roomAllocated": "Seminar Hall 2",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "368376789012",
@@ -2464,8 +2482,178 @@
       },
       "createdAt": "2026-10-05T10:47:35.593Z",
       "status": "confirmed"
+    },
+    {
+      "id": "INF-8792",
+      "teamName": "s",
+      "college": "sdas",
+      "preferredDomain": "mind",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:ad4d4f9f1b178d68caea32a563c78014:753b2667421d1fbc6f527abe59eee1bde093eb972ec1c670a653157d91e23414",
+      "leader": {
+        "name": "as",
+        "email": "aarav.sharma@iitm.ac.ini",
+        "phone": "9876543219"
+      },
+      "members": [
+        {
+          "name": "as",
+          "email": "aarav.sharma@iitm.ac.ini1",
+          "phone": "9876543212"
+        },
+        {
+          "name": "as",
+          "email": "aarav.sharma@iitm.ac.ini2",
+          "phone": "9876543215"
+        }
+      ],
+      "roomAllocated": "Lab Block 3 (CS-301)",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "12345679012",
+        "phone": "9876543219",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791208562576-mldxxi.jpeg",
+        "submittedAt": "2026-10-05T13:56:03.579Z",
+        "amount": 1047,
+        "status": "pending"
+      },
+      "reviews": {
+        "r1": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r2": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r3": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false,
+          "time": null
+        },
+        "dinner": {
+          "collected": false,
+          "time": null
+        },
+        "midnightFuel": {
+          "collected": false,
+          "time": null
+        },
+        "breakfast": {
+          "collected": false,
+          "time": null
+        },
+        "lunch": {
+          "collected": false,
+          "time": null
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-05T13:56:03.579Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "INF-3148",
+      "teamName": "s",
+      "college": "sdas",
+      "preferredDomain": "mind",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:758769b41931c87c8b66624f01ea34b2:97b4fde5ef437f4ec800c0e25bb9b7f0dcccefc70c4d1c0745c27671eeabd920",
+      "leader": {
+        "name": "as",
+        "email": "aarav.sharma@iitm.ac.ine",
+        "phone": "9876543232"
+      },
+      "members": [
+        {
+          "name": "as",
+          "email": "aarav.sharma@iitm.ac.ni1",
+          "phone": "9876543218"
+        },
+        {
+          "name": "as",
+          "email": "aarav.sharma@iitm.ac.ni2",
+          "phone": "9876543234"
+        }
+      ],
+      "roomAllocated": "Lab Block 3 (CS-301)",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "123456780987",
+        "phone": "9876543232",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791208905216-ch16n7.jpeg",
+        "submittedAt": "2026-10-05T14:01:45.603Z",
+        "amount": 1047,
+        "status": "pending"
+      },
+      "reviews": {
+        "r1": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r2": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r3": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false,
+          "time": null
+        },
+        "dinner": {
+          "collected": false,
+          "time": null
+        },
+        "midnightFuel": {
+          "collected": false,
+          "time": null
+        },
+        "breakfast": {
+          "collected": false,
+          "time": null
+        },
+        "lunch": {
+          "collected": false,
+          "time": null
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-05T14:01:45.603Z",
+      "status": "confirmed"
     }
   ],
-  "_version": 64,
-  "_lastModified": "2026-10-05T11:12:41.529Z"
+  "_version": 71,
+  "_lastModified": "2026-10-05T14:21:10.926Z"
 }

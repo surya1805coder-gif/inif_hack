@@ -328,14 +328,10 @@
                 (Autonomous)</span>
             </div>
             <div class="host-strip-accreditations">
-              <span class="accred-item" style="color: #ffd000; font-weight: 700;">Departments of CSE &amp;
-                CSE-AIML</span>
-              <span class="accred-sep">•</span>
-              <span class="accred-item">Affiliated to Andhra University</span>
-              <span class="accred-sep">•</span>
-              <span class="accred-item">Accredited by NAAC with 'A' Grade</span>
-              <span class="accred-sep">•</span>
-              <span class="accred-item">NBA Accredited B.Tech (CE, CSE, ECE, ME) &amp; MBA</span>
+              <div class="accred-item accred-highlight">Departments of CSE &amp; CSE-AIML</div>
+              <div class="accred-item">Affiliated to Andhra University</div>
+              <div class="accred-item">Accredited by NAAC with 'A' Grade</div>
+              <div class="accred-item">NBA Accredited B.Tech (CE, CSE, ECE, ME) &amp; MBA</div>
             </div>
           </div>
         </div>
@@ -1074,6 +1070,113 @@
   </div>
 
   <!-- =========================================================================
+       REGISTRATION REVIEW & CONFIRMATION MODAL
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modal-confirm" aria-hidden="true" style="z-index: 1050;">
+    <div class="modal-dialog modal-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+      <button class="modal-close-btn" id="btn-close-confirm" aria-label="Close Confirmation">✕</button>
+
+      <div class="modal-header" style="text-align: center; margin-bottom: 16px;">
+        <div class="success-icon-wrap" style="background: rgba(255, 208, 0, 0.12); border-color: #ffd000; color: #ffd000; box-shadow: 0 0 25px rgba(255, 208, 0, 0.3); width: 48px; height: 48px; font-size: 1.4rem; margin: 0 auto 10px auto;">✦</div>
+        <h2 class="modal-title" id="confirm-modal-title" style="color: #ffffff; font-size: 1.35rem; letter-spacing: 0.04em;">REVIEW SQUAD REGISTRATION</h2>
+        <p class="modal-sub" style="font-size: 0.8rem; margin-top: 4px;">Verify your squad roster, domain selection, and transaction details before committing.</p>
+      </div>
+
+      <div class="confirm-details-scroll">
+        <!-- 1. Squad & Domain Card -->
+        <div class="confirm-section-card">
+          <div class="confirm-section-header">
+            <span class="step-num">01</span>
+            <span class="confirm-section-title">Squad &amp; Domain Overview</span>
+          </div>
+          <div class="confirm-grid-2">
+            <div class="confirm-field">
+              <span class="confirm-label">Team Name</span>
+              <span class="confirm-value font-mono" id="conf-team-name" style="color: #ffd000; font-weight: 700;">-</span>
+            </div>
+            <div class="confirm-field">
+              <span class="confirm-label">College / Institution</span>
+              <span class="confirm-value" id="conf-college">-</span>
+            </div>
+            <div class="confirm-field">
+              <span class="confirm-label">Selected Domain</span>
+              <span class="confirm-value" id="conf-domain" style="color: #00d2ff; font-weight: 700;">-</span>
+            </div>
+            <div class="confirm-field">
+              <span class="confirm-label">Squad Size</span>
+              <span class="confirm-value font-mono" id="conf-team-size">-</span>
+            </div>
+            <div class="confirm-field" style="grid-column: 1 / -1;" id="conf-tech-stack-row">
+              <span class="confirm-label">Tech Stack</span>
+              <span class="confirm-value" id="conf-tech-stack" style="font-size: 0.8rem; color: #d4d4d8;">Not specified</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Squad Members Roster -->
+        <div class="confirm-section-card">
+          <div class="confirm-section-header">
+            <span class="step-num">02</span>
+            <span class="confirm-section-title">Verified Member Roster</span>
+          </div>
+          <div class="confirm-roster-list" id="conf-roster-list">
+            <!-- Dynamically populated roster rows -->
+          </div>
+        </div>
+
+        <!-- 3. Payment & Credentials Card -->
+        <div class="confirm-section-card">
+          <div class="confirm-section-header">
+            <span class="step-num">03</span>
+            <span class="confirm-section-title">Payment &amp; Leader Credentials</span>
+          </div>
+          <div class="confirm-grid-2">
+            <div class="confirm-field">
+              <span class="confirm-label">Registration Fee</span>
+              <span class="confirm-value font-mono" id="conf-amount" style="color: #ffd000; font-size: 1.05rem; font-weight: 800;">-</span>
+            </div>
+            <div class="confirm-field">
+              <span class="confirm-label">Bank UTR / Ref No.</span>
+              <span class="confirm-value font-mono" id="conf-utr" style="color: #00ff88; font-weight: 700;">-</span>
+            </div>
+            <div class="confirm-field">
+              <span class="confirm-label">Payer Mobile</span>
+              <span class="confirm-value font-mono" id="conf-pay-phone">-</span>
+            </div>
+            <div class="confirm-field">
+              <span class="confirm-label">Leader Portal Password</span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="confirm-value font-mono" id="conf-password" style="letter-spacing: 0.12em;">••••••••</span>
+                <button type="button" id="btn-toggle-conf-pw" class="btn-pw-eye" style="background: none; border: none; color: #ffd000; cursor: pointer; font-size: 0.7rem; font-family: var(--font-mono); padding: 0 4px; text-decoration: underline;" title="Toggle Password Visibility">VIEW</button>
+              </div>
+            </div>
+            <div class="confirm-field" style="grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; margin-top: 4px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06);">
+              <div id="conf-receipt-thumb-wrap" style="width: 48px; height: 48px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.18); overflow: hidden; background: #000; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                <img id="conf-receipt-thumb" src="" alt="Receipt Preview" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                <span id="conf-receipt-no-thumb" style="font-size: 0.65rem; color: #71717a;">PROOF</span>
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <span class="confirm-label">Payment Proof Screenshot</span>
+                <span class="confirm-value" id="conf-receipt-filename" style="font-size: 0.78rem; color: #a1a1aa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">screenshot.jpg</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions-row" style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+        <button type="button" class="btn-modal-secondary" id="btn-back-edit" style="min-width: 130px; font-size: 0.76rem; letter-spacing: 0.06em;">
+          ← EDIT DETAILS
+        </button>
+        <button type="button" class="btn-modal-primary" id="btn-confirm-final" style="background: #ffd000; color: #000; font-weight: 800; min-width: 220px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem; letter-spacing: 0.06em;">
+          <span id="conf-submit-text">CONFIRM &amp; LOCK SQUAD ✦</span>
+          <span class="spinner" id="conf-submit-spinner" style="display: none; width: 14px; height: 14px; border-width: 2px;"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
        REGISTRATION SUCCESS CONFIRMATION MODAL
        ========================================================================= -->
   <div class="modal-backdrop" id="modal-success" aria-hidden="true">
@@ -1086,15 +1189,19 @@
       <div class="success-summary-box">
         <div class="summary-row">
           <span class="summary-lbl">TEAM ID:</span>
-          <span class="summary-val font-mono" id="suc-team-id">INF-0000</span>
+          <span class="summary-val font-mono" id="suc-team-id" style="color: #ffd000; font-weight: 800; font-size: 0.95rem;">INF-0000</span>
         </div>
         <div class="summary-row">
           <span class="summary-lbl">TEAM NAME:</span>
           <span class="summary-val" id="suc-team-name">Stark Coders</span>
         </div>
         <div class="summary-row">
+          <span class="summary-lbl">COLLEGE / INSTITUTION:</span>
+          <span class="summary-val" id="suc-college">-</span>
+        </div>
+        <div class="summary-row">
           <span class="summary-lbl">SELECTED DOMAIN:</span>
-          <span class="summary-val" id="suc-domain">Mind Stone // INTELLIGENCE</span>
+          <span class="summary-val" id="suc-domain" style="color: #00d2ff; font-weight: 700;">Mind Stone // INTELLIGENCE</span>
         </div>
         <div class="summary-row">
           <span class="summary-lbl">LOGIN EMAIL:</span>
@@ -1102,7 +1209,21 @@
         </div>
         <div class="summary-row">
           <span class="summary-lbl">AMOUNT PAID:</span>
-          <span class="summary-val" id="suc-amount">₹1,047</span>
+          <span class="summary-val font-mono" id="suc-amount" style="color: #ffd000; font-weight: 700;">₹1,047</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-lbl">PAYMENT UTR:</span>
+          <span class="summary-val font-mono" id="suc-utr" style="color: #00ff88;">-</span>
+        </div>
+
+        <!-- Squad Members Roster Section -->
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+          <div style="font-family: var(--font-mono); font-size: 0.68rem; font-weight: 700; color: #ffd000; letter-spacing: 0.08em; margin-bottom: 8px; text-align: left;">
+            SQUAD ROSTER &amp; TEAM MEMBERS:
+          </div>
+          <div id="suc-roster-list" style="display: flex; flex-direction: column; gap: 6px;">
+            <!-- Dynamically populated member cards -->
+          </div>
         </div>
       </div>
 
