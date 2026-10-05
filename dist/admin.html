@@ -1382,7 +1382,7 @@
       }
     }
   </style>
-  <script type="module" crossorigin src="/assets/admin-8V1AO3Ff.js"></script>
+  <script type="module" crossorigin src="/assets/admin-wxBQUCaw.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
 </head>
 
@@ -1483,10 +1483,6 @@
         <button class="btn-ps-mgr btn-reg-toggle open" id="btn-toggle-reg" title="Toggle Public Registrations Open / Closed">
           <span id="reg-status-icon">🟢</span>
           <span id="reg-status-text">REGISTRATION: OPEN</span>
-        </button>
-        <button class="btn-ps-mgr btn-danger-purge" id="btn-open-purge-modal" title="Permanently Erase All Registered Squads Data">
-          <span>🗑️</span>
-          <span>ERASE ALL SQUADS DATA</span>
         </button>
       </div>
 
@@ -1872,37 +1868,7 @@
           </button>
         </div>
       </div>
-    </div>
-  <!-- =========================================================================
-       SAFETY CONFIRMATION MODAL: ERASE ALL SQUADS DATA
-       ========================================================================= -->
-  <div class="modal-overlay" id="modal-purge-data" style="display:none;">
-    <div class="admin-dialog purge-dialog">
-      <button class="btn-dialog-close" id="btn-close-purge-modal" aria-label="Close Dialog">✕</button>
-      <div class="purge-modal-header">
-        <div class="purge-warning-icon">⚠️</div>
-        <h3 class="purge-title">DANGER ZONE: ERASE ALL USER DATA</h3>
-        <p class="purge-sub">This action will permanently delete all registered squads, participant details, payment records, food tokens, and evaluation marks.</p>
-      </div>
-
-      <div class="purge-alert-box">
-        <strong>CRITICAL SAFEGUARD:</strong> This action is completely permanent and cannot be undone. All squad IDs and credentials will become invalid immediately.
-      </div>
-
-      <div class="form-group" style="margin-top: 18px; text-align: left;">
-        <label class="form-label" for="txt-purge-confirm">TYPE <span style="color:var(--red); font-weight:800;">ERASE</span> BELOW TO CONFIRM:</label>
-        <input type="text" id="txt-purge-confirm" class="form-input font-mono" placeholder="Type ERASE here" autocomplete="off" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">
-      </div>
-
-      <div class="purge-modal-actions" style="display:flex; gap:12px; margin-top:20px;">
-        <button type="button" class="btn-dialog-cancel" id="btn-cancel-purge" style="flex:1;">CANCEL</button>
-        <button type="button" class="btn-danger-confirm" id="btn-confirm-purge" disabled style="flex:1.2;">
-          💥 PERMANENTLY ERASE EVERYTHING
-        </button>
-      </div>
-    </div>
-  </div>
-
+    </div>
 </body>
 
 </html>

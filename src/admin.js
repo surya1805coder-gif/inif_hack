@@ -132,13 +132,6 @@ function authHeaders(extra = {}) {
     const regStatusIcon = document.getElementById('reg-status-icon');
     const regStatusText = document.getElementById('reg-status-text');
 
-    const modalPurgeData = document.getElementById('modal-purge-data');
-    const btnOpenPurgeModal = document.getElementById('btn-open-purge-modal');
-    const btnClosePurgeModal = document.getElementById('btn-close-purge-modal');
-    const btnCancelPurge = document.getElementById('btn-cancel-purge');
-    const txtPurgeConfirm = document.getElementById('txt-purge-confirm');
-    const btnConfirmPurge = document.getElementById('btn-confirm-purge');
-
     async function doAdminLogin(password, isSilent = false) {
       if (!isSilent && loginErr) loginErr.style.display = 'none';
 
@@ -1968,86 +1961,4 @@ function authHeaders(extra = {}) {
           alert('Error: ' + err.message);
         }
       });
-    }
-
-    // ==========================================
-    // ERASE ALL SQUADS DATA (PURGE MODAL)
-    // ==========================================
-    function closePurgeModal() {
-      if (modalPurgeData) modalPurgeData.style.display = 'none';
-      if (txtPurgeConfirm) txtPurgeConfirm.value = '';
-      if (btnConfirmPurge) {
-        btnConfirmPurge.disabled = true;
-        btnConfirmPurge.textContent = '💥 PERMANENTLY ERASE EVERYTHING';
-      }
-    }
-
-    if (btnOpenPurgeModal && modalPurgeData) {
-      btnOpenPurgeModal.addEventListener('click', () => {
-        if (txtPurgeConfirm) txtPurgeConfirm.value = '';
-        if (btnConfirmPurge) btnConfirmPurge.disabled = true;
-        modalPurgeData.style.display = 'flex';
-        setTimeout(() => txtPurgeConfirm && txtPurgeConfirm.focus(), 100);
-      });
-    }
-
-    if (btnClosePurgeModal) btnClosePurgeModal.addEventListener('click', closePurgeModal);
-    if (btnCancelPurge) btnCancelPurge.addEventListener('click', closePurgeModal);
-
-    if (modalPurgeData) {
-      modalPurgeData.addEventListener('click', (e) => {
-        if (e.target === modalPurgeData) closePurgeModal();
-      });
-    }
-
-    if (txtPurgeConfirm && btnConfirmPurge) {
-      txtPurgeConfirm.addEventListener('input', () => {
-        const val = txtPurgeConfirm.value.trim().toUpperCase();
-        btnConfirmPurge.disabled = (val !== 'ERASE');
-      });
-      txtPurgeConfirm.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !btnConfirmPurge.disabled) {
-          e.preventDefault();
-          btnConfirmPurge.click();
-        }
-      });
-    }
-
-    if (btnConfirmPurge) {
-      btnConfirmPurge.addEventListener('click', async () => {
-        const confirmVal = txtPurgeConfirm?.value.trim().toUpperCase();
-        if (confirmVal !== 'ERASE') {
-          alert('Please type ERASE into the box to confirm deletion.');
-          return;
-        }
-
-        try {
-          btnConfirmPurge.disabled = true;
-          btnConfirmPurge.textContent = 'ERASING EVERYTHING...';
-
-          const res = await fetch('/api/admin/purge-data', {
-            method: 'POST',
-            headers: authHeaders({ 'Content-Type': 'application/json' }),
-            body: JSON.stringify({ confirm: 'ERASE' })
-          });
-
-          const data = await res.json();
-          if (!res.ok || !data.success) {
-            throw new Error(data.error || 'Failed to erase data.');
-          }
-
-          closePurgeModal();
-          allTeams = [];
-          renderTable();
-          updateKPIs();
-          showAdminToast(`💥 ${data.message || 'All user data has been permanently erased.'}`);
-        } catch (err) {
-          alert('Error: ' + err.message);
-        } finally {
-          if (btnConfirmPurge) {
-            btnConfirmPurge.disabled = true;
-            btnConfirmPurge.textContent = '💥 PERMANENTLY ERASE EVERYTHING';
-          }
-        }
-      });
-    }
+    }
