@@ -704,7 +704,10 @@
     <a href="/" class="brand-group" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
       <img src="/logo.png" alt="Infinity Crest"
         style="width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(255, 208, 0, 0.5));">
-      <span class="brand-title">INFINITY HACKATHON</span>
+      <div style="display: flex; flex-direction: column;">
+        <span class="brand-title">INFINITY HACKATHON</span>
+        <span style="font-size: 0.60rem; color: #ffd000; font-family: 'JetBrains Mono', monospace; font-weight: 700; letter-spacing: 0.08em;">GVPCDPGC (A) • CSE &amp; CSE-AIML</span>
+      </div>
       <span class="portal-badge">TEAM LEADER DESK</span>
     </a>
     <div class="nav-actions">
@@ -740,7 +743,7 @@
         <input type="password" id="txt-password" class="form-input" placeholder="Password (Default: mind2026)" required>
       </div>
 
-      <button type="submit" class="btn-login" id="btn-do-login">AUTHENTICATE & ENTER PORTAL</button>
+      <button type="submit" class="btn-login" id="btn-do-login">AUTHENTICATE &amp; ENTER PORTAL</button>
       <div class="login-err" id="login-err"></div>
     </form>
   </main>
@@ -758,6 +761,11 @@
         </div>
         <h2 class="team-title" id="dash-team-name">Team Name</h2>
         <div class="college-tag" id="dash-college">College Name</div>
+        <div style="margin-top: 8px; font-size: 0.72rem; color: #a1a1aa; font-family: 'JetBrains Mono', monospace; display: flex; flex-wrap: wrap; gap: 8px;">
+          <span>📍 <strong style="color:#ffd000;">DAY 1:</strong> Rushikonda Campus (Build Before Zero)</span>
+          <span>•</span>
+          <span>📍 <strong style="color:#00ff88;">DAY 2:</strong> Engineering Block 3rd Floor (Victory Awaits)</span>
+        </div>
       </div>
 
       <div id="dash-payment-badge">
@@ -786,33 +794,41 @@
         <!-- Review Milestones Timeline -->
         <div class="dash-section">
           <div class="sec-header">
-            <h3 class="sec-title"><span>⏱️</span> REVIEW MILESTONES TIMELINE</h3>
-            <span class="college-tag">Coordinator & Jury Station</span>
+            <h3 class="sec-title"><span>⏱️</span> OFFICIAL REVIEW MILESTONES</h3>
+            <span class="college-tag">Jury Stations</span>
           </div>
 
           <div class="timeline-track-list" id="reviews-list">
             <div class="milestone-item">
               <div>
-                <div class="m-title">Review Round 1: Architecture & Idea Feasibility</div>
-                <div class="m-sub">Day 1 // 07:30 PM • Pod Check-in</div>
+                <div class="m-title">Stage 1 Review: Eye of Agamotto</div>
+                <div class="m-sub">Day 1 // 01:00 – 02:00 PM • Idea Validation &amp; Presentation Deck</div>
               </div>
               <span class="badge-check badge-wait" id="status-r1">PENDING</span>
             </div>
 
             <div class="milestone-item">
               <div>
-                <div class="m-title">Review Round 2: Mid-way Logic & API Stress Test</div>
-                <div class="m-sub">Day 2 // 09:30 AM • Pod Check-in</div>
+                <div class="m-title">Stage 2 Review: Reality Stone Prototype</div>
+                <div class="m-sub">Day 1 // 05:00 – 06:00 PM • 2nd Judge Architecture &amp; DB Evaluation</div>
               </div>
               <span class="badge-check badge-wait" id="status-r2">PENDING</span>
             </div>
 
             <div class="milestone-item">
               <div>
-                <div class="m-title">Review Round 3: Grand Pitch & Final Product Demo</div>
-                <div class="m-sub">Day 2 // 04:30 PM • Main Stage</div>
+                <div class="m-title">Stage 3 Review: Time-Loop MVP Review</div>
+                <div class="m-sub">Day 2 // 02:00 – 03:00 AM • 3rd Judge Working MVP &amp; Feasibility</div>
               </div>
               <span class="badge-check badge-wait" id="status-r3">PENDING</span>
+            </div>
+
+            <div class="milestone-item">
+              <div>
+                <div class="m-title">Top 6 Showdown: Cosmic Endgame</div>
+                <div class="m-sub">Day 2 // 09:00 – 09:45 AM • Grand Jury Pitches • Engineering Block 3rd Floor</div>
+              </div>
+              <span class="badge-check badge-wait" id="status-r4">TOP 6 FINALE</span>
             </div>
           </div>
         </div>
@@ -831,24 +847,24 @@
 
           <div class="food-grid" id="food-tokens-list">
             <div class="food-card">
-              <span class="food-name">☕ High Tea Fuel</span>
+              <span class="food-name">🍱 Infinity Feast: Midday Refuel (Lunch)</span>
+              <span class="badge-check badge-wait" id="food-lunch">PENDING</span>
+            </div>
+            <div class="food-card">
+              <span class="food-name">☕ Pym Particles: Snap Refreshment (High Tea)</span>
               <span class="badge-check badge-wait" id="food-highTea">PENDING</span>
             </div>
             <div class="food-card">
-              <span class="food-name">🍲 Dinner Buffet</span>
+              <span class="food-name">🍲 Grand Alliance: Infinity Dinner</span>
               <span class="badge-check badge-wait" id="food-dinner">PENDING</span>
             </div>
             <div class="food-card">
-              <span class="food-name">⚡ Midnight Fuel & Red Bull</span>
+              <span class="food-name">⚡ Multiverse Arcade &amp; Midnight Fuel</span>
               <span class="badge-check badge-wait" id="food-midnightFuel">PENDING</span>
             </div>
             <div class="food-card">
-              <span class="food-name">🥐 Day 2 Breakfast</span>
+              <span class="food-name">🥐 Morning Dawn: Hero Breakfast</span>
               <span class="badge-check badge-wait" id="food-breakfast">PENDING</span>
-            </div>
-            <div class="food-card">
-              <span class="food-name">🥗 Day 2 Lunch Drop</span>
-              <span class="badge-check badge-wait" id="food-lunch">PENDING</span>
             </div>
           </div>
         </div>

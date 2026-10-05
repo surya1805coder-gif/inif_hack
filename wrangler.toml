@@ -10,6 +10,8 @@ binding = "BUCKET"
 [vars]
 APP_URL = "https://infinity.akao.in"
 CLOUDFLARE_R2_PUBLIC_DOMAIN = "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev"
+RESEND_API_KEY = "re_5r2BeM59_AnyXKqPxWm4A8ej6C9cJqXEX"
+EMAIL_FROM = "Infinity Hackathon 2026 <hackathon@infinity.akao.in>"
 
 [env.production]
 compatibility_date = "2026-09-24"
@@ -22,4 +24,7 @@ binding = "BUCKET"
 [env.production.vars]
 APP_URL = "https://infinity.akao.in"
 CLOUDFLARE_R2_PUBLIC_DOMAIN = "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev"
+RESEND_API_KEY = "re_5r2BeM59_AnyXKqPxWm4A8ej6C9cJqXEX"
+EMAIL_FROM = "Infinity Hackathon 2026 <hackathon@infinity.akao.in>"
+
 
