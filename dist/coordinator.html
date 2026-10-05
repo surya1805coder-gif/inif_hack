@@ -511,12 +511,15 @@
     .member-food-chip {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
+      min-width: 32px;
       gap: 3px;
-      padding: 3px 7px;
+      padding: 4px 8px;
       border-radius: 5px;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--border-subtle);
-      font-size: 0.65rem;
+      font-size: 0.7rem;
+      font-weight: 700;
       font-family: 'JetBrains Mono', monospace;
       color: #aaa;
       cursor: pointer;
@@ -665,7 +668,7 @@
       }
     }
   </style>
-  <script type="module" crossorigin src="/assets/coordinator-D0_BDSSl.js"></script>
+  <script type="module" crossorigin src="/assets/coordinator-FMonhMaS.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
 </head>
 
@@ -755,9 +758,7 @@
       <div class="filter-pills" id="meal-filters" style="margin-top: 8px;">
         <span class="mono-label" style="font-size: 0.68rem; color: var(--gold); display: inline-flex; align-items: center; margin-right: 4px;">MEAL FOCUS:</span>
         <button class="f-pill active" data-meal="all">ALL MEALS</button>
-        <button class="f-pill" data-meal="highTea">HIGH TEA</button>
         <button class="f-pill" data-meal="dinner">DINNER</button>
-        <button class="f-pill" data-meal="midnightFuel">MIDNIGHT</button>
         <button class="f-pill" data-meal="breakfast">BREAKFAST</button>
         <button class="f-pill" data-meal="lunch">LUNCH</button>
       </div>

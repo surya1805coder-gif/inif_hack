@@ -184,9 +184,7 @@ let currentTeam = null;
       updateStatusBadge('status-r4', currentTeam.reviews?.r4?.attended || currentTeam.isTop6);
 
       // Food Statuses
-      updateStatusBadge('food-highTea', currentTeam.food?.highTea?.collected);
       updateStatusBadge('food-dinner', currentTeam.food?.dinner?.collected);
-      updateStatusBadge('food-midnightFuel', currentTeam.food?.midnightFuel?.collected);
       updateStatusBadge('food-breakfast', currentTeam.food?.breakfast?.collected);
       updateStatusBadge('food-lunch', currentTeam.food?.lunch?.collected);
 

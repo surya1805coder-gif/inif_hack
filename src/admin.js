@@ -545,8 +545,8 @@ function authHeaders(extra = {}) {
         const scores = t.scores || {};
 
         let foodCount = 0;
-        ['highTea', 'dinner', 'midnightFuel', 'breakfast', 'lunch'].forEach(k => {
-          if (food[k]?.collected) foodCount++;
+        ['dinner', 'breakfast', 'lunch'].forEach(k => {
+          if (food[k]?.collected || (Array.isArray(food[k]?.members) && food[k].members.some(Boolean))) foodCount++;
         });
 
         let revCount = 0;
@@ -590,7 +590,7 @@ function authHeaders(extra = {}) {
               ${safeUrl(pay.screenshotUrl) ? `<a href="${safeUrl(pay.screenshotUrl)}" target="_blank" rel="noopener noreferrer" style="font-size:0.68rem; color:var(--cyan);">View Receipt ↗</a>` : (pay.screenshotUrl ? `<span style="font-size:0.68rem; color:#888;">Receipt Attached</span>` : '')}
             </td>
             <td>
-              <span class="font-mono" style="font-weight:700;">${foodCount} / 5</span>
+              <span class="font-mono" style="font-weight:700;">${foodCount} / 3</span>
             </td>
             <td>
               <span class="font-mono" style="font-weight:700;">${revCount} / 3</span>
@@ -731,11 +731,12 @@ function authHeaders(extra = {}) {
       document.getElementById('edt-pay-amount').value = pay.amount || (editingTeam.teamSize || 4) * 349;
 
       const food = editingTeam.food || {};
-      document.getElementById('edt-food-ht').checked = Boolean(food.highTea?.collected);
-      document.getElementById('edt-food-din').checked = Boolean(food.dinner?.collected);
-      document.getElementById('edt-food-mid').checked = Boolean(food.midnightFuel?.collected);
-      document.getElementById('edt-food-bf').checked = Boolean(food.breakfast?.collected);
-      document.getElementById('edt-food-ln').checked = Boolean(food.lunch?.collected);
+      const elDin = document.getElementById('edt-food-din');
+      const elBf = document.getElementById('edt-food-bf');
+      const elLn = document.getElementById('edt-food-ln');
+      if (elDin) elDin.checked = Boolean(food.dinner?.collected);
+      if (elBf) elBf.checked = Boolean(food.breakfast?.collected);
+      if (elLn) elLn.checked = Boolean(food.lunch?.collected);
 
       const rev = editingTeam.reviews || {};
       document.getElementById('edt-rev-r1').checked = Boolean(rev.r1?.attended);
@@ -889,11 +890,9 @@ function authHeaders(extra = {}) {
           amount: parseFloat(document.getElementById('edt-pay-amount').value) || 0,
         },
         food: {
-          highTea: { collected: document.getElementById('edt-food-ht').checked },
-          dinner: { collected: document.getElementById('edt-food-din').checked },
-          midnightFuel: { collected: document.getElementById('edt-food-mid').checked },
-          breakfast: { collected: document.getElementById('edt-food-bf').checked },
-          lunch: { collected: document.getElementById('edt-food-ln').checked },
+          dinner: { collected: Boolean(document.getElementById('edt-food-din')?.checked) },
+          breakfast: { collected: Boolean(document.getElementById('edt-food-bf')?.checked) },
+          lunch: { collected: Boolean(document.getElementById('edt-food-ln')?.checked) },
         },
         reviews: {
           r1: { attended: document.getElementById('edt-rev-r1').checked },

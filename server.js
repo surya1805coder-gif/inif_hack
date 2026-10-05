@@ -1161,9 +1161,7 @@ app.post('/api/register', upload.single('paymentScreenshot'), async (req, res) =
       },
       // Food meal tokens (for Coordinator and Team Leader dashboard)
       food: {
-        highTea: { collected: false, time: null },
         dinner: { collected: false, time: null },
-        midnightFuel: { collected: false, time: null },
         breakfast: { collected: false, time: null },
         lunch: { collected: false, time: null }
       },
@@ -2076,9 +2074,7 @@ app.get('/api/admin/export', requireAdminAuth, async (req, res) => {
       'Team ID': t.id,
       'Team Name': t.teamName,
       'College': t.college,
-      'High Tea': t.food?.highTea?.collected ? 'RECEIVED' : 'PENDING',
       'Dinner': t.food?.dinner?.collected ? 'RECEIVED' : 'PENDING',
-      'Midnight Fuel': t.food?.midnightFuel?.collected ? 'RECEIVED' : 'PENDING',
       'Breakfast': t.food?.breakfast?.collected ? 'RECEIVED' : 'PENDING',
       'Lunch': t.food?.lunch?.collected ? 'RECEIVED' : 'PENDING',
       'Review 1 (Ideation)': t.reviews?.r1?.attended ? 'ATTENDED' : 'PENDING',
