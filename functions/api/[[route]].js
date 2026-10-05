@@ -799,6 +799,7 @@ async function loadDbWithMeta(env) {
         if (text && text.trim().length > 10) {
           const parsed = JSON.parse(text);
           if (parsed && Array.isArray(parsed.domains) && Array.isArray(parsed.teams)) {
+            if (!parsed.settings) parsed.settings = { registrationOpen: true };
             return {
               db: parsed,
               etag: obj.etag,
@@ -820,6 +821,7 @@ async function loadDbWithMeta(env) {
           const backupParsed = JSON.parse(backupText);
           if (backupParsed && Array.isArray(backupParsed.domains) && Array.isArray(backupParsed.teams)) {
             console.warn('⚠️ RESTORED DATABASE FROM SHADOW BACKUP R2_DB_BACKUP_KEY!');
+            if (!backupParsed.settings) backupParsed.settings = { registrationOpen: true };
             return {
               db: backupParsed,
               etag: backupObj.etag,
@@ -833,7 +835,7 @@ async function loadDbWithMeta(env) {
     }
   }
   return {
-    db: { domains: INITIAL_DOMAINS, teams: [], _version: 0 },
+    db: { domains: INITIAL_DOMAINS, teams: [], settings: { registrationOpen: true }, _version: 0 },
     etag: null,
     version: 0,
   };
@@ -1387,7 +1389,17 @@ export async function onRequest(context) {
     // -------------------------------------------------------------
     if (pathname === '/api/domains' && method === 'GET') {
       const db = await loadDb(env);
-      return jsonResponse({ success: true, domains: db.domains });
+      const registrationOpen = db.settings ? db.settings.registrationOpen !== false : true;
+      return jsonResponse({ success: true, domains: db.domains, registrationOpen });
+    }
+
+    // -------------------------------------------------------------
+    // Public Registration Status
+    // -------------------------------------------------------------
+    if (pathname === '/api/registration-status' && method === 'GET') {
+      const db = await loadDb(env);
+      const registrationOpen = db.settings ? db.settings.registrationOpen !== false : true;
+      return jsonResponse({ success: true, registrationOpen });
     }
 
     // -------------------------------------------------------------
@@ -1470,6 +1482,14 @@ export async function onRequest(context) {
         }, 429, {
           'Retry-After': String(regCheck.retryAfter)
         });
+      }
+
+      const dbCheck = await loadDb(env);
+      if (dbCheck.settings && dbCheck.settings.registrationOpen === false) {
+        return jsonResponse({
+          success: false,
+          error: 'Registrations for Infinity Hackathon 2026 are currently closed by the organizers.'
+        }, 403);
       }
 
       let teamName, college, preferredDomain, techStack, teamSize, teamPassword;
@@ -2252,7 +2272,68 @@ export async function onRequest(context) {
         copy.hasPassword = Boolean(t.teamPassword);
         return copy;
       });
-      return jsonResponse({ success: true, teams: safeTeams });
+      return jsonResponse({
+        success: true,
+        teams: safeTeams,
+        settings: db.settings || { registrationOpen: true }
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Admin Settings Get & Toggle Registration
+    // -------------------------------------------------------------
+    if (pathname === '/api/admin/settings' && method === 'GET') {
+      const db = await loadDb(env);
+      return jsonResponse({
+        success: true,
+        settings: db.settings || { registrationOpen: true }
+      });
+    }
+
+    if (pathname === '/api/admin/toggle-registration' && method === 'POST') {
+      const body = (await request.json().catch(() => ({}))) || {};
+      const { registrationOpen } = body;
+      const { result } = await updateDb(env, async (db) => {
+        db.settings = db.settings || { registrationOpen: true };
+        if (typeof registrationOpen === 'boolean') {
+          db.settings.registrationOpen = registrationOpen;
+        } else {
+          db.settings.registrationOpen = !db.settings.registrationOpen;
+        }
+        return { registrationOpen: db.settings.registrationOpen };
+      });
+
+      return jsonResponse({
+        success: true,
+        registrationOpen: result.registrationOpen,
+        message: result.registrationOpen ? 'Public registrations are now OPEN.' : 'Public registrations are now CLOSED.'
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Admin Purge All Teams / User Data (Dangerous - strictly requires confirm: "ERASE")
+    // -------------------------------------------------------------
+    if (pathname === '/api/admin/purge-data' && method === 'POST') {
+      const body = (await request.json().catch(() => ({}))) || {};
+      const { confirm } = body;
+      if (!confirm || (confirm !== 'ERASE' && confirm !== 'DELETE')) {
+        return jsonResponse({
+          success: false,
+          error: 'Confirmation failed. You must provide confirm: "ERASE" to purge all user data.'
+        }, 400);
+      }
+
+      const { result } = await updateDb(env, async (db) => {
+        const count = Array.isArray(db.teams) ? db.teams.length : 0;
+        db.teams = [];
+        return { purgedCount: count };
+      });
+
+      return jsonResponse({
+        success: true,
+        purgedCount: result.purgedCount,
+        message: `All ${result.purgedCount} squad(s) and user data have been permanently erased.`
+      });
     }
 
     // -------------------------------------------------------------

@@ -489,7 +489,7 @@ export async function loadDb() {
         const text = await res.Body.transformToString();
         const parsed = JSON.parse(text);
         if (parsed.domains && parsed.teams) {
-          // Normalize domains if needed
+          if (!parsed.settings) parsed.settings = { registrationOpen: true };
           return parsed;
         }
       }
@@ -502,13 +502,15 @@ export async function loadDb() {
   if (fs.existsSync(DB_FILE)) {
     try {
       const raw = fs.readFileSync(DB_FILE, 'utf-8');
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      if (!parsed.settings) parsed.settings = { registrationOpen: true };
+      return parsed;
     } catch (e) {
       console.error('Error reading local db.json:', e);
     }
   }
 
-  const initial = { domains: INITIAL_DOMAINS, teams: [] };
+  const initial = { domains: INITIAL_DOMAINS, teams: [], settings: { registrationOpen: true } };
   await saveDb(initial);
   return initial;
 }
@@ -653,7 +655,19 @@ app.get('/api/health', (req, res) => {
 app.get('/api/domains', async (req, res) => {
   try {
     const db = await loadDb();
-    res.json({ success: true, domains: db.domains });
+    const registrationOpen = db.settings ? db.settings.registrationOpen !== false : true;
+    res.json({ success: true, domains: db.domains, registrationOpen });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 1b. Public Registration Status
+app.get('/api/registration-status', async (req, res) => {
+  try {
+    const db = await loadDb();
+    const registrationOpen = db.settings ? db.settings.registrationOpen !== false : true;
+    res.json({ success: true, registrationOpen });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -980,6 +994,14 @@ app.post('/api/register', upload.single('paymentScreenshot'), async (req, res) =
         success: false,
         error: regCheck.message,
         retryAfter: regCheck.retryAfter
+      });
+    }
+
+    const dbCheck = await loadDb();
+    if (dbCheck.settings && dbCheck.settings.registrationOpen === false) {
+      return res.status(403).json({
+        success: false,
+        error: 'Registrations for Infinity Hackathon 2026 are currently closed by the organizers.'
       });
     }
 
@@ -1792,7 +1814,74 @@ app.get('/api/admin/teams', requireAdminAuth, async (req, res) => {
       copy.hasPassword = Boolean(t.teamPassword);
       return copy;
     });
-    res.json({ success: true, teams: safeTeams });
+    res.json({
+      success: true,
+      teams: safeTeams,
+      settings: db.settings || { registrationOpen: true }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 9b. Admin Settings Get & Toggle Registration
+app.get('/api/admin/settings', requireAdminAuth, async (req, res) => {
+  try {
+    const db = await loadDb();
+    res.json({
+      success: true,
+      settings: db.settings || { registrationOpen: true }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/admin/toggle-registration', requireAdminAuth, async (req, res) => {
+  try {
+    const { registrationOpen } = req.body || {};
+    const { result } = await updateDb(async (db) => {
+      db.settings = db.settings || { registrationOpen: true };
+      if (typeof registrationOpen === 'boolean') {
+        db.settings.registrationOpen = registrationOpen;
+      } else {
+        db.settings.registrationOpen = !db.settings.registrationOpen;
+      }
+      return { registrationOpen: db.settings.registrationOpen };
+    });
+
+    res.json({
+      success: true,
+      registrationOpen: result.registrationOpen,
+      message: result.registrationOpen ? 'Public registrations are now OPEN.' : 'Public registrations are now CLOSED.'
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 9c. Admin Purge All Teams / User Data (Dangerous - strictly requires confirm: "ERASE")
+app.post('/api/admin/purge-data', requireAdminAuth, async (req, res) => {
+  try {
+    const { confirm } = req.body || {};
+    if (!confirm || (confirm !== 'ERASE' && confirm !== 'DELETE')) {
+      return res.status(400).json({
+        success: false,
+        error: 'Confirmation failed. You must provide confirm: "ERASE" to purge all user data.'
+      });
+    }
+
+    const { result } = await updateDb(async (db) => {
+      const count = Array.isArray(db.teams) ? db.teams.length : 0;
+      db.teams = [];
+      return { purgedCount: count };
+    });
+
+    res.json({
+      success: true,
+      purgedCount: result.purgedCount,
+      message: `All ${result.purgedCount} squad(s) and user data have been permanently erased.`
+    });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

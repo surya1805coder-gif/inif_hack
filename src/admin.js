@@ -127,6 +127,18 @@ function authHeaders(extra = {}) {
     const stoneAreasStatus = document.getElementById('stone-areas-status');
     const chkSyncExistingTeams = document.getElementById('chk-sync-existing-teams');
 
+    let registrationOpen = true;
+    const btnToggleReg = document.getElementById('btn-toggle-reg');
+    const regStatusIcon = document.getElementById('reg-status-icon');
+    const regStatusText = document.getElementById('reg-status-text');
+
+    const modalPurgeData = document.getElementById('modal-purge-data');
+    const btnOpenPurgeModal = document.getElementById('btn-open-purge-modal');
+    const btnClosePurgeModal = document.getElementById('btn-close-purge-modal');
+    const btnCancelPurge = document.getElementById('btn-cancel-purge');
+    const txtPurgeConfirm = document.getElementById('txt-purge-confirm');
+    const btnConfirmPurge = document.getElementById('btn-confirm-purge');
+
     async function doAdminLogin(password, isSilent = false) {
       if (!isSilent && loginErr) loginErr.style.display = 'none';
 
@@ -228,6 +240,12 @@ function authHeaders(extra = {}) {
 
         allTeams = teamsData.teams || [];
         allDomains = domainsData.domains || [];
+
+        if (teamsData.settings && typeof teamsData.settings.registrationOpen === 'boolean') {
+          updateRegistrationUI(teamsData.settings.registrationOpen);
+        } else if (domainsData && typeof domainsData.registrationOpen === 'boolean') {
+          updateRegistrationUI(domainsData.registrationOpen);
+        }
 
         const btnExcel = document.querySelector('.btn-excel');
         if (btnExcel && !btnExcel.dataset.bound) {
@@ -1898,6 +1916,138 @@ function authHeaders(extra = {}) {
         } finally {
           btnSaveStoneAreas.disabled = false;
           btnSaveStoneAreas.textContent = oldText;
+        }
+      });
+    }
+
+    // ==========================================
+    // REGISTRATION STATUS TOGGLE
+    // ==========================================
+    function updateRegistrationUI(isOpen) {
+      registrationOpen = Boolean(isOpen);
+      if (!btnToggleReg) return;
+      if (registrationOpen) {
+        btnToggleReg.classList.remove('closed');
+        btnToggleReg.classList.add('open');
+        if (regStatusIcon) regStatusIcon.textContent = '🟢';
+        if (regStatusText) regStatusText.textContent = 'REGISTRATION: OPEN';
+        btnToggleReg.title = 'Public registrations are currently OPEN. Click to CLOSE.';
+      } else {
+        btnToggleReg.classList.remove('open');
+        btnToggleReg.classList.add('closed');
+        if (regStatusIcon) regStatusIcon.textContent = '🔴';
+        if (regStatusText) regStatusText.textContent = 'REGISTRATION: CLOSED';
+        btnToggleReg.title = 'Public registrations are currently CLOSED. Click to OPEN.';
+      }
+    }
+
+    if (btnToggleReg) {
+      btnToggleReg.addEventListener('click', async () => {
+        const targetState = !registrationOpen;
+        const promptMsg = targetState
+          ? 'Are you sure you want to OPEN public registrations?'
+          : 'Are you sure you want to CLOSE public registrations? No new squads will be able to register.';
+        if (!confirm(promptMsg)) return;
+
+        try {
+          btnToggleReg.style.opacity = '0.6';
+          const res = await fetch('/api/admin/toggle-registration', {
+            method: 'POST',
+            headers: authHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ registrationOpen: targetState })
+          });
+          const data = await res.json();
+          btnToggleReg.style.opacity = '1';
+          if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Failed to update registration status.');
+          }
+          updateRegistrationUI(data.registrationOpen);
+          showAdminToast(data.message || (data.registrationOpen ? 'Registrations are now OPEN.' : 'Registrations are now CLOSED.'));
+        } catch (err) {
+          btnToggleReg.style.opacity = '1';
+          alert('Error: ' + err.message);
+        }
+      });
+    }
+
+    // ==========================================
+    // ERASE ALL SQUADS DATA (PURGE MODAL)
+    // ==========================================
+    function closePurgeModal() {
+      if (modalPurgeData) modalPurgeData.style.display = 'none';
+      if (txtPurgeConfirm) txtPurgeConfirm.value = '';
+      if (btnConfirmPurge) {
+        btnConfirmPurge.disabled = true;
+        btnConfirmPurge.textContent = '💥 PERMANENTLY ERASE EVERYTHING';
+      }
+    }
+
+    if (btnOpenPurgeModal && modalPurgeData) {
+      btnOpenPurgeModal.addEventListener('click', () => {
+        if (txtPurgeConfirm) txtPurgeConfirm.value = '';
+        if (btnConfirmPurge) btnConfirmPurge.disabled = true;
+        modalPurgeData.style.display = 'flex';
+        setTimeout(() => txtPurgeConfirm && txtPurgeConfirm.focus(), 100);
+      });
+    }
+
+    if (btnClosePurgeModal) btnClosePurgeModal.addEventListener('click', closePurgeModal);
+    if (btnCancelPurge) btnCancelPurge.addEventListener('click', closePurgeModal);
+
+    if (modalPurgeData) {
+      modalPurgeData.addEventListener('click', (e) => {
+        if (e.target === modalPurgeData) closePurgeModal();
+      });
+    }
+
+    if (txtPurgeConfirm && btnConfirmPurge) {
+      txtPurgeConfirm.addEventListener('input', () => {
+        const val = txtPurgeConfirm.value.trim().toUpperCase();
+        btnConfirmPurge.disabled = (val !== 'ERASE');
+      });
+      txtPurgeConfirm.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !btnConfirmPurge.disabled) {
+          e.preventDefault();
+          btnConfirmPurge.click();
+        }
+      });
+    }
+
+    if (btnConfirmPurge) {
+      btnConfirmPurge.addEventListener('click', async () => {
+        const confirmVal = txtPurgeConfirm?.value.trim().toUpperCase();
+        if (confirmVal !== 'ERASE') {
+          alert('Please type ERASE into the box to confirm deletion.');
+          return;
+        }
+
+        try {
+          btnConfirmPurge.disabled = true;
+          btnConfirmPurge.textContent = 'ERASING EVERYTHING...';
+
+          const res = await fetch('/api/admin/purge-data', {
+            method: 'POST',
+            headers: authHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ confirm: 'ERASE' })
+          });
+
+          const data = await res.json();
+          if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Failed to erase data.');
+          }
+
+          closePurgeModal();
+          allTeams = [];
+          renderTable();
+          updateKPIs();
+          showAdminToast(`💥 ${data.message || 'All user data has been permanently erased.'}`);
+        } catch (err) {
+          alert('Error: ' + err.message);
+        } finally {
+          if (btnConfirmPurge) {
+            btnConfirmPurge.disabled = true;
+            btnConfirmPurge.textContent = '💥 PERMANENTLY ERASE EVERYTHING';
+          }
         }
       });
     }

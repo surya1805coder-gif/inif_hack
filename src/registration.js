@@ -19,6 +19,8 @@ export function initRegistrationModule() {
   const btnNavRegister = document.getElementById('btn-nav-register');
   const btnWieldStone = document.getElementById('btn-wield-stone');
   const formReg = document.getElementById('form-registration');
+  const regClosedNotice = document.getElementById('reg-closed-notice');
+  let isRegistrationOpen = true;
 
   const regDomainBadge = document.getElementById('reg-domain-badge');
   const domainCards = document.querySelectorAll('.domain-radio-card');
@@ -45,6 +47,45 @@ export function initRegistrationModule() {
     member3: '/3mem.png',
     member4: '/4mem.png'
   };
+
+  async function checkRegistrationStatus() {
+    try {
+      const res = await fetch('/api/registration-status');
+      if (res.ok) {
+        const data = await res.json();
+        if (typeof data.registrationOpen === 'boolean') {
+          isRegistrationOpen = data.registrationOpen;
+          applyRegistrationStatusUI(isRegistrationOpen);
+        }
+      }
+    } catch (_) {}
+  }
+
+  function applyRegistrationStatusUI(isOpen) {
+    if (!isOpen) {
+      if (formReg) formReg.style.display = 'none';
+      if (regClosedNotice) regClosedNotice.style.display = 'block';
+      if (btnNavRegister) {
+        btnNavRegister.innerHTML = '<span>🔒 REGISTRATION CLOSED</span>';
+        btnNavRegister.classList.add('reg-nav-closed');
+      }
+      if (btnWieldStone) {
+        btnWieldStone.innerHTML = '<span>🔒 REGISTRATIONS CLOSED</span>';
+      }
+    } else {
+      if (formReg) formReg.style.display = 'block';
+      if (regClosedNotice) regClosedNotice.style.display = 'none';
+      if (btnNavRegister) {
+        btnNavRegister.innerHTML = '<span>REGISTER SQUAD</span>';
+        btnNavRegister.classList.remove('reg-nav-closed');
+      }
+      if (btnWieldStone) {
+        btnWieldStone.innerHTML = '<span>WIELD THIS STONE</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+      }
+    }
+  }
+
+  checkRegistrationStatus();
 
   async function fetchDynamicPaymentQrs() {
     try {
@@ -93,6 +134,7 @@ export function initRegistrationModule() {
   // 1. OPEN MODAL
   function openModal(stoneId = 'mind') {
     if (!modalRegister) return;
+    checkRegistrationStatus();
     fetchDynamicPaymentQrs();
     modalRegister.classList.add('is-open');
     modalRegister.setAttribute('aria-hidden', 'false');

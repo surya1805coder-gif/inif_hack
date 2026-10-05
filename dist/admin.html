@@ -504,6 +504,118 @@
       }
     }
 
+    /* Registration Open/Close Button */
+    .btn-reg-toggle {
+      border: 1px solid rgba(0, 255, 136, 0.4) !important;
+      background: rgba(0, 255, 136, 0.08) !important;
+      color: #00ff88 !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .btn-reg-toggle:hover {
+      background: rgba(0, 255, 136, 0.16) !important;
+      border-color: #00ff88 !important;
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.3) !important;
+    }
+
+    .btn-reg-toggle.closed {
+      border: 1px solid rgba(255, 42, 75, 0.5) !important;
+      background: rgba(255, 42, 75, 0.12) !important;
+      color: #ff4a68 !important;
+    }
+
+    .btn-reg-toggle.closed:hover {
+      background: rgba(255, 42, 75, 0.22) !important;
+      border-color: #ff2a4b !important;
+      box-shadow: 0 0 15px rgba(255, 42, 75, 0.4) !important;
+    }
+
+    /* Danger Purge Button */
+    .btn-danger-purge {
+      border: 1px solid rgba(255, 42, 75, 0.35) !important;
+      background: rgba(255, 42, 75, 0.06) !important;
+      color: #ff8597 !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .btn-danger-purge:hover {
+      background: rgba(255, 42, 75, 0.2) !important;
+      border-color: #ff2a4b !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 16px rgba(255, 42, 75, 0.4) !important;
+    }
+
+    /* Purge Modal Styles */
+    .purge-dialog {
+      max-width: 520px !important;
+      border: 1px solid rgba(255, 42, 75, 0.5) !important;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 42, 75, 0.2) !important;
+      text-align: center;
+      padding: 30px !important;
+    }
+
+    .purge-warning-icon {
+      font-size: 2.8rem;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 0 12px rgba(255, 42, 75, 0.6));
+    }
+
+    .purge-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+
+    .purge-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .purge-alert-box {
+      background: rgba(255, 42, 75, 0.12);
+      border: 1px solid rgba(255, 42, 75, 0.35);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 0.78rem;
+      color: #ff99a8;
+      line-height: 1.45;
+      text-align: left;
+    }
+
+    .btn-danger-confirm {
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: 1px solid var(--red);
+      background: var(--red);
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.04em;
+    }
+
+    .btn-danger-confirm:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      filter: grayscale(0.8);
+      border-color: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      color: #888;
+    }
+
+    .btn-danger-confirm:not(:disabled):hover {
+      background: #ff4a68;
+      box-shadow: 0 0 25px rgba(255, 42, 75, 0.6);
+      transform: translateY(-1px);
+    }
+
     .search-box {
       min-width: 320px;
       padding: 10px 14px;
@@ -1270,7 +1382,7 @@
       }
     }
   </style>
-  <script type="module" crossorigin src="/assets/admin-pt-3QpCp.js"></script>
+  <script type="module" crossorigin src="/assets/admin-8V1AO3Ff.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
 </head>
 
@@ -1367,6 +1479,14 @@
         <button class="btn-ps-mgr btn-stone-area" id="btn-open-stone-areas">
           <span>🏛️</span>
           <span>STONE AREAS &amp; LABS</span>
+        </button>
+        <button class="btn-ps-mgr btn-reg-toggle open" id="btn-toggle-reg" title="Toggle Public Registrations Open / Closed">
+          <span id="reg-status-icon">🟢</span>
+          <span id="reg-status-text">REGISTRATION: OPEN</span>
+        </button>
+        <button class="btn-ps-mgr btn-danger-purge" id="btn-open-purge-modal" title="Permanently Erase All Registered Squads Data">
+          <span>🗑️</span>
+          <span>ERASE ALL SQUADS DATA</span>
         </button>
       </div>
 
@@ -1751,6 +1871,34 @@
             💾 SAVE &amp; PROPAGATE STONE AREAS
           </button>
         </div>
+      </div>
+    </div>
+  <!-- =========================================================================
+       SAFETY CONFIRMATION MODAL: ERASE ALL SQUADS DATA
+       ========================================================================= -->
+  <div class="modal-overlay" id="modal-purge-data" style="display:none;">
+    <div class="admin-dialog purge-dialog">
+      <button class="btn-dialog-close" id="btn-close-purge-modal" aria-label="Close Dialog">✕</button>
+      <div class="purge-modal-header">
+        <div class="purge-warning-icon">⚠️</div>
+        <h3 class="purge-title">DANGER ZONE: ERASE ALL USER DATA</h3>
+        <p class="purge-sub">This action will permanently delete all registered squads, participant details, payment records, food tokens, and evaluation marks.</p>
+      </div>
+
+      <div class="purge-alert-box">
+        <strong>CRITICAL SAFEGUARD:</strong> This action is completely permanent and cannot be undone. All squad IDs and credentials will become invalid immediately.
+      </div>
+
+      <div class="form-group" style="margin-top: 18px; text-align: left;">
+        <label class="form-label" for="txt-purge-confirm">TYPE <span style="color:var(--red); font-weight:800;">ERASE</span> BELOW TO CONFIRM:</label>
+        <input type="text" id="txt-purge-confirm" class="form-input font-mono" placeholder="Type ERASE here" autocomplete="off" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">
+      </div>
+
+      <div class="purge-modal-actions" style="display:flex; gap:12px; margin-top:20px;">
+        <button type="button" class="btn-dialog-cancel" id="btn-cancel-purge" style="flex:1;">CANCEL</button>
+        <button type="button" class="btn-danger-confirm" id="btn-confirm-purge" disabled style="flex:1.2;">
+          💥 PERMANENTLY ERASE EVERYTHING
+        </button>
       </div>
     </div>
   </div>
