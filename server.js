@@ -2279,9 +2279,6 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
       subject,
       html: htmlContent,
     };
-    if (memberEmails.length > 0) {
-      payload.cc = memberEmails;
-    }
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
