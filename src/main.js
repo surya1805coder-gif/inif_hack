@@ -14,6 +14,7 @@ import { initRegistrationModule } from './registration.js';
 import { TechText } from './techText.js';
 import { initCinematicPreloader } from './cinematicPreloader.js';
 import { initMoltenMetal } from './moltenMetal.js';
+import { initScrollReveal } from './scrollReveal.js';
 
 class InfinityScrollShowcase {
   constructor() {
@@ -60,6 +61,7 @@ class InfinityScrollShowcase {
     this.initScrollAndGestures();
     this.initEventListeners();
     initRegistrationModule();
+    initScrollReveal();
     this.initServiceWorker();
 
     // Reset window scroll to top
@@ -584,9 +586,33 @@ class InfinityScrollShowcase {
     if (mobileBackdrop) mobileBackdrop.addEventListener('click', closeMobileMenu);
 
     mobileDrawerLinks.forEach(link => {
-      link.addEventListener('click', () => {
+      link.addEventListener('click', (e) => {
         closeMobileMenu();
-        this.unlockTimeline(true);
+        const href = link.getAttribute('href');
+        if (href && href.startsWith('#')) {
+          const targetId = href.substring(1);
+          if (targetId !== 'showcase-section') {
+            e.preventDefault();
+            this.unlockTimeline(true, targetId);
+          }
+        } else {
+          this.unlockTimeline(true);
+        }
+      });
+    });
+
+    // Desktop Navigation Links
+    const desktopNavLinks = document.querySelectorAll('.hud-nav .nav-link');
+    desktopNavLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        const href = link.getAttribute('href');
+        if (href && href.startsWith('#')) {
+          const targetId = href.substring(1);
+          if (targetId !== 'showcase-section') {
+            e.preventDefault();
+            this.unlockTimeline(true, targetId);
+          }
+        }
       });
     });
 
@@ -901,6 +927,7 @@ class InfinityScrollShowcase {
       document.body.classList.add('timeline-unlocked');
       audioEngine.playChime(660);
       window.dispatchEvent(new Event('resize'));
+      window.dispatchEvent(new Event('timelineUnlocked'));
     }
     if (scroll) {
       setTimeout(() => {
@@ -927,8 +954,22 @@ class InfinityScrollShowcase {
   initScrollAndGestures() {
     // Wheel / Trackpad Scroll Event
     window.addEventListener('wheel', (e) => {
-      // If timeline is unlocked and user has scrolled down into it, let natural page scroll handle it
-      if (document.body.classList.contains('timeline-unlocked') && window.scrollY > 40) return;
+      // If timeline is unlocked, let natural page scroll handle downward and normal page scrolling
+      if (document.body.classList.contains('timeline-unlocked')) {
+        if (e.deltaY > 0) return; // Natural scroll down
+
+        // If scrolling up, only lock back to 3D showcase if user is at the very top
+        if (e.deltaY < 0) {
+          if (window.scrollY <= 5) {
+            const now = Date.now();
+            if (now - this.lastScrollTime >= this.scrollCooldown) {
+              this.lastScrollTime = now;
+              this.lockTimeline();
+            }
+          }
+          return;
+        }
+      }
 
       const now = Date.now();
       if (now - this.lastScrollTime < this.scrollCooldown) return;
@@ -943,19 +984,12 @@ class InfinityScrollShowcase {
           // Scroll Down -> Next Stone or Reveal Timeline after 6th stone
           this.stepStone(1);
         } else if (e.deltaY < 0) {
-          if (document.body.classList.contains('timeline-unlocked') && window.scrollY <= 10) {
-            this.lockTimeline();
-          } else {
-            this.stepStone(-1);
-          }
+          this.stepStone(-1);
         }
       }
     }, { passive: true });
 
     // Touch Gestures: On mobile, vertical touch MUST ONLY SCROLL the page naturally!
-    // Touch Gestures:
-    // When locked on 6-stone showcase: swiping up/down (or left/right) advances or reverses stones!
-    // When unlocked and scrolled down into the timeline/sponsors: allow normal page scrolling!
     let touchStartX = 0;
     let touchStartY = 0;
     window.addEventListener('touchstart', (e) => {
@@ -967,8 +1001,20 @@ class InfinityScrollShowcase {
     window.addEventListener('touchend', (e) => {
       if (!e.changedTouches || !e.changedTouches[0]) return;
 
-      // If unlocked and user has scrolled down into lower sections, do not intercept - let natural page scrolling happen!
-      if (document.body.classList.contains('timeline-unlocked') && window.scrollY > 40) return;
+      // If unlocked, let natural page scrolling happen!
+      if (document.body.classList.contains('timeline-unlocked')) {
+        const diffY = touchStartY - e.changedTouches[0].clientY;
+        if (diffY > 0) return; // Swiping up = scrolling down, natural
+
+        if (diffY < 0 && window.scrollY <= 5) {
+          const now = Date.now();
+          if (now - this.lastScrollTime >= this.scrollCooldown) {
+            this.lastScrollTime = now;
+            this.lockTimeline();
+          }
+        }
+        return;
+      }
 
       const diffX = touchStartX - e.changedTouches[0].clientX;
       const diffY = touchStartY - e.changedTouches[0].clientY;
@@ -992,14 +1038,9 @@ class InfinityScrollShowcase {
         const isBackward = (absY >= absX && diffY < 0) || (absX > absY && diffX < 0);
 
         if (isForward) {
-          // If at stone 6 (index 5), stepStone(1) will automatically call unlockTimeline(true)!
           this.stepStone(1);
         } else if (isBackward) {
-          if (document.body.classList.contains('timeline-unlocked') && window.scrollY <= 10) {
-            this.lockTimeline();
-          } else {
-            this.stepStone(-1);
-          }
+          this.stepStone(-1);
         }
       }
     }, { passive: true });

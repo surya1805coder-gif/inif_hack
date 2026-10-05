@@ -2828,33 +2828,33 @@ body.timeline-unlocked #sponsors-section {
 
 /* 1. Captain America Shield */
 .sticker-cap {
-  top: -18px;
-  left: -14px;
-  width: 56px;
+  top: -26px;
+  left: -16px;
+  width: 80px;
   transform: rotate(-10deg);
 }
 
 /* 2. Doctor Strange Mystic Shield */
 .sticker-strange {
-  top: -24px;
-  right: -12px;
-  width: 62px;
+  top: -34px;
+  right: -16px;
+  width: 92px;
   transform: rotate(5deg);
 }
 
 /* 3. Iron Man Flight Sprint */
 .sticker-ironman-fly {
-  top: -16px;
-  right: -14px;
-  width: 75px;
+  top: -24px;
+  right: -16px;
+  width: 108px;
   transform: rotate(-5deg);
 }
 
 /* 4. Dum-E Robot Assistant */
 .sticker-dume {
-  bottom: -18px;
-  right: -12px;
-  width: 68px;
+  bottom: -26px;
+  right: -16px;
+  width: 98px;
   transform: rotate(0deg);
 }
 
@@ -2868,10 +2868,10 @@ body.timeline-unlocked #sponsors-section {
     margin: 20px auto 40px !important;
   }
 
-  .sticker-cap { width: 48px !important; top: -14px !important; left: -10px !important; }
-  .sticker-strange { width: 54px !important; top: -18px !important; right: -10px !important; }
-  .sticker-ironman-fly { width: 65px !important; top: -14px !important; right: -10px !important; }
-  .sticker-dume { width: 58px !important; bottom: -14px !important; right: -10px !important; }
+  .sticker-cap { width: 68px !important; top: -20px !important; left: -12px !important; }
+  .sticker-strange { width: 78px !important; top: -26px !important; right: -12px !important; }
+  .sticker-ironman-fly { width: 90px !important; top: -20px !important; right: -12px !important; }
+  .sticker-dume { width: 82px !important; bottom: -20px !important; right: -12px !important; }
 }
 
 @media (max-width: 640px) {
@@ -2940,10 +2940,10 @@ body.timeline-unlocked #sponsors-section {
     letter-spacing: 0.03em;
   }
 
-  .sticker-cap { width: 42px !important; top: -12px !important; left: -8px !important; }
-  .sticker-strange { width: 48px !important; top: -14px !important; right: -8px !important; }
-  .sticker-ironman-fly { width: 56px !important; top: -12px !important; right: -8px !important; }
-  .sticker-dume { width: 50px !important; bottom: -12px !important; right: -8px !important; }
+  .sticker-cap { width: 56px !important; top: -16px !important; left: -10px !important; }
+  .sticker-strange { width: 64px !important; top: -18px !important; right: -10px !important; }
+  .sticker-ironman-fly { width: 74px !important; top: -16px !important; right: -10px !important; }
+  .sticker-dume { width: 68px !important; bottom: -16px !important; right: -10px !important; }
 }
 
 /* Schedule Entries inside 4 Dossier Cards */
@@ -4464,6 +4464,51 @@ body.timeline-unlocked #sponsors-section {
   transform: rotate(-14deg);
 }
 
+/* FAQ Section Header Stickers (Knowledge Vault Guardians) */
+.faq-header-relative {
+  position: relative;
+  overflow: visible;
+}
+
+.faq-header-sticker {
+  position: absolute;
+  z-index: 10;
+  user-select: none;
+  cursor: pointer;
+  pointer-events: auto;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.92)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
+  transition: transform 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.faq-header-sticker img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  filter: contrast(1.1) saturate(1.15);
+}
+
+.faq-header-sticker:hover {
+  transform: scale(1.15) rotate(0deg) !important;
+  z-index: 25;
+}
+
+/* Captain America charging on header left flank */
+.sticker-faq-head-cap {
+  top: -15px;
+  left: -115px;
+  width: 145px;
+  transform: rotate(-12deg);
+}
+
+/* Spider-Man crouching on header right flank */
+.sticker-faq-head-spidey {
+  top: -20px;
+  right: -115px;
+  width: 145px;
+  transform: rotate(14deg);
+}
+
 /* FAQs Accordion */
 .faq-container {
   position: relative;
@@ -4474,7 +4519,7 @@ body.timeline-unlocked #sponsors-section {
   margin-bottom: 60px;
 }
 
-/* Marvel Swag Stickers in FAQ Knowledge Vault */
+/* Marvel Swag Stickers in FAQ Knowledge Vault (Right Flank / Zero text overlap) */
 .faq-sticker {
   position: absolute;
   z-index: 10;
@@ -4498,44 +4543,12 @@ body.timeline-unlocked #sponsors-section {
   z-index: 25;
 }
 
-/* Spider-Man perched top-right of FAQ container */
-.sticker-faq-spidey {
-  top: -55px;
-  right: -32px;
-  width: 165px;
-  transform: rotate(14deg);
-}
-
-/* Nano Gauntlet snapping on upper left flank */
-.sticker-faq-gauntlet {
-  top: 50px;
-  left: -52px;
-  width: 175px;
-  transform: rotate(-15deg);
-}
-
-/* Iron Man helmet on middle right flank */
-.sticker-faq-ironman {
-  top: 175px;
-  right: -42px;
-  width: 145px;
-  transform: rotate(16deg);
-}
-
-/* Captain America charging on lower left flank */
-.sticker-faq-cap {
-  bottom: 45px;
-  left: -48px;
-  width: 160px;
-  transform: rotate(-12deg);
-}
-
 /* Doctor Strange Eye of Agamotto on bottom right corner */
 .sticker-faq-eye {
-  bottom: -40px;
-  right: -25px;
-  width: 150px;
-  transform: rotate(10deg);
+  bottom: -35px;
+  right: -65px;
+  width: 88px;
+  transform: rotate(8deg);
 }
 
 .faq-item {
@@ -4571,6 +4584,8 @@ body.timeline-unlocked #sponsors-section {
 }
 
 .faq-icon {
+  position: relative;
+  z-index: 20 !important;
   font-size: 1.3rem;
   color: #ffd000;
   transition: transform 0.25s ease;
@@ -4602,10 +4617,52 @@ body.timeline-unlocked #sponsors-section {
 
 /* Contact Box */
 .contact-box {
+  position: relative;
+  overflow: visible;
   padding: 36px;
   border-radius: 16px;
   background: linear-gradient(135deg, rgba(20, 20, 30, 0.9) 0%, rgba(10, 10, 15, 0.9) 100%);
   border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+/* Marvel Swag Stickers in Operations Command Contact Box */
+.contact-sticker {
+  position: absolute;
+  z-index: 10;
+  user-select: none;
+  cursor: pointer;
+  pointer-events: auto;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.92)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
+  transition: transform 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.contact-sticker img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  filter: contrast(1.1) saturate(1.15);
+}
+
+.contact-sticker:hover {
+  transform: scale(1.15) rotate(0deg) !important;
+  z-index: 25;
+}
+
+/* Nano Gauntlet on top-right corner of Contact Box */
+.sticker-contact-gauntlet {
+  top: -38px;
+  right: -25px;
+  width: 120px;
+  transform: rotate(14deg);
+}
+
+/* Iron Man helmet on bottom-left corner of Contact Box */
+.sticker-contact-ironman {
+  bottom: -32px;
+  left: -24px;
+  width: 110px;
+  transform: rotate(-12deg);
 }
 
 .contact-header {
@@ -5452,30 +5509,30 @@ body.timeline-unlocked #sponsors-section {
     top: -50px !important;
     right: -16px !important;
   }
-  .sticker-faq-spidey {
-    top: -40px !important;
-    right: -15px !important;
-    width: 125px !important;
-  }
-  .sticker-faq-gauntlet {
-    top: 40px !important;
-    left: -25px !important;
-    width: 130px !important;
-  }
-  .sticker-faq-ironman {
-    top: 145px !important;
-    right: -20px !important;
+  .sticker-faq-head-cap {
+    left: -40px !important;
+    top: -10px !important;
     width: 110px !important;
   }
-  .sticker-faq-cap {
-    bottom: 35px !important;
-    left: -25px !important;
-    width: 120px !important;
+  .sticker-faq-head-spidey {
+    right: -40px !important;
+    top: -15px !important;
+    width: 110px !important;
   }
   .sticker-faq-eye {
-    bottom: -30px !important;
+    bottom: -25px !important;
+    right: -40px !important;
+    width: 74px !important;
+  }
+  .sticker-contact-gauntlet {
+    top: -28px !important;
     right: -15px !important;
-    width: 115px !important;
+    width: 95px !important;
+  }
+  .sticker-contact-ironman {
+    bottom: -24px !important;
+    left: -15px !important;
+    width: 85px !important;
   }
 }
 
@@ -5485,34 +5542,36 @@ body.timeline-unlocked #sponsors-section {
     top: -40px !important;
     right: -12px !important;
   }
-  .faq-sticker {
+  .faq-header-sticker,
+  .faq-sticker,
+  .contact-sticker {
     pointer-events: none !important;
     opacity: 0.92 !important;
   }
-  .sticker-faq-spidey {
-    top: -30px !important;
-    right: -8px !important;
-    width: 95px !important;
-  }
-  .sticker-faq-gauntlet {
-    top: 35px !important;
+  .sticker-faq-head-cap {
     left: -12px !important;
-    width: 95px !important;
+    top: -24px !important;
+    width: 75px !important;
   }
-  .sticker-faq-ironman {
-    top: 130px !important;
-    right: -10px !important;
-    width: 85px !important;
-  }
-  .sticker-faq-cap {
-    bottom: 25px !important;
-    left: -10px !important;
-    width: 90px !important;
+  .sticker-faq-head-spidey {
+    right: -12px !important;
+    top: -24px !important;
+    width: 75px !important;
   }
   .sticker-faq-eye {
-    bottom: -25px !important;
-    right: -8px !important;
-    width: 90px !important;
+    bottom: -20px !important;
+    right: -18px !important;
+    width: 65px !important;
+  }
+  .sticker-contact-gauntlet {
+    top: -22px !important;
+    right: -10px !important;
+    width: 75px !important;
+  }
+  .sticker-contact-ironman {
+    bottom: -18px !important;
+    left: -10px !important;
+    width: 70px !important;
   }
 }
 
@@ -6031,4 +6090,38 @@ body.webgl-fallback-active .stone-stage-overlay {
   50% { filter: hue-rotate(30deg) brightness(1.1); }
   100% { filter: hue-rotate(-20deg) brightness(1.0); }
 }
+
+/* ==========================================================================
+   SCROLL REVEAL / SCROLL APPEARING ANIMATION SYSTEM
+   Provides cinematic, hardware-accelerated entrance animations on scroll
+   ========================================================================== */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0s);
+}
+
+.scroll-reveal.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Clear transitions once revealed to free GPU layers and restore clean hover states */
+.scroll-reveal.is-revealed.reveal-complete {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 

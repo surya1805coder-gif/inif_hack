@@ -401,6 +401,18 @@
       box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
     }
 
+    .btn-stone-area {
+      background: rgba(168, 85, 247, 0.12) !important;
+      border-color: #c084fc !important;
+      color: #c084fc !important;
+    }
+
+    .btn-stone-area:hover {
+      background: #c084fc !important;
+      color: #000 !important;
+      box-shadow: 0 0 20px rgba(192, 132, 252, 0.4);
+    }
+
     /* Payment QR Manager Modal */
     .qr-mgr-grid {
       display: grid;
@@ -1187,7 +1199,7 @@
       }
     }
   </style>
-  <script type="module" crossorigin src="/assets/admin-XueVQJ9r.js"></script>
+  <script type="module" crossorigin src="/assets/admin-CXg66zqa.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
 </head>
 
@@ -1276,6 +1288,10 @@
         <button class="btn-ps-mgr btn-qr-mgr" id="btn-open-qr-mgr">
           <span>💳</span>
           <span>MANAGE PAYMENT QR CODES</span>
+        </button>
+        <button class="btn-ps-mgr btn-stone-area" id="btn-open-stone-areas">
+          <span>🏛️</span>
+          <span>STONE AREAS &amp; LABS</span>
         </button>
       </div>
 
@@ -1432,9 +1448,17 @@
           </div>
         </div>
 
+        <!-- Squad Members Details -->
+        <div class="field-card">
+          <div class="field-card-title">3. Squad Members Information</div>
+          <div id="edt-members-container" style="display: flex; flex-direction: column; gap: 14px;">
+            <!-- Dynamically populated with member cards based on squad size -->
+          </div>
+        </div>
+
         <!-- Payment Details -->
         <div class="field-card">
-          <div class="field-card-title">3. Payment & Receipt Telemetry</div>
+          <div class="field-card-title">4. Payment & Receipt Telemetry</div>
           <div class="edit-grid-3">
             <div class="form-group">
               <label class="form-label">PAYMENT STATUS</label>
@@ -1457,7 +1481,7 @@
 
         <!-- Food Checkbox Overrides -->
         <div class="field-card">
-          <div class="field-card-title">4. Food Received Status</div>
+          <div class="field-card-title">5. Food Received Status</div>
           <div style="display: flex; gap: 18px; flex-wrap: wrap;">
             <label class="switch-wrap"><input type="checkbox" id="edt-food-ht"> High Tea</label>
             <label class="switch-wrap"><input type="checkbox" id="edt-food-din"> Dinner</label>
@@ -1469,7 +1493,7 @@
 
         <!-- Review Checkbox Overrides -->
         <div class="field-card">
-          <div class="field-card-title">5. Reviews Attended</div>
+          <div class="field-card-title">6. Reviews Attended</div>
           <div style="display: flex; gap: 18px; flex-wrap: wrap;">
             <label class="switch-wrap"><input type="checkbox" id="edt-rev-r1"> Review 1 (Ideation)</label>
             <label class="switch-wrap"><input type="checkbox" id="edt-rev-r2"> Review 2 (Logic)</label>
@@ -1479,7 +1503,7 @@
 
         <!-- Judges Scores Override -->
         <div class="field-card">
-          <div class="field-card-title">6. Evaluation Marks Override</div>
+          <div class="field-card-title">7. Evaluation Marks Override</div>
           <div class="edit-grid-2">
             <div class="form-group">
               <label class="form-label">TOTAL SCORE (MAX 100)</label>
@@ -1599,6 +1623,51 @@
           </button>
           <button id="btn-save-qrs" class="btn-save-admin" type="button" style="width:auto; padding:10px 22px; font-size:0.8rem; background:var(--cyan); color:#000;">
             SAVE &amp; DEPLOY QR CODES
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       STONE AREAS & LABS ALLOCATION MODAL
+       ========================================================================= -->
+  <div class="admin-modal" id="modal-stone-areas">
+    <div class="admin-dialog" style="max-width: 920px;">
+      <button class="modal-close" id="btn-close-stone-areas">✕</button>
+
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+        <span class="portal-badge" style="color:var(--gold); border-color:var(--gold);">VENUE LOGISTICS</span>
+        <span class="portal-badge font-mono" style="color:#c084fc; border-color:#c084fc;">6 INFINITY STONES</span>
+      </div>
+      <h3 class="font-display" style="font-size: 1.35rem; margin: 4px 0 8px 0;">INFINITY STONES // LAB &amp; AREA ALLOCATION</h3>
+
+      <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+        Assign designated campus labs, halls, or rooms to each Infinity Stone.
+        Saving changes will instantly update the venue across leader dashboards, coordinator rosters, and squad badges.
+      </p>
+
+      <div id="stone-areas-status" style="font-family:'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--cyan); margin-bottom: 14px;">
+        ✦ Load complete. Ready to adjust stone areas.
+      </div>
+
+      <div id="stone-areas-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 14px; margin-bottom: 20px;">
+        <!-- Injected dynamically via src/admin.js -->
+      </div>
+
+      <!-- Action Row -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-top:8px; padding-top:16px; border-top:1px solid var(--border-subtle);">
+        <label style="display:inline-flex; align-items:center; gap:8px; font-size:0.75rem; color:#bbb; cursor:pointer; font-family:'JetBrains Mono', monospace;">
+          <input type="checkbox" id="chk-sync-existing-teams" checked style="accent-color:var(--gold); width:16px; height:16px;">
+          <span>Automatically synchronize all existing registered squads to updated areas</span>
+        </label>
+
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <button id="btn-cancel-stone-areas" class="modal-cancel-btn" type="button" style="padding:10px 16px; font-size:0.75rem; font-weight:700; background:transparent; border:1px solid var(--border-subtle); color:var(--text-muted); border-radius:6px; cursor:pointer;">
+            CLOSE
+          </button>
+          <button id="btn-save-stone-areas" class="btn-save-admin" type="button" style="width:auto; padding:10px 22px; font-size:0.8rem; background:linear-gradient(135deg, #c084fc, #9333ea); color:#fff; font-weight:800; border:none; cursor:pointer; box-shadow:0 0 15px rgba(192,132,252,0.3);">
+            💾 SAVE &amp; PROPAGATE STONE AREAS
           </button>
         </div>
       </div>

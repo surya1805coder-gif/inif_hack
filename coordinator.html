@@ -425,6 +425,128 @@
       border-color: #fff;
     }
 
+    /* Food Check-in Per-Member Styles */
+    .food-meals-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 270px;
+    }
+
+    .meal-check-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      padding: 5px 8px;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .meal-check-group:hover {
+      background: rgba(255, 255, 255, 0.035);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .meal-check-group.all-served {
+      border-left: 3px solid var(--green);
+    }
+
+    .meal-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 95px;
+      flex-shrink: 0;
+    }
+
+    .meal-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #ddd;
+    }
+
+    .btn-meal-all {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .meal-count-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      padding: 2px 6px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s;
+    }
+
+    .meal-count-badge.has-some {
+      background: rgba(255, 208, 0, 0.15);
+      color: var(--gold);
+      border-color: rgba(255, 208, 0, 0.35);
+    }
+
+    .meal-count-badge.all-done {
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--green);
+      border-color: rgba(0, 255, 136, 0.45);
+    }
+
+    .meal-members-chips {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .member-food-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      gap: 3px;
+      padding: 4px 8px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.7rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: #aaa;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .member-food-chip:hover {
+      border-color: #fff;
+      color: #fff;
+    }
+
+    .member-food-chip.checked {
+      background: rgba(0, 255, 136, 0.18);
+      border-color: var(--green);
+      color: var(--green);
+      font-weight: 700;
+      box-shadow: 0 0 6px rgba(0, 255, 136, 0.2);
+    }
+
+    .member-food-chip:disabled,
+    .btn-meal-all:disabled {
+      opacity: 0.5;
+      cursor: wait;
+    }
+
     /* Mobile Responsive Optimizations */
     @media (max-width: 900px) {
       .kpi-row {
@@ -631,6 +753,13 @@
         <button class="f-pill" data-domain="time">TIME</button>
         <button class="f-pill" data-domain="soul">SOUL</button>
       </div>
+      <div class="filter-pills" id="meal-filters" style="margin-top: 8px;">
+        <span class="mono-label" style="font-size: 0.68rem; color: var(--gold); display: inline-flex; align-items: center; margin-right: 4px;">MEAL FOCUS:</span>
+        <button class="f-pill active" data-meal="all">ALL MEALS</button>
+        <button class="f-pill" data-meal="dinner">DINNER</button>
+        <button class="f-pill" data-meal="breakfast">BREAKFAST</button>
+        <button class="f-pill" data-meal="lunch">LUNCH</button>
+      </div>
     </div>
 
     <!-- Teams Table -->
@@ -640,7 +769,7 @@
           <tr>
             <th>TEAM / COLLEGE</th>
             <th>DOMAIN / LAB</th>
-            <th>MEALS (LUNCH 12PM | TEA 6PM | DINNER 8PM | MIDNIGHT 12AM | BREAKFAST 7AM)</th>
+            <th>FOOD CHECK-IN (PER-MEMBER MARKS)</th>
             <th>REVIEWS (R1 IDEA 1PM | R2 PROTO 5PM | R3 MVP 2AM)</th>
           </tr>
         </thead>

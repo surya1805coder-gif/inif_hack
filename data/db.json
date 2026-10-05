@@ -45,7 +45,8 @@
             "asd"
           ]
         }
-      ]
+      ],
+      "roomAllocated": "Lab Block 3 - CSE AI Lab"
     },
     {
       "id": "connectivity",
@@ -81,7 +82,8 @@
             "Real-time threat detection & firewall isolation rules"
           ]
         }
-      ]
+      ],
+      "roomAllocated": "Lab Block 2 - IoT Lab 204"
     },
     {
       "id": "digital",
@@ -117,7 +119,8 @@
             "Offline-first progressive synchronization"
           ]
         }
-      ]
+      ],
+      "roomAllocated": "Lab Block 1 - WebXR Studio 102"
     },
     {
       "id": "automation",
@@ -153,7 +156,8 @@
             "Real-time metrics visualizer with latency histograms"
           ]
         }
-      ]
+      ],
+      "roomAllocated": "Mech Block - Robotics 01"
     },
     {
       "id": "analytics",
@@ -189,7 +193,8 @@
             "Visual telemetry interface with latency histograms"
           ]
         }
-      ]
+      ],
+      "roomAllocated": "CS Block - Big Data 401"
     },
     {
       "id": "impact",
@@ -225,210 +230,11 @@
             "SMS/WhatsApp fallback alerting pipeline"
           ]
         }
-      ]
+      ],
+      "roomAllocated": "Main Auditorium / Hall 2"
     }
   ],
   "teams": [
-    {
-      "id": "INF-1001",
-      "teamName": "Neural Architects",
-      "college": "Indian Institute of Technology, Madras",
-      "preferredDomain": "intelligence",
-      "techStack": [
-        "Python",
-        "PyTorch",
-        "LangChain",
-        "FastAPI"
-      ],
-      "teamSize": 4,
-      "teamPassword": "mind2026",
-      "leader": {
-        "name": "Aarav Sharma",
-        "email": "aarav.sharma@iitm.ac.in",
-        "phone": "+91 98401 23456"
-      },
-      "members": [
-        {
-          "name": "Priya Nair",
-          "email": "priya.nair@iitm.ac.in",
-          "phone": "+91 98401 23457"
-        },
-        {
-          "name": "Rohan Varma",
-          "email": "rohan.varma@iitm.ac.in",
-          "phone": "+91 98401 23458"
-        },
-        {
-          "name": "Ananya Iyer",
-          "email": "ananya.iyer@iitm.ac.in",
-          "phone": "+91 98401 23459"
-        }
-      ],
-      "roomAllocated": "Turing Computing Lab (Block A - 204)",
-      "selectedProblemStatement": {
-        "id": "ps-intel-02",
-        "code": "PS-INTEL-02",
-        "title": "aaasd",
-        "category": "INTELLIGENCE & Systems",
-        "selectedAt": "2026-09-29T17:47:14.367Z"
-      },
-      "payment": {
-        "utr": "928374615243",
-        "phone": "+91 98401 23456",
-        "screenshotUrl": "/placeholder-receipt.png",
-        "submittedAt": "2026-09-29T18:30:00.000Z",
-        "amount": 1560,
-        "status": "pending"
-      },
-      "reviews": {
-        "r1": {
-          "attended": true,
-          "time": "2026-10-10T14:15:00.000Z",
-          "notes": "Multi-agent debate loop design completed; verification testbench in progress."
-        },
-        "r2": {
-          "attended": true,
-          "time": "2026-10-10T22:00:00.000Z",
-          "notes": "Real-time trace visualizer working cleanly with sub-second arbitration."
-        },
-        "r3": {
-          "attended": false,
-          "time": null,
-          "notes": ""
-        }
-      },
-      "food": {
-        "highTea": {
-          "collected": false,
-          "time": null
-        },
-        "dinner": {
-          "collected": true,
-          "time": "2026-10-10T20:45:00.000Z"
-        },
-        "midnightFuel": {
-          "collected": true,
-          "time": "2026-10-11T01:30:00.000Z"
-        },
-        "breakfast": {
-          "collected": false,
-          "time": null
-        },
-        "lunch": {
-          "collected": false,
-          "time": null
-        }
-      },
-      "scores": {
-        "innovation": 24,
-        "technical": 25,
-        "execution": 23,
-        "presentation": 24,
-        "total": 96,
-        "remarks": "Outstanding multi-agent consensus architecture with automated self-correction.",
-        "updatedAt": "2026-10-11T02:00:00.000Z"
-      },
-      "createdAt": "2026-09-29T18:30:00.000Z",
-      "status": "confirmed"
-    },
-    {
-      "id": "INF-2048",
-      "teamName": "Cyber Aegis",
-      "college": "National Institute of Technology, Trichy",
-      "preferredDomain": "connectivity",
-      "techStack": [
-        "Rust",
-        "Go",
-        "eBPF",
-        "Kubernetes",
-        "WireGuard"
-      ],
-      "teamSize": 3,
-      "teamPassword": "space2026",
-      "leader": {
-        "name": "Kavya Sundaram",
-        "email": "kavya.s@nitt.edu",
-        "phone": "+91 94431 87654"
-      },
-      "members": [
-        {
-          "name": "Aditya Menon",
-          "email": "aditya.m@nitt.edu",
-          "phone": "+91 94431 87655"
-        },
-        {
-          "name": "Gautam Rao",
-          "email": "gautam.r@nitt.edu",
-          "phone": "+91 94431 87656"
-        }
-      ],
-      "roomAllocated": "Cyber Defense Simulation Lab (Block C - 102)",
-      "selectedProblemStatement": {
-        "id": "ps-conn-01",
-        "code": "PS-CONN-01",
-        "title": "Zero-Trust Multi-Cloud Mesh Failover & Network Threat Shield",
-        "category": "Cybersecurity & Cloud",
-        "selectedAt": "2026-10-10T09:45:00.000Z"
-      },
-      "payment": {
-        "utr": "819273645102",
-        "phone": "+91 94431 87654",
-        "screenshotUrl": "/placeholder-receipt.png",
-        "submittedAt": "2026-09-29T19:00:00.000Z",
-        "amount": 1170,
-        "status": "verified"
-      },
-      "reviews": {
-        "r1": {
-          "attended": true,
-          "time": "2026-10-10T14:40:00.000Z",
-          "notes": "Kernel-level eBPF packet filter hooked; multi-cloud failover logic ready."
-        },
-        "r2": {
-          "attended": false,
-          "time": null,
-          "notes": ""
-        },
-        "r3": {
-          "attended": false,
-          "time": null,
-          "notes": ""
-        }
-      },
-      "food": {
-        "highTea": {
-          "collected": true,
-          "time": "2026-10-10T16:45:00.000Z"
-        },
-        "dinner": {
-          "collected": true,
-          "time": "2026-10-10T21:10:00.000Z"
-        },
-        "midnightFuel": {
-          "collected": false,
-          "time": null
-        },
-        "breakfast": {
-          "collected": false,
-          "time": null
-        },
-        "lunch": {
-          "collected": false,
-          "time": null
-        }
-      },
-      "scores": {
-        "innovation": 23,
-        "technical": 24,
-        "execution": 22,
-        "presentation": 21,
-        "total": 90,
-        "remarks": "Clean low-level network hooks with zero packet loss during cloud migration.",
-        "updatedAt": "2026-10-10T17:00:00.000Z"
-      },
-      "createdAt": "2026-09-29T19:00:00.000Z",
-      "status": "confirmed"
-    },
     {
       "id": "INF-3141",
       "teamName": "Aether Spatial Lab",
@@ -465,7 +271,7 @@
           "phone": "+91 97890 11226"
         }
       ],
-      "roomAllocated": "Immersive Reality Studio (Block B - 305)",
+      "roomAllocated": "Lab Block 1 - WebXR Studio 102",
       "selectedProblemStatement": {
         "id": "ps-dig-01",
         "code": "PS-DIG-01",
@@ -483,7 +289,9 @@
       },
       "reviews": {
         "r1": {
-          "attended": true
+          "attended": false,
+          "time": null,
+          "notes": ""
         },
         "r2": {
           "attended": false
@@ -494,10 +302,18 @@
       },
       "food": {
         "highTea": {
-          "collected": true
+          "collected": true,
+          "count": 3,
+          "members": [
+            true,
+            true,
+            false,
+            true
+          ],
+          "time": "2026-10-05T11:05:35.979Z"
         },
         "dinner": {
-          "collected": false
+          "collected": true
         },
         "midnightFuel": {
           "collected": false
@@ -552,7 +368,7 @@
           "phone": "+91 99441 55669"
         }
       ],
-      "roomAllocated": "Agri-Health IoT Innovation Hub (Block D - 110)",
+      "roomAllocated": "Main Auditorium / Hall 2",
       "selectedProblemStatement": {
         "id": "ps-imp-01",
         "code": "PS-IMP-01",
@@ -570,8 +386,8 @@
       },
       "reviews": {
         "r1": {
-          "attended": false,
-          "time": null,
+          "attended": true,
+          "time": "2026-10-05T10:54:10.248Z",
           "notes": ""
         },
         "r2": {
@@ -580,8 +396,8 @@
           "notes": ""
         },
         "r3": {
-          "attended": false,
-          "time": null,
+          "attended": true,
+          "time": "2026-10-05T10:54:12.390Z",
           "notes": ""
         }
       },
@@ -644,7 +460,7 @@
           "phone": "09985252395"
         }
       ],
-      "roomAllocated": "TBA (Lab Block 3)",
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "424102044729",
@@ -705,91 +521,6 @@
       "status": "confirmed"
     },
     {
-      "id": "INF-2373",
-      "teamName": "tarun",
-      "college": "oiuytre",
-      "preferredDomain": "mind",
-      "techStack": [],
-      "teamSize": 3,
-      "teamPassword": "0987654321",
-      "leader": {
-        "name": "Ganugula Tarun venkata swamy",
-        "email": "tarunganugula31@gmail.com",
-        "phone": "9985252395"
-      },
-      "members": [
-        {
-          "name": "t",
-          "email": "tarunganugula209@gmail.com",
-          "phone": "09985252395"
-        },
-        {
-          "name": "ttt",
-          "email": "tarunganugula209@gmail.com",
-          "phone": "09985252395"
-        }
-      ],
-      "roomAllocated": "TBA (Lab Block 3)",
-      "selectedProblemStatement": null,
-      "payment": {
-        "utr": "424102044720",
-        "phone": "9985252395",
-        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1790826443999-zg3ghd.jpeg",
-        "submittedAt": "2026-10-01T03:47:24.359Z",
-        "amount": 1047,
-        "status": "pending"
-      },
-      "reviews": {
-        "r1": {
-          "attended": false,
-          "time": null,
-          "notes": ""
-        },
-        "r2": {
-          "attended": false,
-          "time": null,
-          "notes": ""
-        },
-        "r3": {
-          "attended": false,
-          "time": null,
-          "notes": ""
-        }
-      },
-      "food": {
-        "highTea": {
-          "collected": false,
-          "time": null
-        },
-        "dinner": {
-          "collected": false,
-          "time": null
-        },
-        "midnightFuel": {
-          "collected": false,
-          "time": null
-        },
-        "breakfast": {
-          "collected": false,
-          "time": null
-        },
-        "lunch": {
-          "collected": false,
-          "time": null
-        }
-      },
-      "scores": {
-        "innovation": 0,
-        "technical": 0,
-        "execution": 0,
-        "presentation": 0,
-        "total": 0,
-        "remarks": ""
-      },
-      "createdAt": "2026-10-01T03:47:24.359Z",
-      "status": "confirmed"
-    },
-    {
       "id": "INF-6907",
       "teamName": "Crypto Guardians",
       "college": "Cyber Tech Institute",
@@ -814,7 +545,7 @@
           "phone": "9265018057"
         }
       ],
-      "roomAllocated": "TBA (Lab Block 3)",
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
       "selectedProblemStatement": {
         "id": "ps-intel-01",
         "code": "PS-INTEL-01",
@@ -905,7 +636,7 @@
           "phone": "9253933857"
         }
       ],
-      "roomAllocated": "TBA (Lab Block 3)",
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
       "selectedProblemStatement": {
         "id": "ps-intel-01",
         "code": "PS-INTEL-01",
@@ -996,7 +727,7 @@
           "phone": "9264691992"
         }
       ],
-      "roomAllocated": "TBA (Lab Block 3)",
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "UTR17908372054571",
@@ -1081,7 +812,7 @@
           "phone": "9284673342"
         }
       ],
-      "roomAllocated": "TBA (Lab Block 3)",
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "UTR17908372065002",
@@ -1166,7 +897,7 @@
           "phone": "9224325794"
         }
       ],
-      "roomAllocated": "TBA (Lab Block 3)",
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "UTR17908372078183",
@@ -1251,7 +982,7 @@
           "phone": "9261812759"
         }
       ],
-      "roomAllocated": "TBA (Lab Block 3)",
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "UTR17908372090314",
@@ -1312,176 +1043,6 @@
       "status": "confirmed"
     },
     {
-      "id": "INF-3255",
-      "teamName": "Spam Squad 5",
-      "college": "Spam College",
-      "preferredDomain": "intelligence",
-      "techStack": [],
-      "teamSize": 3,
-      "teamPassword": "pbkdf2:100000:ac5dd393c8c27b4ee7d33d27b9d9a706:4d52037e2f363880fb93b0baef832d036916100598129d91e145780708c0dbe8",
-      "leader": {
-        "name": "Leader 5",
-        "email": "leader_5_1790837210161@example.com",
-        "phone": "9846583394"
-      },
-      "members": [
-        {
-          "name": "M1",
-          "email": "m1_5_1790837210161@example.com",
-          "phone": "9141424821"
-        },
-        {
-          "name": "M2",
-          "email": "m2_5_1790837210161@example.com",
-          "phone": "9258609005"
-        }
-      ],
-      "roomAllocated": "TBA (Lab Block 3)",
-      "selectedProblemStatement": null,
-      "payment": {
-        "utr": "UTR17908372101615",
-        "phone": "9812345678",
-        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1790837210166-01x4bh.png",
-        "submittedAt": "2026-10-01T06:46:50.767Z",
-        "amount": 1047,
-        "status": "pending"
-      },
-      "reviews": {
-        "r1": {
-          "attended": false,
-          "time": null,
-          "notes": ""
-        },
-        "r2": {
-          "attended": false,
-          "time": null,
-          "notes": ""
-        },
-        "r3": {
-          "attended": false,
-          "time": null,
-          "notes": ""
-        }
-      },
-      "food": {
-        "highTea": {
-          "collected": false,
-          "time": null
-        },
-        "dinner": {
-          "collected": false,
-          "time": null
-        },
-        "midnightFuel": {
-          "collected": false,
-          "time": null
-        },
-        "breakfast": {
-          "collected": false,
-          "time": null
-        },
-        "lunch": {
-          "collected": false,
-          "time": null
-        }
-      },
-      "scores": {
-        "innovation": 0,
-        "technical": 0,
-        "execution": 0,
-        "presentation": 0,
-        "total": 0,
-        "remarks": ""
-      },
-      "createdAt": "2026-10-01T06:46:50.767Z",
-      "status": "confirmed"
-    },
-    {
-      "id": "INF-4029",
-      "teamName": "hi",
-      "college": "hi",
-      "preferredDomain": "mind",
-      "techStack": [],
-      "teamSize": 3,
-      "teamPassword": "pbkdf2:100000:a77d83205320398269039bf358ba33c1:4bdc574d73ab5ee55669b086108b8b54ddd18506c893709c2b787784545e533c",
-      "leader": {
-        "name": "hi",
-        "email": "hi@gmail.com",
-        "phone": "1234567890"
-      },
-      "members": [
-        {
-          "name": "hi",
-          "email": "h1i@gmail.com",
-          "phone": "1234567894"
-        },
-        {
-          "name": "hi",
-          "email": "h2i@gmail.com",
-          "phone": "1234567896"
-        }
-      ],
-      "roomAllocated": "TBA (Lab Block 3)",
-      "selectedProblemStatement": null,
-      "payment": {
-        "utr": "614824672882",
-        "phone": "1234567890",
-        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1790842530968-b1jqem.jpeg",
-        "submittedAt": "2026-10-01T08:15:32.042Z",
-        "amount": 1047,
-        "status": "pending"
-      },
-      "reviews": {
-        "r1": {
-          "attended": false,
-          "time": null,
-          "notes": ""
-        },
-        "r2": {
-          "attended": false,
-          "time": null,
-          "notes": ""
-        },
-        "r3": {
-          "attended": false,
-          "time": null,
-          "notes": ""
-        }
-      },
-      "food": {
-        "highTea": {
-          "collected": false,
-          "time": null
-        },
-        "dinner": {
-          "collected": false,
-          "time": null
-        },
-        "midnightFuel": {
-          "collected": false,
-          "time": null
-        },
-        "breakfast": {
-          "collected": false,
-          "time": null
-        },
-        "lunch": {
-          "collected": false,
-          "time": null
-        }
-      },
-      "scores": {
-        "innovation": 0,
-        "technical": 0,
-        "execution": 0,
-        "presentation": 0,
-        "total": 0,
-        "remarks": ""
-      },
-      "createdAt": "2026-10-01T08:15:32.042Z",
-      "status": "confirmed"
-    },
-    {
       "id": "INF-4789",
       "teamName": "h11",
       "college": "h11",
@@ -1506,7 +1067,7 @@
           "phone": "2345665432"
         }
       ],
-      "roomAllocated": "TBA (Lab Block 3)",
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
       "selectedProblemStatement": null,
       "payment": {
         "utr": "912498993636",
@@ -1565,8 +1126,1346 @@
       },
       "createdAt": "2026-10-01T08:19:43.295Z",
       "status": "confirmed"
+    },
+    {
+      "id": "INF-6331",
+      "teamName": "e",
+      "college": "r",
+      "preferredDomain": "mind",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:622e15bfc491683a7c4ea462b7f4c083:d569b45c48ad298eebdb6e0474c4a39f0101bf3f1a0239113ae092bdfe2a4d9b",
+      "leader": {
+        "name": "e",
+        "email": "e@gmail.com",
+        "phone": "0987654321"
+      },
+      "members": [
+        {
+          "name": "r",
+          "email": "u@gmail.com",
+          "phone": "6789634512"
+        },
+        {
+          "name": "t",
+          "email": "j@gmail.com",
+          "phone": "1234432234"
+        }
+      ],
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "385017766706",
+        "phone": "0987654321",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1790843941119-5u28b5.jpeg",
+        "submittedAt": "2026-10-01T08:39:01.527Z",
+        "amount": 1047,
+        "status": "pending"
+      },
+      "reviews": {
+        "r1": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r2": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r3": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false,
+          "time": null
+        },
+        "dinner": {
+          "collected": false,
+          "time": null
+        },
+        "midnightFuel": {
+          "collected": false,
+          "time": null
+        },
+        "breakfast": {
+          "collected": false,
+          "time": null
+        },
+        "lunch": {
+          "collected": false,
+          "time": null
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-01T08:39:01.527Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "INF-7745",
+      "teamName": "infinite coders",
+      "college": "aysdfyd",
+      "preferredDomain": "mind",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:39c8ecb93c292a3579a412f075adc8d0:0e7975cae2142688bce112cf958e972570969a3bde3fe954be354b5b6fb38357",
+      "leader": {
+        "name": "edge",
+        "email": "kegfhywtef@gmail.com",
+        "phone": "7093651747"
+      },
+      "members": [
+        {
+          "name": "uyfegy",
+          "email": "uyfgea@aco.in",
+          "phone": "7568298589"
+        },
+        {
+          "name": "yugfycqtvctd",
+          "email": "ttjrhrcbrhevj@hgj.com",
+          "phone": "1236549873"
+        }
+      ],
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "315975523799",
+        "phone": "7539514568",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1790955878305-f247h7.jpeg",
+        "submittedAt": "2026-10-02T15:44:38.607Z",
+        "amount": 1047,
+        "status": "pending"
+      },
+      "reviews": {
+        "r1": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r2": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r3": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false,
+          "time": null
+        },
+        "dinner": {
+          "collected": false,
+          "time": null
+        },
+        "midnightFuel": {
+          "collected": false,
+          "time": null
+        },
+        "breakfast": {
+          "collected": false,
+          "time": null
+        },
+        "lunch": {
+          "collected": false,
+          "time": null
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-02T15:44:38.607Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "INF-5133",
+      "teamName": "Invicta",
+      "college": "Gvp",
+      "preferredDomain": "intelligence",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:0a0385bf8d34f2f301f08307c7c53484:57de0b94ad1fb5761c102f89af3eb98819d107ab9144409362154627caff7fd7",
+      "leader": {
+        "name": "Jahnavi",
+        "email": "gunturujahnaviramani@gmail.com",
+        "phone": "9398548046"
+      },
+      "members": [
+        {
+          "name": "Akshara",
+          "email": "5241411155@gvpcdpgc.com",
+          "phone": "8309064895"
+        },
+        {
+          "name": "Prakash",
+          "email": "5241411138@gvpcdpgc.com",
+          "phone": "9398548045"
+        }
+      ],
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "081594841782",
+        "phone": "8309064895",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791182307918-lv3lb3.jpg",
+        "submittedAt": "2026-10-05T06:38:28.268Z",
+        "amount": 1047,
+        "status": "pending"
+      },
+      "reviews": {
+        "r1": {
+          "attended": false
+        },
+        "r2": {
+          "attended": false
+        },
+        "r3": {
+          "attended": false
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false
+        },
+        "dinner": {
+          "collected": false
+        },
+        "midnightFuel": {
+          "collected": false
+        },
+        "breakfast": {
+          "collected": false
+        },
+        "lunch": {
+          "collected": false
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-05T06:38:28.268Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "INF-9242",
+      "teamName": "Team Hoppers",
+      "college": "Gayatri Vidhya Parishad",
+      "preferredDomain": "mind",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:b56eae36d6427ca37522b7cdbc782d5b:86e90d439b020023d4c59315ff36112444e75527b61f72fb410555106b1779cf",
+      "leader": {
+        "name": "Prakash",
+        "email": "524141138@gvpcdpgc.edu.in",
+        "phone": "8331877963"
+      },
+      "members": [
+        {
+          "name": "Leasha",
+          "email": "5241411064@gvpcdpgcd.edu.in",
+          "phone": "8374744013"
+        },
+        {
+          "name": "Akshara",
+          "email": "aksharayerupalli12@gmail.com",
+          "phone": "9441913964"
+        }
+      ],
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "792210874930",
+        "phone": "8309064895",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791182842854-3koa0k.jpg",
+        "submittedAt": "2026-10-05T06:47:23.237Z",
+        "amount": 1047,
+        "status": "pending"
+      },
+      "reviews": {
+        "r1": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r2": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r3": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false,
+          "time": null
+        },
+        "dinner": {
+          "collected": false,
+          "time": null
+        },
+        "midnightFuel": {
+          "collected": false,
+          "time": null
+        },
+        "breakfast": {
+          "collected": false,
+          "time": null
+        },
+        "lunch": {
+          "collected": false,
+          "time": null
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-05T06:47:23.237Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "INF-2388",
+      "teamName": "Astra Architects",
+      "college": "Gvp",
+      "preferredDomain": "mind",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:1e0ebe22bcbcf134d8f6446a335fb3bb:dcd4701f2b0ee4645125a1e3eefb5b0e9bcb9922c25cbd92c3d8d5fe445b732b",
+      "leader": {
+        "name": "Astra Architects",
+        "email": "namapravallika10@gmail.com",
+        "phone": "8919488970"
+      },
+      "members": [
+        {
+          "name": "Muska",
+          "email": "muskanrana2903@gmail.com",
+          "phone": "9884884840"
+        },
+        {
+          "name": "Sarvani",
+          "email": "janakisarvani@gmail.com",
+          "phone": "1223688759"
+        }
+      ],
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "5123348992",
+        "phone": "8919488970",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791192160765-t0fu4l.jpg",
+        "submittedAt": "2026-10-05T09:22:41.073Z",
+        "amount": 1047,
+        "status": "verified"
+      },
+      "reviews": {
+        "r1": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r2": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r3": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false,
+          "time": null
+        },
+        "dinner": {
+          "collected": false,
+          "time": null
+        },
+        "midnightFuel": {
+          "collected": false,
+          "time": null
+        },
+        "breakfast": {
+          "collected": false,
+          "time": null
+        },
+        "lunch": {
+          "collected": false,
+          "time": null
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-05T09:22:41.073Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "INF-7005",
+      "teamName": "sdfghjkl",
+      "college": "cvbnm,./",
+      "preferredDomain": "mind",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:d3d9495b519565e655b3dad7e6683aea:d1d4448d9711c2fc7b361792ab862fe3b7e97ed1f40d910dad06b3d81547fdf6",
+      "leader": {
+        "name": "tony stark",
+        "email": "aasdfghjkl@gmail.com",
+        "phone": "1234567890"
+      },
+      "members": [
+        {
+          "name": "asdfghjk",
+          "email": "hjkghjkl@gmail.com",
+          "phone": "1122334455"
+        },
+        {
+          "name": "qhjkfghj",
+          "email": "hjkghjwwwkl@gmail.com",
+          "phone": "1928353822"
+        }
+      ],
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "627868468471",
+        "phone": "6301191942",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791192231447-wi6md6.jpeg",
+        "submittedAt": "2026-10-05T09:23:51.765Z",
+        "amount": 1047,
+        "status": "pending"
+      },
+      "reviews": {
+        "r1": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r2": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r3": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false,
+          "time": null
+        },
+        "dinner": {
+          "collected": false,
+          "time": null
+        },
+        "midnightFuel": {
+          "collected": false,
+          "time": null
+        },
+        "breakfast": {
+          "collected": false,
+          "time": null
+        },
+        "lunch": {
+          "collected": false,
+          "time": null
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-05T09:23:51.765Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "INF-6215",
+      "teamName": "CodeNex",
+      "college": "gvp",
+      "preferredDomain": "power",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:046884bbdb6accb9e082fe45e07dda5a:87d5b7ef03364fd268684aff6e9d36fbbaa0c0581193e951f31e209a5896731a",
+      "leader": {
+        "name": "Akhil Kumar",
+        "email": "vanapalliakhil2006@gmail.com",
+        "phone": "9391844237"
+      },
+      "members": [
+        {
+          "name": "harsha",
+          "email": "kumarvanapalli2006@gmail.com",
+          "phone": "6301235985"
+        },
+        {
+          "name": "karthik",
+          "email": "karthik2006@gmail.com",
+          "phone": "9701552324"
+        }
+      ],
+      "roomAllocated": "Mech Block - Robotics 01",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "416505991235",
+        "phone": "9391844237",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791192299830-tbbq17.jpg",
+        "submittedAt": "2026-10-05T09:25:00.860Z",
+        "amount": 1047,
+        "status": "pending"
+      },
+      "reviews": {
+        "r1": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r2": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r3": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false,
+          "time": null
+        },
+        "dinner": {
+          "collected": false,
+          "time": null
+        },
+        "midnightFuel": {
+          "collected": false,
+          "time": null
+        },
+        "breakfast": {
+          "collected": false,
+          "time": null
+        },
+        "lunch": {
+          "collected": false,
+          "time": null
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-05T09:25:00.860Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "INF-9701",
+      "teamName": "Team stark",
+      "college": "Gayatri Vidya Parishid",
+      "preferredDomain": "mind",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:7067a21d556b100c326b4a09513126e0:4f42ce815d1bd881506227a352152886b8cd9572995f5a483dbef6386911351e",
+      "leader": {
+        "name": "Likitha",
+        "email": "likithak71@gmail.com",
+        "phone": "9121599469"
+      },
+      "members": [
+        {
+          "name": "Monika",
+          "email": "klikitha426@gmail.com",
+          "phone": "9949018090"
+        },
+        {
+          "name": "Monisha",
+          "email": "devichodesti@gmail.com",
+          "phone": "9959226954"
+        }
+      ],
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "517440337338",
+        "phone": "912159949",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791192304201-kxc19i.jpg",
+        "submittedAt": "2026-10-05T09:25:04.453Z",
+        "amount": 1047,
+        "status": "verified"
+      },
+      "reviews": {
+        "r1": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r2": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r3": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false,
+          "time": null
+        },
+        "dinner": {
+          "collected": false,
+          "time": null
+        },
+        "midnightFuel": {
+          "collected": false,
+          "time": null
+        },
+        "breakfast": {
+          "collected": false,
+          "time": null
+        },
+        "lunch": {
+          "collected": false,
+          "time": null
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-05T09:25:04.453Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "INF-8350",
+      "teamName": "Coders crack",
+      "college": "Gvp",
+      "preferredDomain": "mind",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:bd2745fcda795cf9e5295e9fa6cebf06:fff42b58203b6d5e50baabffadc38273bf929bee020c09813678f6883c497b0d",
+      "leader": {
+        "name": "Harsha Vardhan Bonela",
+        "email": "harshavardhanela@gmail.com",
+        "phone": "9391137729"
+      },
+      "members": [
+        {
+          "name": "VARDHAN",
+          "email": "harshavardhanbona@gmail.com",
+          "phone": "9391137725"
+        },
+        {
+          "name": "Harsha Vardhan Bonela",
+          "email": "harshavardhanbonela@gmail.com",
+          "phone": "9391137726"
+        }
+      ],
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "573034810447",
+        "phone": "9391137729",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791192320966-yrl00c.jpg",
+        "submittedAt": "2026-10-05T09:25:21.489Z",
+        "amount": 1047,
+        "status": "verified"
+      },
+      "reviews": {
+        "r1": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r2": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r3": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false,
+          "time": null
+        },
+        "dinner": {
+          "collected": false,
+          "time": null
+        },
+        "midnightFuel": {
+          "collected": false,
+          "time": null
+        },
+        "breakfast": {
+          "collected": false,
+          "time": null
+        },
+        "lunch": {
+          "collected": false,
+          "time": null
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-05T09:25:21.489Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "INF-6463",
+      "teamName": "Stark coders",
+      "college": "Gayatri Vidya parishad college for degree and pg courses",
+      "preferredDomain": "soul",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:597561680700d1f8f5d973d44d1421cf:41ebb0e984cd7001223a48cacee97137b83f6b05d62b0e9f9a422a8b405065ae",
+      "leader": {
+        "name": "Sruthi",
+        "email": "sruthi@gmail.com",
+        "phone": "9876543210"
+      },
+      "members": [
+        {
+          "name": "Bhavani",
+          "email": "bhavani@gmail.com",
+          "phone": "9987654321"
+        },
+        {
+          "name": "Renuka",
+          "email": "renuka@gmail.com",
+          "phone": "9998765432"
+        }
+      ],
+      "roomAllocated": "Main Auditorium / Hall 2",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "368308744269",
+        "phone": "9876543210",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791192376557-g8oxl6.jpg",
+        "submittedAt": "2026-10-05T09:26:16.779Z",
+        "amount": 1047,
+        "status": "pending"
+      },
+      "reviews": {
+        "r1": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r2": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r3": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false,
+          "time": null
+        },
+        "dinner": {
+          "collected": false,
+          "time": null
+        },
+        "midnightFuel": {
+          "collected": false,
+          "time": null
+        },
+        "breakfast": {
+          "collected": false,
+          "time": null
+        },
+        "lunch": {
+          "collected": false,
+          "time": null
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-05T09:26:16.779Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "INF-9465",
+      "teamName": "Stark code 11",
+      "college": "Gvpcdpgc",
+      "preferredDomain": "reality",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:f97fb82b11e3f390241b27425b6d4e33:b52a9697a43acf928bf01c036768ed5976d961c25f704b01a0c316c88b3af12d",
+      "leader": {
+        "name": "Queeni",
+        "email": "achuk0807@gmail.com",
+        "phone": "9390087701"
+      },
+      "members": [
+        {
+          "name": "Queeni",
+          "email": "queeni@gmail.com",
+          "phone": "9496352841"
+        },
+        {
+          "name": "Sruthi",
+          "email": "sruthi@gnail.com",
+          "phone": "9865321478"
+        }
+      ],
+      "roomAllocated": "Lab Block 1 - WebXR Studio 102",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "664703374493",
+        "phone": "9390087701",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791192856297-qhylt9.jpg",
+        "submittedAt": "2026-10-05T09:34:16.633Z",
+        "amount": 1047,
+        "status": "pending"
+      },
+      "reviews": {
+        "r1": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r2": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r3": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false,
+          "time": null
+        },
+        "dinner": {
+          "collected": false,
+          "time": null
+        },
+        "midnightFuel": {
+          "collected": false,
+          "time": null
+        },
+        "breakfast": {
+          "collected": false,
+          "time": null
+        },
+        "lunch": {
+          "collected": false,
+          "time": null
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-05T09:34:16.633Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "INF-5758",
+      "teamName": "Jdjdjf",
+      "college": "Hdbdbfn",
+      "preferredDomain": "mind",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:0ac933007119fa8ac1d4f2563f0be09a:0f103ebe65383b8ae66bcbdc3b54a1f8be19d61bda2a693e9068229caf706640",
+      "leader": {
+        "name": "Dhdbdnsmj",
+        "email": "nfndj@hdhdj.com",
+        "phone": "8332817931"
+      },
+      "members": [
+        {
+          "name": "Tarun",
+          "email": "tarunganugula20@gmail.com",
+          "phone": "9849892263"
+        },
+        {
+          "name": "Tarun",
+          "email": "tarunganugula1@gmail.com",
+          "phone": "9985252393"
+        }
+      ],
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "615261604561",
+        "phone": "8332817931",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791193327141-y4n8rp.jpg",
+        "submittedAt": "2026-10-05T09:42:07.520Z",
+        "amount": 1047,
+        "status": "pending"
+      },
+      "reviews": {
+        "r1": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r2": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r3": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false,
+          "time": null
+        },
+        "dinner": {
+          "collected": false,
+          "time": null
+        },
+        "midnightFuel": {
+          "collected": false,
+          "time": null
+        },
+        "breakfast": {
+          "collected": false,
+          "time": null
+        },
+        "lunch": {
+          "collected": false,
+          "time": null
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-05T09:42:07.520Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "INF-9982",
+      "teamName": "sruthi",
+      "college": "gvp",
+      "preferredDomain": "mind",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:75314dd013c8447daf9acd067d8063c5:5523ab8cb16f0a2aedeb5b287dfcde27f43aadf2f3c336abce1f67b8054a29e9",
+      "leader": {
+        "name": "sruthi",
+        "email": "sruthi20@gmail.com",
+        "phone": "8341454346"
+      },
+      "members": [
+        {
+          "name": "renuka",
+          "email": "renu@gmail.com",
+          "phone": "9734865808"
+        },
+        {
+          "name": "queeni",
+          "email": "queen@gmail.com",
+          "phone": "9236468677"
+        }
+      ],
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "098765432112",
+        "phone": "8341454346",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791193590466-9jqm5j.jpeg",
+        "submittedAt": "2026-10-05T09:46:30.746Z",
+        "amount": 1047,
+        "status": "pending"
+      },
+      "reviews": {
+        "r1": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r2": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r3": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false,
+          "time": null
+        },
+        "dinner": {
+          "collected": false,
+          "time": null
+        },
+        "midnightFuel": {
+          "collected": false,
+          "time": null
+        },
+        "breakfast": {
+          "collected": false,
+          "time": null
+        },
+        "lunch": {
+          "collected": false,
+          "time": null
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-05T09:46:30.746Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "INF-2116",
+      "teamName": "Team7",
+      "college": "Mvgr",
+      "preferredDomain": "mind",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:f302e1019783dc2dceba34185b85b6ce:4bde295996ca9be6e3636c43a4189b3c015c517a93af9612bc494df1a8dcdf61",
+      "leader": {
+        "name": "Muskan",
+        "email": "muskanrana290@gmail.com",
+        "phone": "6466401234"
+      },
+      "members": [
+        {
+          "name": "Evara",
+          "email": "evara@gmail.com",
+          "phone": "9123467829"
+        },
+        {
+          "name": "Pravs",
+          "email": "pravs@gmail.com",
+          "phone": "9842461912"
+        }
+      ],
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "512738268912",
+        "phone": "9164191512",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791194220982-6cqezo.jpg",
+        "submittedAt": "2026-10-05T09:57:02.172Z",
+        "amount": 1047,
+        "status": "pending"
+      },
+      "reviews": {
+        "r1": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r2": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r3": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false,
+          "time": null
+        },
+        "dinner": {
+          "collected": false,
+          "time": null
+        },
+        "midnightFuel": {
+          "collected": false,
+          "time": null
+        },
+        "breakfast": {
+          "collected": false,
+          "time": null
+        },
+        "lunch": {
+          "collected": false,
+          "time": null
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-05T09:57:02.172Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "INF-1911",
+      "teamName": "Team1",
+      "college": "Gvp",
+      "preferredDomain": "intelligence",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:e954ff04772762f84788def7e2ec308b:0d53f5142774932bffef1cfa93e27602b055d66269be110b585f716e9d4691b3",
+      "leader": {
+        "name": "Jahnavi",
+        "email": "gunturujahnavi2ramani@gmail.com",
+        "phone": "9398548642"
+      },
+      "members": [
+        {
+          "name": "Jaanu",
+          "email": "guntrujahnaviramani@gmail.com",
+          "phone": "9298548046"
+        },
+        {
+          "name": "Ramaniii",
+          "email": "gunturujahnaviramanii@gmail.com",
+          "phone": "7398548046"
+        }
+      ],
+      "roomAllocated": "Lab Block 3 - CSE AI Lab",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "081456765436",
+        "phone": "9398548046",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791194776961-omcy07.jpg",
+        "submittedAt": "2026-10-05T10:06:17.656Z",
+        "amount": 1047,
+        "status": "verified"
+      },
+      "reviews": {
+        "r1": {
+          "attended": true
+        },
+        "r2": {
+          "attended": false
+        },
+        "r3": {
+          "attended": false
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false
+        },
+        "dinner": {
+          "collected": false
+        },
+        "midnightFuel": {
+          "collected": false
+        },
+        "breakfast": {
+          "collected": false
+        },
+        "lunch": {
+          "collected": false
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-05T10:06:17.656Z",
+      "status": "confirmed"
+    },
+    {
+      "id": "INF-4894",
+      "teamName": "Jttu",
+      "college": "History",
+      "preferredDomain": "soul",
+      "techStack": [],
+      "teamSize": 3,
+      "teamPassword": "pbkdf2:100000:5cb61a5bc450162b28bc39ecb3aa902b:0648148ca154b996bf96c0ea895132230d5a6bbff06413d9b029c613b96fc44b",
+      "leader": {
+        "name": "Furyi",
+        "email": "poornimakilladi@gmail.com",
+        "phone": "9491039985"
+      },
+      "members": [
+        {
+          "name": "Didi",
+          "email": "poorni@gmail.com",
+          "phone": "1234567895"
+        },
+        {
+          "name": "History",
+          "email": "poornima@gmail.com",
+          "phone": "1234567894"
+        }
+      ],
+      "roomAllocated": "Main Auditorium / Hall 2",
+      "selectedProblemStatement": null,
+      "payment": {
+        "utr": "368376789012",
+        "phone": "9234567890",
+        "screenshotUrl": "https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev/receipts/1791197255280-oq728t.jpg",
+        "submittedAt": "2026-10-05T10:47:35.593Z",
+        "amount": 1047,
+        "status": "pending"
+      },
+      "reviews": {
+        "r1": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r2": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        },
+        "r3": {
+          "attended": false,
+          "time": null,
+          "notes": ""
+        }
+      },
+      "food": {
+        "highTea": {
+          "collected": false,
+          "time": null
+        },
+        "dinner": {
+          "collected": false,
+          "time": null
+        },
+        "midnightFuel": {
+          "collected": false,
+          "time": null
+        },
+        "breakfast": {
+          "collected": false,
+          "time": null
+        },
+        "lunch": {
+          "collected": false,
+          "time": null
+        }
+      },
+      "scores": {
+        "innovation": 0,
+        "technical": 0,
+        "execution": 0,
+        "presentation": 0,
+        "total": 0,
+        "remarks": ""
+      },
+      "createdAt": "2026-10-05T10:47:35.593Z",
+      "status": "confirmed"
     }
   ],
-  "_version": 13,
-  "_lastModified": "2026-10-01T08:19:43.740Z"
+  "_version": 64,
+  "_lastModified": "2026-10-05T11:12:41.529Z"
 }

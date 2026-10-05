@@ -197,6 +197,28 @@ const DATA_DIR = path.join(__dirname, 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 const R2_DB_KEY = 'state/database.json';
 
+// Stone & Domain Normalization Map
+export const STONE_DOMAIN_MAP = {
+  mind: 'intelligence',
+  intelligence: 'intelligence',
+  space: 'connectivity',
+  connectivity: 'connectivity',
+  reality: 'digital',
+  digital: 'digital',
+  power: 'automation',
+  automation: 'automation',
+  time: 'analytics',
+  analytics: 'analytics',
+  soul: 'impact',
+  impact: 'impact'
+};
+
+export function normalizeDomainId(val) {
+  if (!val) return 'intelligence';
+  const clean = String(val).toLowerCase().replace(/ stone$/i, '').trim();
+  return STONE_DOMAIN_MAP[clean] || clean;
+}
+
 // Initial Domains & Problem Statements — Marvel Infinity Stones
 const INITIAL_DOMAINS = [
   {
@@ -207,6 +229,7 @@ const INITIAL_DOMAINS = [
     tagline: 'AI • ML • Decision Systems',
     marvelTheme: 'Vision Neural Gold',
     accentHex: '#ffd000',
+    roomAllocated: 'Lab Block 3 (CS-301)',
     techStackSuggestions: ['Python', 'PyTorch', 'LangChain', 'FastAPI', 'Gemini API', 'TensorFlow'],
     isPsReleased: false,
     psReleaseDate: '2026-10-10T09:00:00Z',
@@ -248,6 +271,7 @@ const INITIAL_DOMAINS = [
     tagline: 'Cybersecurity • Cloud • Networks',
     marvelTheme: 'Tesseract Cyan',
     accentHex: '#00d2ff',
+    roomAllocated: 'Lab Block 2 (IoT-204)',
     techStackSuggestions: ['Rust', 'Go', 'Kubernetes', 'eBPF', 'Cloudflare Workers', 'WireGuard'],
     isPsReleased: false,
     psReleaseDate: '2026-10-10T09:00:00Z',
@@ -289,6 +313,7 @@ const INITIAL_DOMAINS = [
     tagline: 'Web • Mobile • Digital Platforms',
     marvelTheme: 'Aether Crimson',
     accentHex: '#ff2a4b',
+    roomAllocated: 'Lab Block 1 (AI-102)',
     techStackSuggestions: ['TypeScript', 'React', 'Flutter', 'Next.js', 'Node.js', 'WebGL'],
     isPsReleased: false,
     psReleaseDate: '2026-10-10T09:00:00Z',
@@ -330,6 +355,7 @@ const INITIAL_DOMAINS = [
     tagline: 'IoT • Robotics • Embedded Systems',
     marvelTheme: 'Thanos Void Purple',
     accentHex: '#b026ff',
+    roomAllocated: 'Mechanical Block (Robo-01)',
     techStackSuggestions: ['C++', 'Rust', 'ESP32 / Arduino', 'ROS2', 'MQTT', 'FreeRTOS'],
     isPsReleased: false,
     psReleaseDate: '2026-10-10T09:00:00Z',
@@ -371,6 +397,7 @@ const INITIAL_DOMAINS = [
     tagline: 'Data • Prediction • Optimization',
     marvelTheme: 'Doctor Strange Emerald',
     accentHex: '#00ff88',
+    roomAllocated: 'CS Block (DataLab-401)',
     techStackSuggestions: ['Python', 'Kafka', 'ClickHouse', 'Pandas', 'DuckDB', 'Scikit-Learn'],
     isPsReleased: false,
     psReleaseDate: '2026-10-10T09:00:00Z',
@@ -412,6 +439,7 @@ const INITIAL_DOMAINS = [
     tagline: 'Healthcare • Agriculture • Education • Social Good',
     marvelTheme: 'Vormir Sunset Orange',
     accentHex: '#ff7700',
+    roomAllocated: 'Seminar Hall 2',
     techStackSuggestions: ['Python', 'Flutter', 'PostgreSQL', 'FastAPI', 'Edge AI', 'OpenCV'],
     isPsReleased: false,
     psReleaseDate: '2026-10-10T09:00:00Z',
@@ -1189,6 +1217,10 @@ app.post('/api/register', upload.single('paymentScreenshot'), async (req, res) =
       }
       newTeam.id = assignedId;
 
+      const normDomain = normalizeDomainId(newTeam.preferredDomain);
+      const matchedDomain = db.domains.find(d => d.id === normDomain || d.stoneId === normDomain);
+      newTeam.roomAllocated = matchedDomain?.roomAllocated || 'TBA (Lab Block 3)';
+
       db.teams.push(newTeam);
       return { newTeam, calculatedAmount };
     });
@@ -1563,7 +1595,7 @@ app.get('/api/coordinator/teams', requireCoordinatorAuth, async (req, res) => {
 // Coordinator Mark Food or Review (Protected)
 app.post('/api/coordinator/mark', requireCoordinatorAuth, async (req, res) => {
   try {
-    const { teamId, type, key, value, notes } = req.body;
+    const { teamId, type, key, value, memberIndex, notes } = req.body;
     if (!teamId || !type || !key) {
       return res.status(400).json({ success: false, error: 'Missing teamId, type, or key.' });
     }
@@ -1578,14 +1610,35 @@ app.post('/api/coordinator/mark', requireCoordinatorAuth, async (req, res) => {
 
       if (type === 'food' || type === 'meal') {
         if (!team.food) team.food = {};
-        if (value === true && team.food[key]?.collected) {
-          const err = new Error(`Double Redemption Blocked: ${key.toUpperCase()} was ALREADY collected for ${team.teamName} (${team.id}) at ${new Date(team.food[key].time).toLocaleTimeString()}.`);
-          err.statusCode = 409;
-          throw err;
+        const teamSize = team.teamSize || (team.members ? team.members.length + 1 : 4);
+
+        let existingMembers = [];
+        if (Array.isArray(team.food[key]?.members)) {
+          existingMembers = [...team.food[key].members];
+        } else if (team.food[key]?.collected) {
+          existingMembers = Array(teamSize).fill(true);
+        } else {
+          existingMembers = Array(teamSize).fill(false);
         }
+
+        while (existingMembers.length < teamSize) existingMembers.push(false);
+        if (existingMembers.length > teamSize) existingMembers = existingMembers.slice(0, teamSize);
+
+        if (memberIndex !== undefined && memberIndex !== null) {
+          const idx = parseInt(memberIndex, 10);
+          if (idx >= 0 && idx < teamSize) {
+            existingMembers[idx] = Boolean(value);
+          }
+        } else {
+          existingMembers = Array(teamSize).fill(Boolean(value));
+        }
+
+        const count = existingMembers.filter(Boolean).length;
         team.food[key] = {
-          collected: Boolean(value),
-          time: value ? new Date().toISOString() : null,
+          collected: count > 0,
+          count: count,
+          members: existingMembers,
+          time: count > 0 ? (team.food[key]?.time || new Date().toISOString()) : null,
         };
       } else if (type === 'review') {
         if (!team.reviews) team.reviews = {};
@@ -1794,7 +1847,12 @@ app.put('/api/admin/teams/:id', requireAdminAuth, async (req, res) => {
           ...(updates.leader || {}),
           name: updates.leader?.name ? stripHtmlTags(updates.leader.name) : existing.leader?.name,
         },
-        members: updates.members !== undefined ? (Array.isArray(updates.members) ? updates.members.map(m => ({ ...m, name: stripHtmlTags(m.name) })) : updates.members) : existing.members,
+        members: updates.members !== undefined ? (Array.isArray(updates.members) ? updates.members.map(m => ({
+          ...m,
+          name: stripHtmlTags(m.name),
+          email: stripHtmlTags(m.email).toLowerCase(),
+          phone: stripHtmlTags(m.phone)
+        })) : updates.members) : existing.members,
         payment: updatedPayment,
         reviews: {
           ...existing.reviews,
@@ -1854,16 +1912,75 @@ app.put('/api/admin/domains', requireAdminAuth, async (req, res) => {
   try {
     const updatedDomain = req.body;
     const { result } = await updateDb(async (db) => {
-      const idx = db.domains.findIndex((d) => d.id === updatedDomain.id || d.stoneId === updatedDomain.id);
+      const targetId = normalizeDomainId(updatedDomain.id || updatedDomain.stoneId);
+      const idx = db.domains.findIndex((d) => d.id === updatedDomain.id || d.stoneId === updatedDomain.id || d.id === targetId);
+      let updatedTeamsCount = 0;
+
       if (idx >= 0) {
         db.domains[idx] = { ...db.domains[idx], ...updatedDomain };
-        return { domain: db.domains[idx] };
+
+        // If roomAllocated was updated, optionally sync with teams
+        if (updatedDomain.roomAllocated !== undefined && req.body.syncExistingTeams !== false) {
+          const cleanRoom = stripHtmlTags(String(updatedDomain.roomAllocated)).trim();
+          db.domains[idx].roomAllocated = cleanRoom;
+          db.teams.forEach(t => {
+            if (normalizeDomainId(t.preferredDomain) === targetId) {
+              t.roomAllocated = cleanRoom;
+              updatedTeamsCount++;
+            }
+          });
+        }
+        return { domain: db.domains[idx], updatedTeamsCount };
       }
+
       // If not existing, push new domain
       db.domains.push(updatedDomain);
-      return { domain: updatedDomain };
+      return { domain: updatedDomain, updatedTeamsCount };
     });
-    res.json({ success: true, domain: result.domain });
+    res.json({ success: true, domain: result.domain, updatedTeamsCount: result.updatedTeamsCount });
+  } catch (err) {
+    if (err.statusCode) {
+      return res.status(err.statusCode).json({ success: false, error: err.message });
+    }
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 12A. Admin Bulk Update Stone Areas / Rooms (Protected)
+app.put('/api/admin/stone-areas', requireAdminAuth, async (req, res) => {
+  try {
+    const { stoneAreas, syncExistingTeams = true } = req.body || {};
+    if (!stoneAreas || typeof stoneAreas !== 'object') {
+      return res.status(400).json({ success: false, error: 'stoneAreas object is required.' });
+    }
+
+    const { result } = await updateDb(async (db) => {
+      let updatedTeamsCount = 0;
+
+      // Update each domain in db.domains
+      Object.entries(stoneAreas).forEach(([domainKey, area]) => {
+        const cleanArea = stripHtmlTags(String(area || '')).trim();
+        const normId = normalizeDomainId(domainKey);
+        const dom = db.domains.find(d => d.id === normId || d.stoneId === normId || d.id === domainKey);
+        if (dom) {
+          dom.roomAllocated = cleanArea;
+        }
+
+        // If sync requested, update all squads registered under this stone
+        if (syncExistingTeams) {
+          db.teams.forEach(t => {
+            if (normalizeDomainId(t.preferredDomain) === normId) {
+              t.roomAllocated = cleanArea;
+              updatedTeamsCount++;
+            }
+          });
+        }
+      });
+
+      return { domains: db.domains, updatedTeamsCount };
+    });
+
+    res.json({ success: true, domains: result.domains, updatedTeamsCount: result.updatedTeamsCount });
   } catch (err) {
     if (err.statusCode) {
       return res.status(err.statusCode).json({ success: false, error: err.message });

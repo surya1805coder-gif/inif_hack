@@ -6,6 +6,27 @@ let filterDate = 'all'; // 'all' or 'YYYY-MM-DD'
 let filterPayment = 'all'; // 'all', 'verified', 'pending', 'rejected'
 let editingTeam = null;
 
+const STONE_DOMAIN_MAP = {
+  mind: 'intelligence',
+  intelligence: 'intelligence',
+  space: 'connectivity',
+  connectivity: 'connectivity',
+  reality: 'digital',
+  digital: 'digital',
+  power: 'automation',
+  automation: 'automation',
+  time: 'analytics',
+  analytics: 'analytics',
+  soul: 'impact',
+  impact: 'impact'
+};
+
+function normalizeDomainId(val) {
+  if (!val) return 'intelligence';
+  const clean = String(val).toLowerCase().replace(/ stone$/i, '').trim();
+  return STONE_DOMAIN_MAP[clean] || clean;
+}
+
 function escapeHTML(str) {
   if (str === null || str === undefined) return '';
   return String(str)
@@ -96,6 +117,15 @@ function authHeaders(extra = {}) {
     const btnOpenPsMgr = document.getElementById('btn-open-ps-mgr');
     const btnClosePsMgr = document.getElementById('btn-close-ps-mgr');
     const psMgrList = document.getElementById('ps-mgr-domains-list');
+
+    const modalStoneAreas = document.getElementById('modal-stone-areas');
+    const btnOpenStoneAreas = document.getElementById('btn-open-stone-areas');
+    const btnCloseStoneAreas = document.getElementById('btn-close-stone-areas');
+    const btnCancelStoneAreas = document.getElementById('btn-cancel-stone-areas');
+    const btnSaveStoneAreas = document.getElementById('btn-save-stone-areas');
+    const stoneAreasGrid = document.getElementById('stone-areas-grid');
+    const stoneAreasStatus = document.getElementById('stone-areas-status');
+    const chkSyncExistingTeams = document.getElementById('chk-sync-existing-teams');
 
     async function doAdminLogin(password, isSilent = false) {
       if (!isSilent && loginErr) loginErr.style.display = 'none';
@@ -439,6 +469,12 @@ function authHeaders(extra = {}) {
           const teamDateDisplay = formatDateDisplay(teamDate).toLowerCase();
           const regTimestamp = formatRegistrationTimestamp(t.createdAt).toLowerCase();
 
+          const matchMembers = (t.members || []).some(m =>
+            (m.name && m.name.toLowerCase().includes(q)) ||
+            (m.email && m.email.toLowerCase().includes(q)) ||
+            (m.phone && m.phone.toLowerCase().includes(q))
+          );
+
           const matchSearch =
             (t.teamName && t.teamName.toLowerCase().includes(q)) ||
             (t.id && t.id.toLowerCase().includes(q)) ||
@@ -447,6 +483,7 @@ function authHeaders(extra = {}) {
             (t.leader?.email && t.leader.email.toLowerCase().includes(q)) ||
             (t.payment?.utr && t.payment.utr.toLowerCase().includes(q)) ||
             (t.payment?.phone && t.payment.phone.toLowerCase().includes(q)) ||
+            matchMembers ||
             teamDate.includes(q) ||
             teamDateDisplay.includes(q) ||
             regTimestamp.includes(q);
@@ -536,6 +573,9 @@ function authHeaders(extra = {}) {
             </td>
             <td>
               <span class="portal-badge font-mono">${escapeHTML((t.preferredDomain || 'MIND').toUpperCase())}</span>
+              <div style="font-size:0.68rem; color:#888; font-family:'JetBrains Mono',monospace; margin-top:3px;">
+                📍 ${escapeHTML(t.roomAllocated || 'Lab Block 3')}
+              </div>
               <div style="margin-top:4px;">
                 <span class="badge-size-pill ${sizeClass}">${size} MEMBERS</span>
               </div>
@@ -706,26 +746,142 @@ function authHeaders(extra = {}) {
       document.getElementById('edt-score-total').value = scores.total || 0;
       document.getElementById('edt-score-remarks').value = scores.remarks || '';
 
+      renderEditMembers(editingTeam.members || [], editingTeam.teamSize || 4);
+
       modalEdit.classList.add('is-open');
     }
 
     btnCloseEdit.addEventListener('click', () => modalEdit.classList.remove('is-open'));
 
+    function createMemberRowHtml(member = {}, memberIndex = 0) {
+      const memberNum = String(memberIndex + 2).padStart(2, '0');
+      return `
+        <div class="member-edit-item" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <span class="mono-label edt-member-label" style="font-size: 0.7rem; color: var(--gold); font-weight: 700;">MEMBER ${memberNum}</span>
+            <button type="button" class="btn-del-member-edt" style="background: rgba(255, 23, 68, 0.1); border: 1px solid rgba(255, 23, 68, 0.25); color: #ff5252; padding: 3px 8px; border-radius: 4px; font-size: 0.68rem; cursor: pointer; font-family: 'JetBrains Mono', monospace;">✕ REMOVE</button>
+          </div>
+          <div class="edit-grid-3" style="margin-bottom: 0;">
+            <div class="form-group">
+              <label class="form-label">MEMBER NAME</label>
+              <input type="text" class="form-input edt-member-name" value="${escapeHTML(member.name || '')}" placeholder="Full Name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">MEMBER EMAIL</label>
+              <input type="email" class="form-input edt-member-email" value="${escapeHTML(member.email || '')}" placeholder="Email Address">
+            </div>
+            <div class="form-group">
+              <label class="form-label">MEMBER PHONE</label>
+              <input type="text" class="form-input edt-member-phone" value="${escapeHTML(member.phone || '')}" placeholder="Phone Number">
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateMemberLabels() {
+      const container = document.getElementById('edt-members-container');
+      if (!container) return;
+      const items = container.querySelectorAll('.member-edit-item');
+      items.forEach((item, idx) => {
+        const lbl = item.querySelector('.edt-member-label');
+        if (lbl) {
+          lbl.textContent = `MEMBER ${String(idx + 2).padStart(2, '0')}`;
+        }
+      });
+      const sizeInput = document.getElementById('edt-size');
+      if (sizeInput) {
+        sizeInput.value = items.length + 1;
+      }
+    }
+
+    function attachMemberRemoveHandlers() {
+      const container = document.getElementById('edt-members-container');
+      if (!container) return;
+      container.querySelectorAll('.btn-del-member-edt').forEach(btn => {
+        btn.onclick = (e) => {
+          e.preventDefault();
+          const item = btn.closest('.member-edit-item');
+          if (item) {
+            item.remove();
+            updateMemberLabels();
+          }
+        };
+      });
+    }
+
+    function renderEditMembers(membersList, teamSize = 4) {
+      const container = document.getElementById('edt-members-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const list = Array.isArray(membersList) ? [...membersList] : [];
+      const targetCount = Math.max((parseInt(teamSize, 10) || 4) - 1, list.length, 2);
+
+      for (let i = 0; i < targetCount; i++) {
+        const m = list[i] || { name: '', email: '', phone: '' };
+        container.insertAdjacentHTML('beforeend', createMemberRowHtml(m, i));
+      }
+
+      attachMemberRemoveHandlers();
+    }
+
+    const edtSizeInput = document.getElementById('edt-size');
+    if (edtSizeInput) {
+      edtSizeInput.addEventListener('change', () => {
+        const targetSize = parseInt(edtSizeInput.value, 10);
+        if (!targetSize || targetSize < 2) return;
+        const targetMembers = targetSize - 1;
+        const container = document.getElementById('edt-members-container');
+        if (!container) return;
+        let currentItems = container.querySelectorAll('.member-edit-item');
+        while (currentItems.length < targetMembers) {
+          container.insertAdjacentHTML('beforeend', createMemberRowHtml({}, currentItems.length));
+          currentItems = container.querySelectorAll('.member-edit-item');
+        }
+        if (currentItems.length > targetMembers) {
+          for (let i = currentItems.length - 1; i >= targetMembers; i--) {
+            const row = currentItems[i];
+            const name = row.querySelector('.edt-member-name')?.value?.trim();
+            const email = row.querySelector('.edt-member-email')?.value?.trim();
+            const phone = row.querySelector('.edt-member-phone')?.value?.trim();
+            if (!name && !email && !phone) {
+              row.remove();
+            }
+          }
+        }
+        attachMemberRemoveHandlers();
+        updateMemberLabels();
+      });
+    }
+
     formEdit.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!editingTeam) return;
+
+      const memberRows = document.querySelectorAll('#edt-members-container .member-edit-item');
+      const updatedMembers = [];
+      memberRows.forEach(row => {
+        const name = row.querySelector('.edt-member-name')?.value?.trim() || '';
+        const email = row.querySelector('.edt-member-email')?.value?.trim() || '';
+        const phone = row.querySelector('.edt-member-phone')?.value?.trim() || '';
+        if (name || email || phone) {
+          updatedMembers.push({ name, email, phone });
+        }
+      });
 
       const updates = {
         teamName: document.getElementById('edt-team-name').value.trim(),
         college: document.getElementById('edt-college').value.trim(),
         roomAllocated: document.getElementById('edt-room').value.trim(),
         preferredDomain: document.getElementById('edt-domain').value,
-        teamSize: parseInt(document.getElementById('edt-size').value, 10) || 4,
+        teamSize: parseInt(document.getElementById('edt-size').value, 10) || (updatedMembers.length + 1),
         leader: {
           name: document.getElementById('edt-leader-name').value.trim(),
           email: document.getElementById('edt-leader-email').value.trim(),
           phone: document.getElementById('edt-leader-phone').value.trim(),
         },
+        members: updatedMembers,
         payment: {
           ...editingTeam.payment,
           status: document.getElementById('edt-pay-status').value,
@@ -832,6 +988,17 @@ function authHeaders(extra = {}) {
               </div>
             </div>
 
+            <!-- Allocated Lab / Area for this Stone -->
+            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin: 0 0 14px 0; padding:10px 14px; background:rgba(255,255,255,0.02); border:1px solid ${accent}35; border-radius:8px;">
+              <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:240px;">
+                <span style="font-family:'JetBrains Mono'; font-size:0.72rem; color:${accent}; font-weight:700; white-space:nowrap;">📍 ALLOCATED LAB / AREA:</span>
+                <input type="text" id="edt-ps-area-${escapeHTML(dom.id)}" class="form-input font-mono" value="${escapeHTML(dom.roomAllocated || 'Lab Block 3')}" placeholder="e.g. Lab Block 3 (CS-301)" style="padding:6px 10px; font-size:0.75rem; flex:1;">
+              </div>
+              <button type="button" class="btn-update-stone-area-single" data-domain-id="${escapeHTML(dom.id)}" style="padding:6px 14px; border-radius:6px; background:${accent}; color:#000; font-family:'Syne',sans-serif; font-size:0.72rem; font-weight:800; border:none; cursor:pointer; box-shadow:0 0 10px ${accent}30;">
+                UPDATE AREA
+              </button>
+            </div>
+
             <!-- Expandable Add Problem Statement Panel -->
             <div id="add-panel-${escapeHTML(dom.id)}" style="display:none; margin: 12px 0 16px 0; padding:16px; border-radius:10px; background:rgba(6,6,12,0.95); border:1px solid ${accent}60; box-shadow:0 8px 25px rgba(0,0,0,0.6);">
               <div style="font-family:'Syne',sans-serif; font-size:0.86rem; font-weight:700; color:${accent}; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
@@ -929,6 +1096,51 @@ function authHeaders(extra = {}) {
         `;
       });
       psMgrList.innerHTML = html;
+
+      // Bind Update Stone Area Single Buttons inside PS Manager
+      psMgrList.querySelectorAll('.btn-update-stone-area-single').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const domId = btn.getAttribute('data-domain-id');
+          const areaInput = document.getElementById(`edt-ps-area-${domId}`);
+          const newArea = areaInput ? areaInput.value.trim() : '';
+          const targetDomain = allDomains.find(d => d.id === domId);
+          if (!targetDomain) return;
+
+          btn.disabled = true;
+          const oldText = btn.textContent;
+          btn.textContent = 'SAVING...';
+
+          try {
+            const res = await fetch('/api/admin/domains', {
+              method: 'PUT',
+              headers: authHeaders({ 'Content-Type': 'application/json' }),
+              body: JSON.stringify({
+                ...targetDomain,
+                roomAllocated: newArea,
+                syncExistingTeams: true
+              })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+              throw new Error(data.error || 'Failed to update stone area.');
+            }
+
+            targetDomain.roomAllocated = newArea;
+            allTeams.forEach(t => {
+              if (normalizeDomainId(t.preferredDomain) === normalizeDomainId(domId)) {
+                t.roomAllocated = newArea;
+              }
+            });
+            renderTable();
+            alert(`✓ Venue for ${targetDomain.stoneName} updated to "${newArea}" and synchronized across squads!`);
+          } catch (err) {
+            alert('Error updating venue: ' + err.message);
+          } finally {
+            btn.disabled = false;
+            btn.textContent = oldText;
+          }
+        });
+      });
 
       // Bind Toggle Add Panel Buttons
       psMgrList.querySelectorAll('.btn-toggle-add-ps').forEach(btn => {
@@ -1365,6 +1577,141 @@ function authHeaders(extra = {}) {
           }
         } finally {
           btnResetQrs.disabled = false;
+        }
+      });
+    }
+
+    // =========================================================================
+    // STONE AREAS & LAB ALLOCATION MANAGER
+    // =========================================================================
+    function renderStoneAreas() {
+      if (!stoneAreasGrid) return;
+
+      let html = '';
+      allDomains.forEach(dom => {
+        const accent = dom.accentHex || '#ffd000';
+        const normId = normalizeDomainId(dom.id);
+        const squadCount = allTeams.filter(t => normalizeDomainId(t.preferredDomain) === normId).length;
+        const currentRoom = dom.roomAllocated || 'Lab Block 3 (CS-301)';
+
+        html += `
+          <div class="field-card" style="border-top: 3px solid ${accent}; margin: 0; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 10px; border-left: 1px solid rgba(255,255,255,0.06); border-right: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:8px;">
+              <div>
+                <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:1.05rem; color:#fff; display:flex; align-items:center; gap:8px;">
+                  <span>${escapeHTML(dom.stoneName.toUpperCase())}</span>
+                  <span style="font-family:'JetBrains Mono'; font-size:0.7rem; color:${accent}; font-weight:700;">// ${escapeHTML(dom.domainName)}</span>
+                </div>
+                <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">${escapeHTML(dom.tagline || '')}</div>
+              </div>
+              <span style="font-family:'JetBrains Mono'; font-size:0.68rem; font-weight:700; padding:3px 8px; border-radius:4px; background:${accent}18; color:${accent}; border:1px solid ${accent}40; white-space:nowrap;">
+                ${squadCount} SQUADS
+              </span>
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" style="font-size:0.68rem; color:#aaa; margin-bottom:5px;">CAMPUS LAB / VENUE ALLOCATION</label>
+              <input type="text" class="form-input txt-stone-area font-mono" data-domain-id="${escapeHTML(dom.id)}" value="${escapeHTML(currentRoom)}" placeholder="e.g. Lab Block 3 (CS-301)" style="padding:8px 10px; font-size:0.8rem; border-color:${accent}40;">
+            </div>
+          </div>
+        `;
+      });
+
+      stoneAreasGrid.innerHTML = html;
+      if (stoneAreasStatus) {
+        stoneAreasStatus.textContent = `✦ Active configurations loaded for 6 Infinity Stones (${allTeams.length} total squads registered).`;
+        stoneAreasStatus.style.color = 'var(--cyan)';
+      }
+    }
+
+    if (btnOpenStoneAreas && modalStoneAreas) {
+      btnOpenStoneAreas.addEventListener('click', () => {
+        renderStoneAreas();
+        modalStoneAreas.classList.add('is-open');
+      });
+    }
+
+    if (btnCloseStoneAreas && modalStoneAreas) {
+      btnCloseStoneAreas.addEventListener('click', () => {
+        modalStoneAreas.classList.remove('is-open');
+      });
+    }
+
+    if (btnCancelStoneAreas && modalStoneAreas) {
+      btnCancelStoneAreas.addEventListener('click', () => {
+        modalStoneAreas.classList.remove('is-open');
+      });
+    }
+
+    window.addEventListener('click', (e) => {
+      if (modalStoneAreas && e.target === modalStoneAreas) {
+        modalStoneAreas.classList.remove('is-open');
+      }
+    });
+
+    if (btnSaveStoneAreas && modalStoneAreas) {
+      btnSaveStoneAreas.addEventListener('click', async () => {
+        btnSaveStoneAreas.disabled = true;
+        const oldText = btnSaveStoneAreas.textContent;
+        btnSaveStoneAreas.textContent = 'PROPAGATING VENUES...';
+        if (stoneAreasStatus) {
+          stoneAreasStatus.textContent = 'Synchronizing stone venue allocations to Cloudflare R2 and squad databases...';
+          stoneAreasStatus.style.color = 'var(--gold)';
+        }
+
+        const stoneAreas = {};
+        modalStoneAreas.querySelectorAll('.txt-stone-area').forEach(input => {
+          const domId = input.getAttribute('data-domain-id');
+          stoneAreas[domId] = input.value.trim();
+        });
+
+        const syncTeams = chkSyncExistingTeams ? chkSyncExistingTeams.checked : true;
+
+        try {
+          const res = await fetch('/api/admin/stone-areas', {
+            method: 'PUT',
+            headers: authHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ stoneAreas, syncExistingTeams: syncTeams })
+          });
+          const data = await res.json();
+          if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Failed to update stone areas.');
+          }
+
+          // Update in-memory allDomains
+          if (Array.isArray(data.domains)) {
+            allDomains = data.domains;
+          } else {
+            Object.entries(stoneAreas).forEach(([k, val]) => {
+              const dom = allDomains.find(d => d.id === k);
+              if (dom) dom.roomAllocated = val;
+            });
+          }
+
+          // Update in-memory allTeams if synchronized
+          if (syncTeams) {
+            allTeams.forEach(t => {
+              const normId = normalizeDomainId(t.preferredDomain);
+              if (stoneAreas[normId]) {
+                t.roomAllocated = stoneAreas[normId];
+              }
+            });
+            renderTable();
+          }
+
+          if (stoneAreasStatus) {
+            stoneAreasStatus.textContent = `✓ Successfully updated stone areas! Synchronized to ${data.updatedTeamsCount || 0} squads.`;
+            stoneAreasStatus.style.color = 'var(--green)';
+          }
+        } catch (err) {
+          if (stoneAreasStatus) {
+            stoneAreasStatus.textContent = `✕ Error updating stone areas: ${err.message}`;
+            stoneAreasStatus.style.color = 'var(--red)';
+          }
+          alert('Error updating stone areas: ' + err.message);
+        } finally {
+          btnSaveStoneAreas.disabled = false;
+          btnSaveStoneAreas.textContent = oldText;
         }
       });
     }
