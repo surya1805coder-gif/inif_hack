@@ -768,11 +768,11 @@ export function initRegistrationModule() {
     if (!inputEl) return;
     inputEl.classList.add('is-invalid');
     let parent = inputEl.parentElement;
-    let hint = parent.querySelector('.field-error-hint');
+    let hint = parent ? parent.querySelector(':scope > .field-error-hint') : null;
     if (!hint) {
       hint = document.createElement('span');
       hint.className = 'field-error-hint';
-      parent.appendChild(hint);
+      inputEl.insertAdjacentElement('afterend', hint);
     }
     hint.textContent = msg;
   }
@@ -780,7 +780,7 @@ export function initRegistrationModule() {
   function clearInputError(inputEl) {
     if (!inputEl) return;
     inputEl.classList.remove('is-invalid');
-    const hint = inputEl.parentElement.querySelector('.field-error-hint');
+    const hint = inputEl.parentElement ? inputEl.parentElement.querySelector(':scope > .field-error-hint') : null;
     if (hint) hint.remove();
   }
 
@@ -792,7 +792,8 @@ export function initRegistrationModule() {
       const res = await fetch(`/api/verify-participant?${param}`);
       const data = await res.json();
       if (data.exists) {
-        setInputError(inputEl, `❌ Already registered in team '${data.teamName}' (${data.teamId})`);
+        const fieldLabel = field === 'email' ? 'Email' : 'Mobile number';
+        setInputError(inputEl, `❌ ${fieldLabel} already registered in team '${data.teamName}' (${data.teamId})`);
         safePlayChime(220);
       }
     } catch (e) {
