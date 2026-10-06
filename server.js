@@ -751,7 +751,7 @@ export function stripHtmlTags(str) {
 export function sanitizeUrl(url) {
   if (!url || typeof url !== 'string') return '';
   const trimmed = url.trim();
-  if (/^https?:\/\/[^\s"'<>]+$/i.test(trimmed) || /^\/uploads\/[a-zA-Z0-9_\-\.]+$/i.test(trimmed)) {
+  if (/^https?:\/\/[^\s"'<>]+$/i.test(trimmed) || /^\/(?:uploads|receipts|assets|qrs)\/[a-zA-Z0-9_\-\.\/]+$/i.test(trimmed) || trimmed === '/placeholder-receipt.png') {
     return trimmed;
   }
   return '/placeholder-receipt.png';
@@ -2135,6 +2135,30 @@ app.put('/api/admin/teams/:id', requireAdminAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
+
+    let finalScreenshotUrl = updates.payment?.screenshotUrl;
+    if (finalScreenshotUrl && typeof finalScreenshotUrl === 'string' && finalScreenshotUrl.startsWith('data:image/')) {
+      try {
+        const match = finalScreenshotUrl.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
+        if (match) {
+          const mime = match[1];
+          const base64Data = match[2];
+          const ext = mime.includes('jpeg') || mime.includes('jpg') ? '.jpg' : mime.includes('webp') ? '.webp' : '.png';
+          const filename = `receipt-admin-${id}-${Date.now()}${ext}`;
+          const filePath = path.join(uploadDir, filename);
+          fs.writeFileSync(filePath, Buffer.from(base64Data, 'base64'));
+          finalScreenshotUrl = `/uploads/${filename}`;
+        }
+      } catch (err) {
+        console.warn('Failed to save receipt file locally:', err);
+      }
+    }
+
+    let updatedTeamPassword = null;
+    if (updates.teamPassword && typeof updates.teamPassword === 'string' && updates.teamPassword.trim()) {
+      updatedTeamPassword = hashPassword(updates.teamPassword.trim());
+    }
+
     const { result } = await updateDb(async (db) => {
       const idx = db.teams.findIndex((t) => t.id === id);
       if (idx === -1) {
@@ -2147,14 +2171,9 @@ app.put('/api/admin/teams/:id', requireAdminAuth, async (req, res) => {
       const updatedPayment = updates.payment ? {
         ...existing.payment,
         ...updates.payment,
-        screenshotUrl: updates.payment.screenshotUrl ? sanitizeUrl(updates.payment.screenshotUrl) : existing.payment?.screenshotUrl,
+        screenshotUrl: finalScreenshotUrl ? sanitizeUrl(finalScreenshotUrl) : existing.payment?.screenshotUrl,
         utr: updates.payment.utr ? stripHtmlTags(updates.payment.utr) : existing.payment?.utr,
       } : existing.payment;
-
-      let updatedTeamPassword = existing.teamPassword;
-      if (updates.teamPassword && typeof updates.teamPassword === 'string' && updates.teamPassword.trim()) {
-        updatedTeamPassword = hashPassword(updates.teamPassword.trim());
-      }
 
       db.teams[idx] = {
         ...existing,
@@ -2163,7 +2182,7 @@ app.put('/api/admin/teams/:id', requireAdminAuth, async (req, res) => {
         preferredDomain: updates.preferredDomain !== undefined ? stripHtmlTags(updates.preferredDomain) : existing.preferredDomain,
         teamSize: updates.teamSize !== undefined ? updates.teamSize : existing.teamSize,
         techStack: updates.techStack !== undefined ? (Array.isArray(updates.techStack) ? updates.techStack.map(s => stripHtmlTags(s)) : stripHtmlTags(updates.techStack)) : existing.techStack,
-        teamPassword: updatedTeamPassword,
+        teamPassword: updatedTeamPassword || existing.teamPassword,
         roomAllocated: updates.roomAllocated !== undefined ? stripHtmlTags(updates.roomAllocated) : existing.roomAllocated,
         selectedProblemStatement: updates.selectedProblemStatement !== undefined ? updates.selectedProblemStatement : existing.selectedProblemStatement,
         leader: {

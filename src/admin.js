@@ -5,6 +5,7 @@ let filterTeamSize = 'all'; // 'all', '3', '4'
 let filterDate = 'all'; // 'all' or 'YYYY-MM-DD'
 let filterPayment = 'all'; // 'all', 'verified', 'pending', 'rejected'
 let editingTeam = null;
+let uploadedReceiptData = null;
 
 const STONE_DOMAIN_MAP = {
   mind: 'intelligence',
@@ -40,8 +41,8 @@ function escapeHTML(str) {
 function safeUrl(url) {
   if (!url || typeof url !== 'string') return '';
   const trimmed = url.trim();
-  // Strictly permit only valid http/https or relative uploads paths
-  if (/^https?:\/\/[^\s"'<>]+$/i.test(trimmed) || /^\/uploads\/[a-zA-Z0-9_\-\.]+$/i.test(trimmed)) {
+  // Strictly permit only valid http/https or relative uploads/receipts/assets paths
+  if (/^https?:\/\/[^\s"'<>]+$/i.test(trimmed) || /^\/(?:uploads|receipts|assets|qrs)\/[a-zA-Z0-9_\-\.\/]+$/i.test(trimmed) || trimmed === '/placeholder-receipt.png') {
     return escapeHTML(trimmed);
   }
   return '';
@@ -49,14 +50,74 @@ function safeUrl(url) {
 
 function getAdminToken() {
   try {
-    const saved = sessionStorage.getItem('infinity_admin_auth');
+    const saved = sessionStorage.getItem('infinity_admin_auth') || localStorage.getItem('infinity_admin_auth');
     if (!saved) return '';
-    const parsed = JSON.parse(saved);
-    return parsed.token || (typeof parsed === 'string' ? parsed : '');
+    try {
+      const parsed = JSON.parse(saved);
+      return parsed.token || (typeof parsed === 'string' ? parsed : '');
+    } catch (_) {
+      return saved;
+    }
   } catch (e) {
     return '';
   }
 }
+
+function showAdminToast(message, isError = false) {
+  let toastContainer = document.getElementById('admin-toast-container');
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.id = 'admin-toast-container';
+    toastContainer.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:420px;';
+    document.body.appendChild(toastContainer);
+  }
+
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    background: ${isError ? 'rgba(30, 5, 10, 0.95)' : 'rgba(10, 15, 25, 0.95)'};
+    color: ${isError ? '#ff4d6d' : '#00e5ff'};
+    border: 1px solid ${isError ? 'rgba(255, 77, 109, 0.4)' : 'rgba(0, 229, 255, 0.4)'};
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px ${isError ? 'rgba(255, 77, 109, 0.2)' : 'rgba(0, 229, 255, 0.2)'};
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    pointer-events: auto;
+    backdrop-filter: blur(12px);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  `;
+
+  const icon = document.createElement('span');
+  icon.style.fontSize = '1.1rem';
+  icon.textContent = isError ? '✕' : '✓';
+  toast.appendChild(icon);
+
+  const text = document.createElement('span');
+  text.textContent = message;
+  toast.appendChild(text);
+
+  toastContainer.appendChild(toast);
+
+  requestAnimationFrame(() => {
+    toast.style.transform = 'translateY(0)';
+    toast.style.opacity = '1';
+  });
+
+  setTimeout(() => {
+    toast.style.transform = 'translateY(10px)';
+    toast.style.opacity = '0';
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
+  }, 4000);
+}
+window.showAdminToast = showAdminToast;
 
 function authHeaders(extra = {}) {
   const token = getAdminToken();
@@ -809,6 +870,34 @@ function authHeaders(extra = {}) {
       document.getElementById('edt-pay-utr').value = pay.utr || '';
       document.getElementById('edt-pay-amount').value = pay.amount || (editingTeam.teamSize || 4) * 349;
 
+      uploadedReceiptData = null;
+      const edtPayScreenshot = document.getElementById('edt-pay-screenshot');
+      const fileEdtReceipt = document.getElementById('file-edt-receipt');
+      const lblFileEdtReceipt = document.getElementById('lbl-file-edt-receipt');
+      const edtReceiptLinkWrap = document.getElementById('edt-receipt-link-wrap');
+
+      if (edtPayScreenshot) {
+        edtPayScreenshot.value = pay.screenshotUrl || '';
+      }
+      if (fileEdtReceipt) {
+        fileEdtReceipt.value = '';
+      }
+      if (lblFileEdtReceipt) {
+        lblFileEdtReceipt.textContent = 'Upload File';
+      }
+      if (edtReceiptLinkWrap) {
+        if (pay.screenshotUrl && pay.screenshotUrl !== '/placeholder-receipt.png') {
+          const validUrl = safeUrl(pay.screenshotUrl) || pay.screenshotUrl;
+          edtReceiptLinkWrap.innerHTML = `
+            <a href="${escapeHTML(validUrl)}" target="_blank" rel="noopener noreferrer" style="color:var(--cyan); font-size:0.75rem; text-decoration:underline; font-family:'JetBrains Mono', monospace;">
+              ↗ View Current Receipt
+            </a>
+          `;
+        } else {
+          edtReceiptLinkWrap.innerHTML = `<span style="color:var(--text-muted); font-size:0.72rem; font-family:'JetBrains Mono', monospace;">(No receipt attached)</span>`;
+        }
+      }
+
       const isMailed = Boolean(pay.mailSent);
       const mailStatusEl = document.getElementById('edt-mail-status');
       if (mailStatusEl) {
@@ -892,6 +981,62 @@ function authHeaders(extra = {}) {
     }
 
     btnCloseEdit.addEventListener('click', () => modalEdit.classList.remove('is-open'));
+
+    // Receipt File & URL Handlers
+    const fileEdtReceipt = document.getElementById('file-edt-receipt');
+    const lblFileEdtReceipt = document.getElementById('lbl-file-edt-receipt');
+    const edtPayScreenshot = document.getElementById('edt-pay-screenshot');
+    const edtReceiptLinkWrap = document.getElementById('edt-receipt-link-wrap');
+
+    if (fileEdtReceipt) {
+      fileEdtReceipt.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+          alert('Please select a valid image file (PNG, JPG, WebP).');
+          return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          alert('Receipt image exceeds 5MB limit. Please upload a smaller compressed image.');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (loadEvt) => {
+          uploadedReceiptData = loadEvt.target.result;
+          if (lblFileEdtReceipt) {
+            lblFileEdtReceipt.textContent = `Selected: ${file.name} (${Math.round(file.size / 1024)} KB)`;
+          }
+          if (edtPayScreenshot) {
+            edtPayScreenshot.value = `[Uploaded File: ${file.name}]`;
+          }
+          if (edtReceiptLinkWrap) {
+            edtReceiptLinkWrap.innerHTML = `
+              <span style="color:var(--green); font-size:0.72rem; font-family:'JetBrains Mono', monospace;">
+                ✓ Attached: ${escapeHTML(file.name)}
+              </span>
+            `;
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    if (edtPayScreenshot) {
+      edtPayScreenshot.addEventListener('input', () => {
+        const val = edtPayScreenshot.value.trim();
+        if (val && !val.startsWith('[Uploaded File:')) {
+          uploadedReceiptData = null;
+          if (lblFileEdtReceipt) lblFileEdtReceipt.textContent = 'Upload File';
+          if (edtReceiptLinkWrap) {
+            edtReceiptLinkWrap.innerHTML = `
+              <a href="${escapeHTML(val)}" target="_blank" rel="noopener noreferrer" style="color:var(--cyan); font-size:0.75rem; text-decoration:underline; font-family:'JetBrains Mono', monospace;">
+                ↗ Test Link
+              </a>
+            `;
+          }
+        }
+      });
+    }
 
     function createMemberRowHtml(member = {}, memberIndex = 0) {
       const memberNum = String(memberIndex + 2).padStart(2, '0');
@@ -1010,6 +1155,16 @@ function authHeaders(extra = {}) {
         }
       });
 
+      let finalScreenshotUrl = editingTeam.payment?.screenshotUrl || '';
+      if (uploadedReceiptData) {
+        finalScreenshotUrl = uploadedReceiptData;
+      } else if (edtPayScreenshot) {
+        const txtVal = edtPayScreenshot.value.trim();
+        if (txtVal && !txtVal.startsWith('[Uploaded File:')) {
+          finalScreenshotUrl = txtVal;
+        }
+      }
+
       const updates = {
         teamName: document.getElementById('edt-team-name').value.trim(),
         college: document.getElementById('edt-college').value.trim(),
@@ -1027,6 +1182,7 @@ function authHeaders(extra = {}) {
           status: document.getElementById('edt-pay-status').value,
           utr: document.getElementById('edt-pay-utr').value.trim(),
           amount: parseFloat(document.getElementById('edt-pay-amount').value) || 0,
+          screenshotUrl: finalScreenshotUrl,
         },
         food: {
           dinner: { collected: Boolean(document.getElementById('edt-food-din')?.checked) },
@@ -1050,6 +1206,13 @@ function authHeaders(extra = {}) {
         updates.teamPassword = newPwd;
       }
 
+      const btnSubmit = formEdit.querySelector('button[type="submit"]');
+      const originalSubmitText = btnSubmit ? btnSubmit.textContent : 'COMMIT ALL SQUAD EDITS TO CLOUDFLARE R2';
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.textContent = 'COMMITTING CHANGES TO R2...';
+      }
+
       try {
         const res = await fetch(`/api/admin/teams/${editingTeam.id}`, {
           method: 'PUT',
@@ -1057,16 +1220,25 @@ function authHeaders(extra = {}) {
           body: JSON.stringify(updates),
         });
         const data = await res.json();
-        if (data.success) {
+        if (res.ok && data.success) {
           const idx = allTeams.findIndex(t => t.id === editingTeam.id);
           if (idx >= 0) allTeams[idx] = data.team;
+          editingTeam = data.team;
           modalEdit.classList.remove('is-open');
           renderTable();
           updateKPIs();
           updateDailyRegistrationsTelemetry();
+          showAdminToast(`✓ Squad "${data.team?.teamName || editingTeam.teamName}" updated successfully!`);
+        } else {
+          alert('Failed to update squad: ' + (data.error || 'Server error. Please verify admin credentials.'));
         }
       } catch (err) {
         alert('Error updating team: ' + err.message);
+      } finally {
+        if (btnSubmit) {
+          btnSubmit.disabled = false;
+          btnSubmit.textContent = originalSubmitText;
+        }
       }
     });
 
@@ -1711,6 +1883,7 @@ function authHeaders(extra = {}) {
               qrMgrStatus.textContent = '✓ Payment QR codes updated and deployed to Cloudflare R2 successfully!';
               qrMgrStatus.style.color = 'var(--green)';
             }
+            showAdminToast('✓ Payment QR codes updated and deployed to Cloudflare R2!');
           } else {
             throw new Error(data.error || 'Failed to update payment QR codes.');
           }
@@ -1765,6 +1938,7 @@ function authHeaders(extra = {}) {
               qrMgrStatus.textContent = '✓ Restored default payment QR codes.';
               qrMgrStatus.style.color = 'var(--green)';
             }
+            showAdminToast('✓ Payment QR codes restored to defaults.');
           }
         } catch (err) {
           if (qrMgrStatus) {

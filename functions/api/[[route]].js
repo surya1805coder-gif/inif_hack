@@ -493,7 +493,7 @@ function stripHtmlTags(str) {
 function sanitizeUrl(url) {
   if (!url || typeof url !== 'string') return '';
   const trimmed = url.trim();
-  if (/^https?:\/\/[^\s"'<>]+$/i.test(trimmed) || /^\/uploads\/[a-zA-Z0-9_\-\.]+$/i.test(trimmed)) {
+  if (/^https?:\/\/[^\s"'<>]+$/i.test(trimmed) || /^\/(?:uploads|receipts|assets|qrs)\/[a-zA-Z0-9_\-\.\/]+$/i.test(trimmed) || trimmed === '/placeholder-receipt.png') {
     return trimmed;
   }
   return '/placeholder-receipt.png';
@@ -2497,67 +2497,42 @@ export async function onRequest(context) {
     if (pathname.startsWith('/api/admin/teams/') && method === 'PUT') {
       const id = pathname.replace('/api/admin/teams/', '').trim();
       const updates = await request.json();
-      const db = await loadDb(env);
-      const idx = db.teams.findIndex((t) => t.id === id);
 
-      if (idx === -1) {
-        return jsonResponse({ success: false, error: `Team ${id} not found.` }, 404);
+      let finalScreenshotUrl = updates.payment?.screenshotUrl;
+      if (finalScreenshotUrl && typeof finalScreenshotUrl === 'string' && finalScreenshotUrl.startsWith('data:image/')) {
+        if (env && env.BUCKET) {
+          try {
+            const match = finalScreenshotUrl.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
+            if (match) {
+              const mime = match[1];
+              const base64Data = match[2];
+              const binaryStr = atob(base64Data);
+              const bytes = new Uint8Array(binaryStr.length);
+              for (let i = 0; i < binaryStr.length; i++) {
+                bytes[i] = binaryStr.charCodeAt(i);
+              }
+              const ext = mime.includes('jpeg') || mime.includes('jpg') ? '.jpg' : mime.includes('webp') ? '.webp' : '.png';
+              const key = `receipts/admin-${id}-${Date.now()}${ext}`;
+              await env.BUCKET.put(key, bytes, {
+                httpMetadata: { contentType: mime }
+              });
+              finalScreenshotUrl = `${PUBLIC_DOMAIN.replace(/\/$/, '')}/${key}`;
+            }
+          } catch (err) {
+            console.warn('Failed to upload admin receipt to R2:', err);
+          }
+        }
       }
 
-      const existing = db.teams[idx];
-      const updatedPayment = updates.payment ? {
-        ...existing.payment,
-        ...updates.payment,
-        screenshotUrl: updates.payment.screenshotUrl ? sanitizeUrl(updates.payment.screenshotUrl) : existing.payment?.screenshotUrl,
-        utr: updates.payment.utr ? stripHtmlTags(updates.payment.utr) : existing.payment?.utr,
-      } : existing.payment;
-
-      let updatedTeamPassword = existing.teamPassword;
+      let updatedTeamPassword = null;
       if (updates.teamPassword && typeof updates.teamPassword === 'string' && updates.teamPassword.trim()) {
         updatedTeamPassword = await hashPassword(updates.teamPassword.trim());
       }
 
-      db.teams[idx] = {
-        ...existing,
-        teamName: updates.teamName !== undefined ? stripHtmlTags(updates.teamName) : existing.teamName,
-        college: updates.college !== undefined ? stripHtmlTags(updates.college) : existing.college,
-        preferredDomain: updates.preferredDomain !== undefined ? stripHtmlTags(updates.preferredDomain) : existing.preferredDomain,
-        teamSize: updates.teamSize !== undefined ? updates.teamSize : existing.teamSize,
-        techStack: updates.techStack !== undefined ? (Array.isArray(updates.techStack) ? updates.techStack.map(s => stripHtmlTags(s)) : stripHtmlTags(updates.techStack)) : existing.techStack,
-        teamPassword: updatedTeamPassword,
-        roomAllocated: updates.roomAllocated !== undefined ? stripHtmlTags(updates.roomAllocated) : existing.roomAllocated,
-        selectedProblemStatement: updates.selectedProblemStatement !== undefined ? updates.selectedProblemStatement : existing.selectedProblemStatement,
-        leader: {
-          ...existing.leader,
-          ...(updates.leader || {}),
-          name: updates.leader?.name ? stripHtmlTags(updates.leader.name) : existing.leader?.name,
-        },
-        members: updates.members !== undefined ? (Array.isArray(updates.members) ? updates.members.map(m => ({
-          ...m,
-          name: stripHtmlTags(m.name),
-          email: stripHtmlTags(m.email).toLowerCase(),
-          phone: stripHtmlTags(m.phone)
-        })) : updates.members) : existing.members,
-        payment: updatedPayment,
-        reviews: {
-          ...existing.reviews,
-          ...(updates.reviews || {}),
-        },
-        food: {
-          ...existing.food,
-          ...(updates.food || {}),
-        },
-        scores: {
-          ...existing.scores,
-          ...(updates.scores || {}),
-          remarks: updates.scores?.remarks ? stripHtmlTags(updates.scores.remarks) : existing.scores?.remarks,
-        },
-      };
-
       const { result } = await updateDb(env, async (db) => {
         const idx = db.teams.findIndex((t) => t.id === id);
         if (idx === -1) {
-          const err = new Error('Team not found');
+          const err = new Error(`Team ${id} not found.`);
           err.statusCode = 404;
           throw err;
         }
@@ -2566,14 +2541,9 @@ export async function onRequest(context) {
         const updatedPayment = updates.payment ? {
           ...existing.payment,
           ...updates.payment,
-          screenshotUrl: updates.payment.screenshotUrl ? sanitizeUrl(updates.payment.screenshotUrl) : existing.payment?.screenshotUrl,
+          screenshotUrl: finalScreenshotUrl ? sanitizeUrl(finalScreenshotUrl) : existing.payment?.screenshotUrl,
           utr: updates.payment.utr ? stripHtmlTags(updates.payment.utr) : existing.payment?.utr,
         } : existing.payment;
-
-        let updatedTeamPassword = existing.teamPassword;
-        if (updates.teamPassword && typeof updates.teamPassword === 'string' && updates.teamPassword.trim()) {
-          updatedTeamPassword = await hashPassword(updates.teamPassword.trim());
-        }
 
         db.teams[idx] = {
           ...existing,
@@ -2582,7 +2552,7 @@ export async function onRequest(context) {
           preferredDomain: updates.preferredDomain !== undefined ? stripHtmlTags(updates.preferredDomain) : existing.preferredDomain,
           teamSize: updates.teamSize !== undefined ? updates.teamSize : existing.teamSize,
           techStack: updates.techStack !== undefined ? (Array.isArray(updates.techStack) ? updates.techStack.map(s => stripHtmlTags(s)) : stripHtmlTags(updates.techStack)) : existing.techStack,
-          teamPassword: updatedTeamPassword,
+          teamPassword: updatedTeamPassword || existing.teamPassword,
           roomAllocated: updates.roomAllocated !== undefined ? stripHtmlTags(updates.roomAllocated) : existing.roomAllocated,
           selectedProblemStatement: updates.selectedProblemStatement !== undefined ? updates.selectedProblemStatement : existing.selectedProblemStatement,
           leader: {
