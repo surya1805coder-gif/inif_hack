@@ -51,7 +51,7 @@
     }
     window.scrollTo(0, 0);
   </script>
-  <script type="module" crossorigin src="/assets/main-BIfZnNLm.js"></script>
+  <script type="module" crossorigin src="/assets/main-CNF8YuHG.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
   <link rel="modulepreload" crossorigin href="/assets/three-vendor-D5YnKyrC.js">
   <link rel="modulepreload" crossorigin href="/assets/gsap-vendor-SFc2wnMY.js">
@@ -1219,6 +1219,19 @@
       <p class="modal-sub">Your team has successfully wielded the singularity and registered with Cloudflare R2
         persistence.</p>
 
+      <!-- Confirmation Email & Verification Notice -->
+      <div class="suc-mail-notice" id="suc-mail-notice" style="margin: 14px 0 16px 0; padding: 12px 14px; border-radius: 8px; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.28); text-align: left; display: flex; align-items: flex-start; gap: 10px;">
+        <span style="color: #22c55e; font-size: 1.15rem; line-height: 1.2;">✓</span>
+        <div style="flex: 1;">
+          <div style="font-family: var(--font-mono); font-size: 0.76rem; font-weight: 700; color: #22c55e; letter-spacing: 0.06em; text-transform: uppercase;">
+            CONFIRMATION MAIL DISPATCHED
+          </div>
+          <p style="margin: 3px 0 0 0; font-size: 0.8rem; color: rgba(255, 255, 255, 0.88); line-height: 1.45;">
+            An official squad pass with complete team details, portal credentials, and an entrance verification link has been emailed to <strong id="suc-mail-recipient" style="color: #ffd000; font-family: var(--font-mono);">leader@email.com</strong>.
+          </p>
+        </div>
+      </div>
+
       <div class="success-summary-box">
         <div class="summary-row">
           <span class="summary-lbl">TEAM ID:</span>
@@ -1266,7 +1279,7 @@
       </p>
 
       <div class="modal-actions-row">
-        <a href="/leader.html" class="btn-modal-primary" id="btn-go-leader">PROCEED TO LEADER DASHBOARD →</a>
+        <a href="/leader.html" class="btn-modal-primary" id="btn-go-leader">VIEW SQUAD PASS &amp; VERIFICATION &rarr;</a>
         <button class="btn-modal-secondary" id="btn-close-success">CLOSE</button>
       </div>
     </div>

@@ -1298,6 +1298,14 @@ export function initRegistrationModule() {
         if (sucAmount) sucAmount.textContent = `₹${resData.team.amount.toLocaleString('en-IN')}`;
         if (sucUtr) sucUtr.textContent = submittedUtr;
 
+        const sucMailRecipient = document.getElementById('suc-mail-recipient');
+        if (sucMailRecipient) sucMailRecipient.textContent = leaderEmailVal;
+
+        const btnGoLeader = document.getElementById('btn-go-leader');
+        if (btnGoLeader) {
+          btnGoLeader.href = `/leader.html?team=${encodeURIComponent(resData.team.id)}&email=${encodeURIComponent(leaderEmailVal)}`;
+        }
+
         // Populate Member Roster in Success Modal
         if (sucRosterList) {
           sucRosterList.innerHTML = '';

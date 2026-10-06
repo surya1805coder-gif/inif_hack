@@ -1056,7 +1056,7 @@ export function escapeEmailHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
-export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinity.akao.in', env = {} }) {
+export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinity.akao.in', env = {}, rawPassword = null }) {
   const leader = team.leader || {};
   const leaderEmail = (leader.email || '').trim().toLowerCase();
   if (!leaderEmail || !leaderEmail.includes('@')) {
@@ -1086,7 +1086,7 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
         ${escapeEmailHtml(leader.name || 'Captain')}
       </td>
       <td style="padding:10px 14px; border-bottom:1px solid #e4e4e7; color:#71717a; font-size:12px; font-family:monospace;">
-        ${escapeEmailHtml(leader.email || '')}
+        ${escapeEmailHtml(leader.email || '')} ${leader.phone ? `&bull; ${escapeEmailHtml(leader.phone)}` : ''}
       </td>
     </tr>
   `;
@@ -1103,13 +1103,13 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
           ${escapeEmailHtml(m.name || 'Squad Member')}
         </td>
         <td style="padding:10px 14px; ${borderStyle} color:#71717a; font-size:12px; font-family:monospace;">
-          ${escapeEmailHtml(m.email || '')}
+          ${escapeEmailHtml(m.email || '')} ${m.phone ? `&bull; ${escapeEmailHtml(m.phone)}` : ''}
         </td>
       </tr>
     `;
   });
 
-  const subject = `Pass — Infinity Hackathon 2026 | Squad ${team.teamName} [${team.id}]`;
+  const subject = `Confirmed Squad Pass — Infinity Hackathon 2026 | Squad ${team.teamName} [${team.id}]`;
   const cleanAppUrl = (appUrl || 'https://infinity.akao.in').replace(/\/$/, '');
 
   const htmlContent = `<!DOCTYPE html>
@@ -1125,7 +1125,7 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
     <tr>
       <td align="center">
         <!-- Main Minimal Container -->
-        <table role="presentation" width="100%" style="max-width:560px; background-color:#ffffff; border:1px solid #e4e4e7; border-radius:10px; overflow:hidden; margin:0 auto; box-shadow:0 4px 16px rgba(0,0,0,0.04);" cellspacing="0" cellpadding="0" border="0">
+        <table role="presentation" width="100%" style="max-width:580px; background-color:#ffffff; border:1px solid #e4e4e7; border-radius:10px; overflow:hidden; margin:0 auto; box-shadow:0 4px 16px rgba(0,0,0,0.04);" cellspacing="0" cellpadding="0" border="0">
           
           <!-- Header Section -->
           <tr>
@@ -1136,15 +1136,15 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
               <!-- Minimalist Pass Badge -->
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto 16px auto;">
                 <tr>
-                  <td style="padding:5px 14px; border-radius:9999px; background:#f4f4f5; border:1px solid #e4e4e7; color:#18181b; font-size:10px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase;">
-                    ✓ PASS &bull; VERIFIED
+                  <td style="padding:5px 14px; border-radius:9999px; background:#09090b; border:1px solid #09090b; color:#ffffff; font-size:10px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase;">
+                    ✓ REGISTRATION CONFIRMED &bull; PASS ISSUED
                   </td>
                 </tr>
               </table>
 
               <h1 style="margin:0 0 8px 0; font-size:24px; font-weight:800; color:#09090b; letter-spacing:-0.02em;">Squad ${teamName}</h1>
-              <p style="margin:0 auto; font-size:13px; color:#71717a; line-height:1.6; max-width:440px;">
-                Registration payment is verified. Your official squad pass is ready for hackathon check-in.
+              <p style="margin:0 auto; font-size:13px; color:#71717a; line-height:1.6; max-width:460px;">
+                Your squad is confirmed for <strong>Infinity Hackathon 2026</strong>. Keep this email safe for coordinator entrance verification and online portal access.
               </p>
             </td>
           </tr>
@@ -1160,8 +1160,8 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                       <tr>
                         <td align="left">
-                          <span style="font-size:10px; font-weight:600; color:#71717a; letter-spacing:0.14em; text-transform:uppercase;">PASS ID</span>
-                          <div style="font-size:18px; font-weight:800; color:#09090b; font-family:monospace; margin-top:2px;">${teamId}</div>
+                          <span style="font-size:10px; font-weight:600; color:#71717a; letter-spacing:0.14em; text-transform:uppercase;">OFFICIAL PASS ID</span>
+                          <div style="font-size:19px; font-weight:800; color:#09090b; font-family:monospace; margin-top:2px;">${teamId}</div>
                         </td>
                         <td align="right">
                           <span style="display:inline-block; padding:4px 10px; border-radius:4px; background:#ffffff; border:1px solid #e4e4e7; color:#09090b; font-size:11px; font-weight:700; font-family:monospace;">${size} MEMBERS</span>
@@ -1180,20 +1180,36 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
                         <td style="color:#09090b; font-weight:600;">${college}</td>
                       </tr>
                       <tr>
-                        <td style="color:#71717a; font-weight:500;">Track</td>
+                        <td style="color:#71717a; font-weight:500;">Track / Domain</td>
                         <td style="color:#09090b; font-weight:700;">${domain}</td>
                       </tr>
                       <tr>
-                        <td style="color:#71717a; font-weight:500;">Venue</td>
+                        <td style="color:#71717a; font-weight:500;">Venue Block</td>
                         <td style="color:#09090b; font-weight:600;">${room}</td>
                       </tr>
                       <tr>
-                        <td style="color:#71717a; font-weight:500;">Bank UTR</td>
+                        <td style="color:#71717a; font-weight:500;">Bank UTR / Ref</td>
                         <td style="color:#18181b; font-family:monospace;">${utr}</td>
                       </tr>
                       <tr>
-                        <td style="color:#71717a; font-weight:500;">Verified Fee</td>
+                        <td style="color:#71717a; font-weight:500;">Total Fee Paid</td>
                         <td style="color:#09090b; font-weight:700;">₹${amount}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Leader Username</td>
+                        <td style="color:#09090b; font-family:monospace; font-weight:700;">${leaderEmail}</td>
+                      </tr>
+                      ${rawPassword ? `
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Team Password</td>
+                        <td style="color:#09090b; font-family:monospace; font-weight:700;">${escapeEmailHtml(rawPassword)}</td>
+                      </tr>
+                      ` : ''}
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Verification Link</td>
+                        <td style="color:#09090b; font-family:monospace; font-size:11px;">
+                          <a href="${cleanAppUrl}/leader?team=${teamId}" target="_blank" style="color:#09090b; text-decoration:underline;">${cleanAppUrl}/leader?team=${teamId}</a>
+                        </td>
                       </tr>
                     </table>
                   </td>
@@ -1206,7 +1222,7 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
           <tr>
             <td style="padding:0 28px 24px 28px;">
               <div style="font-size:10px; font-weight:700; letter-spacing:0.14em; color:#71717a; text-transform:uppercase; margin-bottom:8px;">
-                SQUAD MEMBERS
+                CONFIRMED SQUAD ROSTER
               </div>
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fafafa; border:1px solid #e4e4e7; border-radius:8px; overflow:hidden;">
                 ${rosterRows}
@@ -1221,10 +1237,11 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
                 <tr>
                   <td>
                     <div style="font-size:10px; font-weight:700; color:#71717a; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:8px;">
-                      Check-in Guidelines
+                      On-Site Check-in Guidelines
                     </div>
                     <ul style="margin:0; padding-left:16px; color:#52525b; font-size:12px; line-height:1.6;">
                       <li>Reporting time: <strong style="color:#09090b;">08:30 AM</strong> at the Main Campus Innovation Arena.</li>
+                      <li>Present your <strong style="color:#09090b;">Pass ID (${teamId})</strong> at the Coordinator Entrance desk for verification.</li>
                       <li>Bring original college ID cards, personal laptops, and chargers.</li>
                       <li>Problem statements will unlock on your Leader Portal on hackathon morning.</li>
                     </ul>
@@ -1240,14 +1257,14 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto;">
                 <tr>
                   <td align="center" style="border-radius:6px; background:#09090b;">
-                    <a href="${cleanAppUrl}/leader" target="_blank" rel="noopener noreferrer" style="display:inline-block; padding:13px 34px; font-size:12px; font-weight:700; color:#ffffff; text-decoration:none; text-transform:uppercase; letter-spacing:0.08em;">
-                      Access Squad Portal &rarr;
+                    <a href="${cleanAppUrl}/leader?team=${teamId}" target="_blank" rel="noopener noreferrer" style="display:inline-block; padding:13px 34px; font-size:12px; font-weight:700; color:#ffffff; text-decoration:none; text-transform:uppercase; letter-spacing:0.08em;">
+                      VIEW SQUAD PASS &amp; VERIFICATION &rarr;
                     </a>
                   </td>
                 </tr>
               </table>
               <div style="margin-top:12px; font-size:11px; color:#71717a;">
-                Pass ID: <strong style="color:#09090b; font-family:monospace;">${teamId}</strong> &bull; Log in with your squad password.
+                Pass ID: <strong style="color:#09090b; font-family:monospace;">${teamId}</strong> &bull; Log in with your leader email &amp; squad password.
               </div>
             </td>
           </tr>
@@ -1266,21 +1283,22 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
 </body>
 </html>`;
 
-  const resendApiKey = env.RESEND_API_KEY;
-  const brevoApiKey = env.BREVO_API_KEY;
-  const emailFrom = env.EMAIL_FROM || 'Infinity Hackathon 2026 <hackathon@infinity.akao.in>';
+  const resendApiKey = (env.RESEND_API_KEY || '').trim();
+  const brevoApiKey = (env.BREVO_API_KEY || '').trim();
+  const emailFrom = (env.EMAIL_FROM || 'Infinity Hackathon 2026 <hackathon@infinity.akao.in>').trim();
 
-  // 1. Resend API
+  // 1. Resend API (Recommended: 3,000 free/mo, native REST fetch)
   if (resendApiKey && resendApiKey.trim()) {
     const payload = {
       from: emailFrom,
       to: [leaderEmail],
+      ...(memberEmails.length > 0 ? { cc: memberEmails } : {}),
       reply_to: 'support@infinity.akao.in',
       subject,
       html: htmlContent,
     };
 
-    const res = await fetch('https://api.resend.com/emails', {
+    let res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${resendApiKey.trim()}`,
@@ -1289,7 +1307,28 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
       body: JSON.stringify(payload)
     });
 
-    const resData = await res.json().catch(() => ({}));
+    let resData = await res.json().catch(() => ({}));
+
+    // If CC failed due to invalid teammate addresses, retry strictly with leaderEmail
+    if (!res.ok && payload.cc) {
+      const fallbackPayload = {
+        from: emailFrom,
+        to: [leaderEmail],
+        reply_to: 'support@infinity.akao.in',
+        subject,
+        html: htmlContent,
+      };
+      res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${resendApiKey.trim()}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(fallbackPayload)
+      });
+      resData = await res.json().catch(() => ({}));
+    }
+
     if (!res.ok) {
       let errMsg = resData.message || resData.error || `HTTP ${res.status}`;
       if (errMsg.includes('only send testing emails to your own email address')) {
@@ -1300,7 +1339,7 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
     return { success: true, provider: 'resend', id: resData.id };
   }
 
-  // 2. Brevo API
+  // 2. Brevo API (Fallback: 300 free/day)
   if (brevoApiKey && brevoApiKey.trim()) {
     const senderParts = emailFrom.match(/^(.*)<(.*)>$/) || [null, 'Infinity Hackathon 2026', emailFrom];
     const senderName = (senderParts[1] || 'Infinity Hackathon 2026').trim();
@@ -1816,9 +1855,36 @@ export async function onRequest(context) {
         return { newTeam, calculatedAmount };
       });
 
+      // Automatically dispatch confirmation email with squad pass and verification details
+      let mailDispatched = false;
+      let mailError = null;
+      try {
+        const appUrl = (env.APP_URL || new URL(request.url).origin).replace(/\/$/, '');
+        await sendPaymentVerifiedEmail({
+          team: result.newTeam,
+          appUrl,
+          env,
+          rawPassword: teamPassword ? teamPassword.trim() : null
+        });
+        mailDispatched = true;
+        // Mark mailSent in database
+        await updateDb(env, async (db) => {
+          const t = db.teams.find(x => x.id === result.newTeam.id);
+          if (t && t.payment) {
+            t.payment.mailSent = true;
+            t.payment.mailSentAt = new Date().toISOString();
+          }
+        });
+      } catch (mErr) {
+        console.warn('Auto registration confirmation email warning:', mErr.message);
+        mailError = mErr.message;
+      }
+
       return jsonResponse({
         success: true,
         message: `Registration successful for ${result.newTeam.teamName}! Total registration fee: ₹${result.calculatedAmount}.`,
+        mailSent: mailDispatched,
+        mailError: mailError,
         team: {
           id: result.newTeam.id,
           teamName: result.newTeam.teamName,
