@@ -35,24 +35,25 @@ frontend_ui/
 ├── admin.html                 # Administrator Management Portal
 ├── coordinator.html           # Event Coordinator Check-in Portal
 ├── judges.html                # Judging & Rubric Evaluation Portal
-├── verify.html                # QR Code Ticket Verification Terminal
-├── server.js                  # Express 5 backend server (Port 3000)
+├── leader.html                # Team Leader Portal & Desk
+├── server.js                  # Express backend server (Port 3000)
 ├── package.json               # Dependencies, scripts, and build configuration
-├── vite.config.js             # Vite bundler configuration
+├── vite.config.js             # Vite bundler configuration (Port 5174)
 │
 ├── src/                       # Frontend source code (ES Modules)
-│   ├── main.js                # App bootstrap, navigation, modal orchestration
-│   ├── cinematicPreloader.js  # Intro video/audio preloader & autoplay handling
-│   ├── threeScene.js          # Three.js scene setup, camera orbits, post-processing
-│   ├── stoneGeometry.js       # Procedural crystal geometries & PBR shaders
-│   ├── audioEngine.js         # Web Audio API procedural synthesis & soundscapes
-│   ├── registration.js        # Registration form validation & API submission
-│   ├── adminPortal.js         # Admin dashboard logic, CRUD, approvals, export
-│   ├── coordinatorPortal.js   # Coordinator desk allocation & check-in logic
-│   ├── judgePortal.js         # Rubric evaluation matrix & scoring API calls
-│   ├── ticketVerifier.js      # Barcode/QR ticket scanner & cryptographic verification
-│   ├── schedule.js            # Dynamic hackathon schedule component
-│   └── faqs.js                # Interactive expandable FAQ accordion
+│   ├── main.js                # App bootstrap, 3D WebGL scene, particles, modals
+│   ├── admin.js               # Admin dashboard logic, CRUD, approvals, export, purge
+│   ├── coordinator.js         # Coordinator review milestones, meals, check-in
+│   ├── judges.js              # Judge rubric evaluation matrix & scoring API calls
+│   ├── leader.js              # Team Leader portal, domain/problem selection, password reset
+│   ├── registration.js        # Registration form validation, AI OCR receipt scanning
+│   ├── stoneBuilder.js        # Procedural crystal geometries & PBR shaders
+│   ├── audio.js               # Web Audio API procedural synthesis & interaction chimes
+│   ├── stonesData.js          # Domain metadata, Marvel themes, accent colors
+│   ├── timelineData.js        # Dynamic hackathon schedule component data
+│   ├── lightspeedEffect.js    # Three.js hyperspace streak transition effect
+│   ├── scrollReveal.js        # Smooth scroll animations and reveal triggers
+│   └── moltenMetal.js         # Cosmic singularity canvas visual effect
 │
 ├── functions/api/             # Cloudflare Pages Serverless functions
 │   └── [[route]].js           # Universal Edge API router matching server.js
@@ -63,14 +64,13 @@ frontend_ui/
 │   └── assets/                # Logos, badges, and static graphics
 │
 ├── data/                      # Persistent database storage (Server runtime)
-│   ├── teams.json             # Team registrations & check-in state
-│   ├── evaluations.json       # Judge scores and rubrics
-│   ├── audit.json             # Audit trail of administrative actions
-│   └── data_store.json        # Unified atomic fallback store
+│   ├── db.json                # Unified atomic store for squads, domains, settings
+│   └── backup_live_teams_*.json # Automated database snapshots & safety backups
 │
 ├── uploads/                   # User-uploaded payment proofs and team assets
 └── scratch/                   # Test scripts, diagnostics, and build utilities
-    ├── run_live_tests.js      # Full E2E automated test suite
+    ├── run_live_tests.js      # Automated backend stress & security test suite
+    ├── run_browser_e2e_test.js # Automated Chrome E2E browser verification test
     └── generate_catalog.js    # Data indexing & catalog generation tool
 ```
 
@@ -223,7 +223,7 @@ node -e "console.log('Build syntax valid')"
 
 ## 💡 Quick Tips for LLM Agents
 
-- **Modifying Portals**: Each portal (`admin`, `coordinator`, `judges`, `verify`) is a standalone HTML page paired with its own JS controller in `src/`. Modifying one does not break the others.
+- **Modifying Portals**: Each portal (`admin`, `coordinator`, `judges`, `leader`) is a standalone HTML page paired with its own JS controller in `src/`. Modifying one does not break the others.
 - **Styling Architecture**: Modern dark-mode glassmorphic CSS with CSS variables (`--color-space`, `--color-mind`, `--bg-obsidian`, etc.). Avoid external UI frameworks unless explicitly requested.
-- **Three.js Context**: The 3D scene in `src/threeScene.js` uses standard WebGL. Geometry buffers are custom-instanced in `src/stoneGeometry.js`. Keep frame rates at 60 FPS by reusing geometries and materials.
+- **Three.js Context**: The 3D scene in `src/main.js` uses standard WebGL. Geometry buffers are custom-instanced in `src/stoneBuilder.js`. Keep frame rates at 60 FPS by reusing geometries and materials.
 - **Dual Backend Awareness**: If you add or modify an API endpoint in `server.js`, always mirror the route logic in `functions/api/[[route]].js` so Cloudflare Pages deployment remains in sync.

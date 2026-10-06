@@ -679,7 +679,7 @@ export async function withDbLock(fn) {
  */
 export async function updateDb(mutatorFn) {
   return withDbLock(async () => {
-    const db = await loadDb();
+    const db = await loadDb(true); // Always force fresh read before mutation
     const result = await mutatorFn(db);
     db._version = (db._version || 0) + 1;
     db._lastModified = new Date().toISOString();
@@ -929,15 +929,23 @@ export function getImageDimensions(data) {
     if (bytes.length > 30 &&
         bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 &&
         bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50) {
+      // VP8 (lossy)
       if (bytes[12] === 0x56 && bytes[13] === 0x50 && bytes[14] === 0x38 && bytes[15] === 0x20) {
         const width = ((bytes[27] << 8) | bytes[26]) & 0x3fff;
         const height = ((bytes[29] << 8) | bytes[28]) & 0x3fff;
         return { width, height, format: 'webp', mimeType: 'image/webp' };
       }
+      // VP8L (lossless)
       if (bytes[12] === 0x56 && bytes[13] === 0x50 && bytes[14] === 0x38 && bytes[15] === 0x4c) {
         const b1 = bytes[21], b2 = bytes[22], b3 = bytes[23], b4 = bytes[24];
         const width = 1 + (((b2 & 0x3f) << 8) | b1);
         const height = 1 + (((b4 & 0x0f) << 10) | (b3 << 2) | ((b2 & 0xc0) >> 6));
+        return { width, height, format: 'webp', mimeType: 'image/webp' };
+      }
+      // VP8X (extended WebP — common for Android screenshots with alpha / ICC)
+      if (bytes[12] === 0x56 && bytes[13] === 0x50 && bytes[14] === 0x38 && bytes[15] === 0x58 && bytes.length >= 30) {
+        const width = 1 + (bytes[24] | (bytes[25] << 8) | (bytes[26] << 16));
+        const height = 1 + (bytes[27] | (bytes[28] << 8) | (bytes[29] << 16));
         return { width, height, format: 'webp', mimeType: 'image/webp' };
       }
     }

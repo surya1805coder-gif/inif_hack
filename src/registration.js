@@ -417,7 +417,11 @@ export function initRegistrationModule() {
       }
     } catch (e) {
       console.warn('UTR verify network warning:', e);
-      isUtrUnique = true;
+      isUtrUnique = false;
+      if (utrCheckBadge) {
+        utrCheckBadge.textContent = '⚠️ Verification temporarily unavailable. Please re-check.';
+        utrCheckBadge.className = 'utr-status-badge error';
+      }
     }
   }
 
