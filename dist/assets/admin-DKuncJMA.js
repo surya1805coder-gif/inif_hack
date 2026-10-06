@@ -59,7 +59,7 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";let b=[],$=[],Qe="",j="all",N="all"
                   <option value="rejected" ${p==="rejected"?"selected":""}>✕ REJECTED</option>
                 </select>
                 <button class="btn-tbl-mail ${o.mailSent?"is-sent":""}" data-mail-id="${l(a.id)}" title="${o.mailSent?"Confirmation email sent "+(o.mailSentAt?new Date(o.mailSentAt).toLocaleString():"")+". Click to re-send.":p==="verified"?"Send official payment verified email to leader and roster":"Send verification email (will mark payment verified)"}">
-                  ${o.mailSent?"<span>✓</span><span>MAILED</span>":"<span>✉</span><span>MAIL</span>"}
+                  ${o.mailSent?"<span>✓</span><span>MAILED</span>":"<span>📧</span><span>MAIL</span>"}
                 </button>
                 <button class="btn-tbl-edit" data-edit-id="${l(a.id)}">EDIT</button>
                 <button class="btn-tbl-del" data-del-id="${l(a.id)}">DEL</button>

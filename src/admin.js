@@ -718,7 +718,7 @@ function authHeaders(extra = {}) {
                   <option value="rejected" ${payStatus === 'rejected' ? 'selected' : ''}>✕ REJECTED</option>
                 </select>
                 <button class="btn-tbl-mail ${pay.mailSent ? 'is-sent' : ''}" data-mail-id="${escapeHTML(t.id)}" title="${pay.mailSent ? 'Confirmation email sent ' + (pay.mailSentAt ? new Date(pay.mailSentAt).toLocaleString() : '') + '. Click to re-send.' : (payStatus === 'verified' ? 'Send official payment verified email to leader and roster' : 'Send verification email (will mark payment verified)')}">
-                  ${pay.mailSent ? '<span>✓</span><span>MAILED</span>' : '<span>✉</span><span>MAIL</span>'}
+                  ${pay.mailSent ? '<span>✓</span><span>MAILED</span>' : '<span>📧</span><span>MAIL</span>'}
                 </button>
                 <button class="btn-tbl-edit" data-edit-id="${escapeHTML(t.id)}">EDIT</button>
                 <button class="btn-tbl-del" data-del-id="${escapeHTML(t.id)}">DEL</button>
