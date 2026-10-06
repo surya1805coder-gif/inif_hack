@@ -612,6 +612,47 @@ async function verifyTeamToken(token, expectedTeamId, secret) {
   }
 }
 
+async function generatePasswordResetToken(teamId, secret) {
+  const ts = Date.now().toString();
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  const sigBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(`reset:${teamId}:${ts}`));
+  const sigHex = Array.from(new Uint8Array(sigBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+  return btoa(`reset:${teamId}:${ts}:${sigHex}`);
+}
+
+async function verifyPasswordResetToken(token, secret) {
+  if (!token) return null;
+  try {
+    const decoded = atob(token);
+    const [purpose, teamId, ts, sigHex] = decoded.split(':');
+    if (purpose !== 'reset' || !teamId || !ts || !sigHex || sigHex.length !== 64) return null;
+
+    const age = Date.now() - parseInt(ts, 10);
+    if (isNaN(age) || age < 0 || age > 10 * 60 * 1000) return null; // 10-minute validity
+
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify']
+    );
+    const sigBytes = new Uint8Array(sigHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+    const isValid = await crypto.subtle.verify('HMAC', key, sigBytes, encoder.encode(`reset:${teamId}:${ts}`));
+    return isValid ? teamId : null;
+  } catch (e) {
+    return null;
+  }
+}
+
 function isValidEmail(email) {
   if (!email || typeof email !== 'string') return false;
   const clean = email.trim();
@@ -1005,7 +1046,6 @@ const regRateLimiter = new MemoryRateLimiter({
   maxRequests: 50,
   message: 'Registration rate limit reached. Please wait a few minutes before submitting another registration.'
 });
-
 export function escapeEmailHtml(str) {
   if (!str) return '';
   return String(str)
@@ -1306,6 +1346,12 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
     message: 'Simulated email logged. Configure RESEND_API_KEY for live delivery (3,000 free/mo).'
   };
 }
+
+const fgtRateLimiter = new MemoryRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  maxRequests: 15,
+  message: 'Too many password reset attempts. Please wait 15 minutes before trying again.'
+});
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -1821,12 +1867,9 @@ export async function onRequest(context) {
         (t) => t.leader?.email && t.leader.email.trim().toLowerCase() === cleanEmail
       );
 
-      if (!team) {
-        return jsonResponse({ success: false, error: 'No team registered with this leader email.' }, 404);
-      }
-      const isCorrect = await verifyPassword(password, team.teamPassword);
-      if (!isCorrect) {
-        return jsonResponse({ success: false, error: 'Incorrect team password.' }, 401);
+      const isCorrect = team ? await verifyPassword(password, team.teamPassword) : false;
+      if (!team || !isCorrect) {
+        return jsonResponse({ success: false, error: 'Invalid leader email or team password.' }, 401);
       }
 
       // Reset rate limiter on successful authentication
@@ -1897,6 +1940,125 @@ export async function onRequest(context) {
       delete safeTeam.teamPassword;
 
       return jsonResponse({ success: true, team: safeTeam, domainInfo: assignedDomain });
+    }
+
+    // -------------------------------------------------------------
+    // Team Leader Forgot Password - Verify Identity
+    // -------------------------------------------------------------
+    if (pathname === '/api/teams/forgot-password/verify' && method === 'POST') {
+      const authKey = `${clientIp}:teams-forgot-password`;
+      const check = fgtRateLimiter.isLimited(authKey);
+      if (check.limited) {
+        return jsonResponse({
+          success: false,
+          error: check.message,
+          retryAfter: check.retryAfter
+        }, 429, {
+          'Retry-After': String(check.retryAfter)
+        });
+      }
+
+      const { email, phone, utr } = await request.json();
+      if (!email || !phone || !utr) {
+        return jsonResponse({
+          success: false,
+          error: 'Leader email, phone number, and payment UTR are required.'
+        }, 400);
+      }
+
+      const cleanEmail = String(email).trim().toLowerCase();
+      const cleanPhone = normalizePhone(phone);
+      const cleanUtr = String(utr).trim().toLowerCase();
+
+      const db = await loadDb(env);
+      const team = db.teams.find((t) => {
+        if (!t.leader || !t.leader.email) return false;
+        const tEmail = t.leader.email.trim().toLowerCase();
+        if (tEmail !== cleanEmail) return false;
+
+        const tPhone = normalizePhone(t.leader.phone);
+        if (tPhone !== cleanPhone) return false;
+
+        const tUtr = String(t.payment?.utr || '').trim().toLowerCase();
+        const tId = String(t.id || '').trim().toLowerCase();
+        return tUtr === cleanUtr || tId === cleanUtr;
+      });
+
+      if (!team) {
+        return jsonResponse({
+          success: false,
+          error: 'Verification failed. The provided email, phone number, or payment reference does not match our registration records.'
+        }, 401);
+      }
+
+      fgtRateLimiter.reset(authKey);
+
+      const resetToken = await generatePasswordResetToken(team.id, ADMIN_SECRET);
+
+      return jsonResponse({
+        success: true,
+        message: 'Identity verified successfully.',
+        resetToken,
+        teamId: team.id,
+        teamName: team.teamName
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Team Leader Forgot Password - Reset Password
+    // -------------------------------------------------------------
+    if (pathname === '/api/teams/forgot-password/reset' && method === 'POST') {
+      const authKey = `${clientIp}:teams-forgot-password`;
+      const check = fgtRateLimiter.isLimited(authKey);
+      if (check.limited) {
+        return jsonResponse({
+          success: false,
+          error: check.message,
+          retryAfter: check.retryAfter
+        }, 429, {
+          'Retry-After': String(check.retryAfter)
+        });
+      }
+
+      const { resetToken, newPassword } = await request.json();
+      if (!resetToken || !newPassword) {
+        return jsonResponse({
+          success: false,
+          error: 'Reset token and new password are required.'
+        }, 400);
+      }
+
+      if (typeof newPassword !== 'string' || newPassword.trim().length < 6) {
+        return jsonResponse({
+          success: false,
+          error: 'New password must be at least 6 characters long.'
+        }, 400);
+      }
+
+      const teamId = await verifyPasswordResetToken(resetToken, ADMIN_SECRET);
+      if (!teamId) {
+        return jsonResponse({
+          success: false,
+          error: 'Invalid or expired password reset pass. Please verify your details again.'
+        }, 401);
+      }
+
+      fgtRateLimiter.reset(authKey);
+
+      await updateDbWithRetry(env, async (db) => {
+        const team = db.teams.find((t) => t.id === teamId);
+        if (!team) {
+          throw new Error('Team not found.');
+        }
+
+        team.teamPassword = hashPassword(newPassword.trim());
+        team.updatedAt = new Date().toISOString();
+      });
+
+      return jsonResponse({
+        success: true,
+        message: 'Password has been successfully updated. You may now log in.'
+      });
     }
 
     // -------------------------------------------------------------

@@ -145,6 +145,12 @@ export const regRateLimiter = new MemoryRateLimiter({
   message: 'Registration rate limit reached. Please wait a few minutes before submitting another registration.'
 });
 
+export const fgtRateLimiter = new MemoryRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  maxRequests: 15,
+  message: 'Too many password reset attempts. Please wait 15 minutes before trying again.'
+});
+
 // General API Rate Limiting Middleware (600 req / min)
 app.use('/api', (req, res, next) => {
   const ip = getClientIp(req);
@@ -163,9 +169,54 @@ app.use('/api', (req, res, next) => {
   next();
 });
 
-// Static files (dist if built, otherwise public/assets)
+// ==========================================
+// STATIC FILES & SENSITIVE ROUTE SHIELD
+// ==========================================
+// Explicitly block direct HTTP access to data, source code, and configuration files
+app.use((req, res, next) => {
+  const p = req.path.toLowerCase();
+  if (
+    p.startsWith('/data') ||
+    p.startsWith('/.env') ||
+    p.startsWith('/scratch') ||
+    p.startsWith('/functions') ||
+    p.startsWith('/node_modules') ||
+    p === '/server.js' ||
+    p === '/package.json' ||
+    p === '/package-lock.json' ||
+    p === '/wrangler.toml' ||
+    p.endsWith('.tmp')
+  ) {
+    return res.status(403).json({ success: false, error: 'Access forbidden.' });
+  }
+  next();
+});
+
+// Static public media and uploads
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(__dirname));
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+
+// Serve dist static assets if built
+const distDir = path.join(__dirname, 'dist');
+if (fs.existsSync(distDir)) {
+  app.use(express.static(distDir));
+}
+
+// Serve front-end HTML pages explicitly
+const htmlPages = ['admin', 'coordinator', 'judges', 'leader'];
+htmlPages.forEach(page => {
+  app.get(`/${page}`, (req, res) => {
+    const distPath = path.join(distDir, `${page}.html`);
+    if (fs.existsSync(distPath)) return res.sendFile(distPath);
+    return res.sendFile(path.join(__dirname, `${page}.html`));
+  });
+});
+
+app.get('/', (req, res) => {
+  const distIndex = path.join(distDir, 'index.html');
+  if (fs.existsSync(distIndex)) return res.sendFile(distIndex);
+  return res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // ==========================================
 // CLOUDFLARE R2 CONFIGURATION
@@ -480,8 +531,17 @@ function ensureDataDir() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
-// Load Database (R2 First, then Local Cache)
-export async function loadDb() {
+// In-memory cache for high-throughput reads (TTL: 5s)
+let dbMemoryCache = null;
+let dbMemoryCacheTimestamp = 0;
+const DB_CACHE_TTL_MS = 5000;
+
+// Load Database (Cache First, R2, then Local Disk)
+export async function loadDb(forceFresh = false) {
+  if (!forceFresh && dbMemoryCache && (Date.now() - dbMemoryCacheTimestamp < DB_CACHE_TTL_MS)) {
+    return JSON.parse(JSON.stringify(dbMemoryCache));
+  }
+
   if (isR2Enabled && s3Client) {
     try {
       const res = await s3Client.send(new GetObjectCommand({ Bucket: bucketName, Key: R2_DB_KEY }));
@@ -490,6 +550,8 @@ export async function loadDb() {
         const parsed = JSON.parse(text);
         if (parsed.domains && parsed.teams) {
           if (!parsed.settings) parsed.settings = { registrationOpen: true };
+          dbMemoryCache = parsed;
+          dbMemoryCacheTimestamp = Date.now();
           return parsed;
         }
       }
@@ -504,6 +566,8 @@ export async function loadDb() {
       const raw = fs.readFileSync(DB_FILE, 'utf-8');
       const parsed = JSON.parse(raw);
       if (!parsed.settings) parsed.settings = { registrationOpen: true };
+      dbMemoryCache = parsed;
+      dbMemoryCacheTimestamp = Date.now();
       return parsed;
     } catch (e) {
       console.error('Error reading local db.json:', e);
@@ -515,9 +579,13 @@ export async function loadDb() {
   return initial;
 }
 
-// Save Database (Atomic Local Write + R2 Sync)
+// Save Database (Atomic Local Write + R2 Sync + Cache Invalidation)
 export async function saveDb(data) {
   ensureDataDir();
+
+  // Invalidate and refresh in-memory cache immediately
+  dbMemoryCache = JSON.parse(JSON.stringify(data));
+  dbMemoryCacheTimestamp = Date.now();
 
   // 1. Safe atomic file write: write to temp file, then atomically rename
   const tempFile = path.join(DATA_DIR, `.db.${Date.now()}.${Math.random().toString(36).slice(2)}.tmp`);
@@ -602,10 +670,11 @@ const upload = multer({
   storage,
   limits: { fileSize: 20 * 1024 * 1024 }, // 20MB upload limit
   fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
+    const allowedMimes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    if (allowedMimes.includes((file.mimetype || '').toLowerCase())) {
       cb(null, true);
     } else {
-      cb(new Error('Only image files (PNG, JPG, JPEG, WEBP) are allowed.'));
+      cb(new Error('Only authentic image files (PNG, JPG, JPEG, WEBP) are allowed. SVG and vector formats are strictly rejected for security.'));
     }
   },
 });
@@ -688,6 +757,16 @@ export function sanitizeUrl(url) {
   return '/placeholder-receipt.png';
 }
 
+// Neutralize CSV / Spreadsheet Formula Injection (CWE-1236)
+export function sanitizeCsvFormula(val) {
+  if (typeof val !== 'string') return val;
+  const trimmed = val.trim();
+  if (/^[=\+\-@\t\r]/.test(trimmed)) {
+    return `'${trimmed}`;
+  }
+  return val;
+}
+
 // PBKDF2 Password Hashing (100,000 iterations, 16-byte random salt, SHA-256)
 export function hashPassword(password) {
   if (!password || typeof password !== 'string') return '';
@@ -738,6 +817,31 @@ export function verifyTeamToken(token, expectedTeamId, secret) {
   }
 }
 
+// Cryptographic Password Reset Token Generator & Verifier (10-minute validity)
+export function generatePasswordResetToken(teamId, secret) {
+  const ts = Date.now().toString();
+  const signature = crypto.createHmac('sha256', secret).update(`reset:${teamId}:${ts}`).digest('hex');
+  return Buffer.from(`reset:${teamId}:${ts}:${signature}`).toString('base64');
+}
+
+export function verifyPasswordResetToken(token, secret) {
+  if (!token) return null;
+  try {
+    const decoded = Buffer.from(token, 'base64').toString('utf8');
+    const [purpose, teamId, ts, sig] = decoded.split(':');
+    if (purpose !== 'reset' || !teamId || !ts || !sig || sig.length !== 64) return null;
+
+    const age = Date.now() - parseInt(ts, 10);
+    if (isNaN(age) || age < 0 || age > 10 * 60 * 1000) return null; // 10-minute expiration window
+
+    const expectedSig = crypto.createHmac('sha256', secret).update(`reset:${teamId}:${ts}`).digest('hex');
+    if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expectedSig))) return null;
+    return teamId;
+  } catch (e) {
+    return null;
+  }
+}
+
 export function isValidEmail(email) {
   if (!email || typeof email !== 'string') return false;
   const clean = email.trim();
@@ -773,7 +877,7 @@ export function getImageDimensions(data) {
     if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) {
       const width = (bytes[16] << 24) | (bytes[17] << 16) | (bytes[18] << 8) | bytes[19];
       const height = (bytes[20] << 24) | (bytes[21] << 16) | (bytes[22] << 8) | bytes[23];
-      return { width: width >>> 0, height: height >>> 0 };
+      return { width: width >>> 0, height: height >>> 0, format: 'png', mimeType: 'image/png' };
     }
 
     // JPEG: starts with 0xFF 0xD8
@@ -788,7 +892,7 @@ export function getImageDimensions(data) {
         if ((marker >= 0xc0 && marker <= 0xc3) || (marker >= 0xc9 && marker <= 0xcb)) {
           const height = (bytes[offset + 5] << 8) | bytes[offset + 6];
           const width = (bytes[offset + 7] << 8) | bytes[offset + 8];
-          return { width, height };
+          return { width, height, format: 'jpg', mimeType: 'image/jpeg' };
         }
         const len = (bytes[offset + 2] << 8) | bytes[offset + 3];
         offset += 2 + len;
@@ -802,13 +906,13 @@ export function getImageDimensions(data) {
       if (bytes[12] === 0x56 && bytes[13] === 0x50 && bytes[14] === 0x38 && bytes[15] === 0x20) {
         const width = ((bytes[27] << 8) | bytes[26]) & 0x3fff;
         const height = ((bytes[29] << 8) | bytes[28]) & 0x3fff;
-        return { width, height };
+        return { width, height, format: 'webp', mimeType: 'image/webp' };
       }
       if (bytes[12] === 0x56 && bytes[13] === 0x50 && bytes[14] === 0x38 && bytes[15] === 0x4c) {
         const b1 = bytes[21], b2 = bytes[22], b3 = bytes[23], b4 = bytes[24];
         const width = 1 + (((b2 & 0x3f) << 8) | b1);
         const height = 1 + (((b4 & 0x0f) << 10) | (b3 << 2) | ((b2 & 0xc0) >> 6));
-        return { width, height };
+        return { width, height, format: 'webp', mimeType: 'image/webp' };
       }
     }
   } catch (_) {}
@@ -1063,19 +1167,26 @@ app.post('/api/register', upload.single('paymentScreenshot'), async (req, res) =
     }
 
     const imgDim = getImageDimensions(req.file.buffer);
-    if (imgDim && ((imgDim.width < 250 && imgDim.height < 300) && (imgDim.height < 250 && imgDim.width < 300))) {
+    if (!imgDim) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid receipt file format. Only authentic PNG, JPEG, or WebP screenshot files are accepted. SVG and vector formats are strictly rejected for security.',
+      });
+    }
+
+    if ((imgDim.width < 250 && imgDim.height < 300) && (imgDim.height < 250 && imgDim.width < 300)) {
       return res.status(400).json({
         success: false,
         error: `Uploaded image dimensions (${imgDim.width}x${imgDim.height}px) are too small for a payment receipt screenshot. Logos, icons, and small images are not accepted.`,
       });
     }
 
-    // Process screenshot file
+    // Process screenshot file with cryptographically random key and verified extension
     let screenshotUrl = '/placeholder-receipt.png';
     if (req.file) {
-      const ext = path.extname(req.file.originalname) || '.png';
+      const ext = `.${imgDim.format}`;
       const key = `receipts/${Date.now()}-${Math.random().toString(36).substring(2, 8)}${ext}`;
-      screenshotUrl = await uploadToR2(req.file.buffer, key, req.file.mimetype);
+      screenshotUrl = await uploadToR2(req.file.buffer, key, imgDim.mimeType);
     }
 
     // Parse teammates
@@ -1295,11 +1406,9 @@ app.post('/api/teams/login', async (req, res) => {
     const cleanEmail = email.trim().toLowerCase();
     const team = db.teams.find((t) => t.leader && t.leader.email && t.leader.email.trim().toLowerCase() === cleanEmail);
 
-    if (!team) {
-      return res.status(404).json({ success: false, error: 'No team registered with this leader email.' });
-    }
-    if (!verifyPassword(password, team.teamPassword)) {
-      return res.status(401).json({ success: false, error: 'Incorrect team password.' });
+    const isPasswordValid = team ? verifyPassword(password, team.teamPassword) : false;
+    if (!team || !isPasswordValid) {
+      return res.status(401).json({ success: false, error: 'Invalid leader email or team password.' });
     }
 
     // Reset rate limiter on successful authentication
@@ -1382,6 +1491,142 @@ app.get('/api/teams/me', async (req, res) => {
     res.json({ success: true, team: safeTeam, domainInfo: assignedDomain });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 4.2 Team Leader Forgot Password - Verify Identity
+app.post('/api/teams/forgot-password/verify', async (req, res) => {
+  try {
+    const clientIp = getClientIp(req);
+    const authKey = `${clientIp}:teams-forgot-password`;
+    const check = fgtRateLimiter.isLimited(authKey);
+    if (check.limited) {
+      res.setHeader('Retry-After', String(check.retryAfter));
+      return res.status(429).json({
+        success: false,
+        error: check.message,
+        retryAfter: check.retryAfter
+      });
+    }
+
+    const { email, phone, utr } = req.body;
+    if (!email || !phone || !utr) {
+      return res.status(400).json({
+        success: false,
+        error: 'Leader email, phone number, and payment UTR are required.'
+      });
+    }
+
+    const cleanEmail = String(email).trim().toLowerCase();
+    const cleanPhone = normalizePhone(phone);
+    const cleanUtr = String(utr).trim().toLowerCase();
+
+    const db = await loadDb();
+    const team = db.teams.find((t) => {
+      if (!t.leader || !t.leader.email) return false;
+      const tEmail = t.leader.email.trim().toLowerCase();
+      if (tEmail !== cleanEmail) return false;
+
+      const tPhone = normalizePhone(t.leader.phone);
+      if (tPhone !== cleanPhone) return false;
+
+      const tUtr = String(t.payment?.utr || '').trim().toLowerCase();
+      const tId = String(t.id || '').trim().toLowerCase();
+      return tUtr === cleanUtr || tId === cleanUtr;
+    });
+
+    if (!team) {
+      return res.status(401).json({
+        success: false,
+        error: 'Verification failed. The provided email, phone number, or payment reference does not match our registration records.'
+      });
+    }
+
+    // Reset rate limiter on successful verification
+    fgtRateLimiter.reset(authKey);
+
+    const secret = process.env.ADMIN_SECRET;
+    if (!secret) {
+      return res.status(500).json({ success: false, error: 'Server authentication secret is not configured.' });
+    }
+
+    const resetToken = generatePasswordResetToken(team.id, secret);
+
+    res.json({
+      success: true,
+      message: 'Identity verified successfully.',
+      resetToken,
+      teamId: team.id,
+      teamName: team.teamName
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 4.3 Team Leader Forgot Password - Reset Password
+app.post('/api/teams/forgot-password/reset', async (req, res) => {
+  try {
+    const clientIp = getClientIp(req);
+    const authKey = `${clientIp}:teams-forgot-password`;
+    const check = fgtRateLimiter.isLimited(authKey);
+    if (check.limited) {
+      res.setHeader('Retry-After', String(check.retryAfter));
+      return res.status(429).json({
+        success: false,
+        error: check.message,
+        retryAfter: check.retryAfter
+      });
+    }
+
+    const { resetToken, newPassword } = req.body;
+    if (!resetToken || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        error: 'Reset token and new password are required.'
+      });
+    }
+
+    if (typeof newPassword !== 'string' || newPassword.trim().length < 6) {
+      return res.status(400).json({
+        success: false,
+        error: 'New password must be at least 6 characters long.'
+      });
+    }
+
+    const secret = process.env.ADMIN_SECRET;
+    if (!secret) {
+      return res.status(500).json({ success: false, error: 'Server authentication secret is not configured.' });
+    }
+
+    const teamId = verifyPasswordResetToken(resetToken, secret);
+    if (!teamId) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid or expired password reset pass. Please verify your details again.'
+      });
+    }
+
+    fgtRateLimiter.reset(authKey);
+
+    await updateDb(async (db) => {
+      const team = db.teams.find((t) => t.id === teamId);
+      if (!team) {
+        const err = new Error('Team not found.');
+        err.statusCode = 404;
+        throw err;
+      }
+
+      team.teamPassword = hashPassword(newPassword.trim());
+      team.updatedAt = new Date().toISOString();
+    });
+
+    res.json({
+      success: true,
+      message: 'Password has been successfully updated. You may now log in.'
+    });
+  } catch (err) {
+    res.status(err.statusCode || 500).json({ success: false, error: err.message });
   }
 });
 
@@ -2552,29 +2797,29 @@ app.get('/api/admin/export', requireAdminAuth, async (req, res) => {
     // Sheet 1: Payment Details & Status
     const paymentRows = teams.map((t, idx) => ({
       'S.No': idx + 1,
-      'Team ID': t.id,
-      'Team Name': t.teamName,
-      'College': t.college,
-      'Domain': (t.preferredDomain || '').toUpperCase(),
+      'Team ID': sanitizeCsvFormula(t.id),
+      'Team Name': sanitizeCsvFormula(t.teamName),
+      'College': sanitizeCsvFormula(t.college),
+      'Domain': sanitizeCsvFormula((t.preferredDomain || '').toUpperCase()),
       'Team Size': t.teamSize || (t.members ? t.members.length + 1 : 4),
       'Fee Amount (₹)': t.payment?.amount || (349 * (t.teamSize || 4)),
-      'Payment Status': (t.payment?.status || 'pending').toUpperCase(),
+      'Payment Status': sanitizeCsvFormula((t.payment?.status || 'pending').toUpperCase()),
       'Confirmation Mail Sent': t.payment?.mailSent ? 'YES' : 'NO',
       'Mail Sent At': t.payment?.mailSentAt ? new Date(t.payment.mailSentAt).toLocaleString() : 'N/A',
-      'UTR / Transaction No': t.payment?.utr || 'N/A',
-      'Payer Phone': t.payment?.phone || 'N/A',
-      'Leader Email': t.leader?.email || '',
-      'Leader Phone': t.leader?.phone || '',
-      'Proof Screenshot URL': t.payment?.screenshotUrl || 'N/A',
+      'UTR / Transaction No': sanitizeCsvFormula(t.payment?.utr || 'N/A'),
+      'Payer Phone': sanitizeCsvFormula(t.payment?.phone || 'N/A'),
+      'Leader Email': sanitizeCsvFormula(t.leader?.email || ''),
+      'Leader Phone': sanitizeCsvFormula(t.leader?.phone || ''),
+      'Proof Screenshot URL': sanitizeCsvFormula(t.payment?.screenshotUrl || 'N/A'),
       'Registration Time': new Date(t.createdAt).toLocaleString(),
     }));
 
     // Sheet 2: Food & Review Tracking
     const foodReviewRows = teams.map((t, idx) => ({
       'S.No': idx + 1,
-      'Team ID': t.id,
-      'Team Name': t.teamName,
-      'College': t.college,
+      'Team ID': sanitizeCsvFormula(t.id),
+      'Team Name': sanitizeCsvFormula(t.teamName),
+      'College': sanitizeCsvFormula(t.college),
       'High Tea': t.food?.highTea?.collected ? 'RECEIVED' : 'PENDING',
       'Dinner': t.food?.dinner?.collected ? 'RECEIVED' : 'PENDING',
       'Midnight Fuel': t.food?.midnightFuel?.collected ? 'RECEIVED' : 'PENDING',
@@ -2583,41 +2828,41 @@ app.get('/api/admin/export', requireAdminAuth, async (req, res) => {
       'Review 1 (Ideation)': t.reviews?.r1?.attended ? 'ATTENDED' : 'PENDING',
       'Review 2 (Midpoint)': t.reviews?.r2?.attended ? 'ATTENDED' : 'PENDING',
       'Review 3 (Final)': t.reviews?.r3?.attended ? 'ATTENDED' : 'PENDING',
-      'Room / Lab Block': t.roomAllocated || 'TBA',
+      'Room / Lab Block': sanitizeCsvFormula(t.roomAllocated || 'TBA'),
     }));
 
     // Sheet 3: Judges Scores (Confidential)
     const judgeRows = teams.map((t, idx) => ({
       'S.No': idx + 1,
-      'Team ID': t.id,
-      'Team Name': t.teamName,
-      'Domain': (t.preferredDomain || '').toUpperCase(),
-      'Selected Problem Statement': t.selectedProblemStatement ? `${t.selectedProblemStatement.code}: ${t.selectedProblemStatement.title}` : 'Not Selected',
+      'Team ID': sanitizeCsvFormula(t.id),
+      'Team Name': sanitizeCsvFormula(t.teamName),
+      'Domain': sanitizeCsvFormula((t.preferredDomain || '').toUpperCase()),
+      'Selected Problem Statement': sanitizeCsvFormula(t.selectedProblemStatement ? `${t.selectedProblemStatement.code}: ${t.selectedProblemStatement.title}` : 'Not Selected'),
       'Innovation (25)': t.scores?.innovation || 0,
       'Technical Depth (25)': t.scores?.technical || 0,
       'Execution / Demo (25)': t.scores?.execution || 0,
       'UI/UX & Pitch (25)': t.scores?.presentation || 0,
       'Total Score (100)': t.scores?.total || 0,
-      'Judge Remarks': t.scores?.remarks || 'None',
+      'Judge Remarks': sanitizeCsvFormula(t.scores?.remarks || 'None'),
     }));
 
     // Sheet 4: Full Team Rosters
     const teamRows = teams.map((t, idx) => {
       const row = {
         'S.No': idx + 1,
-        'Team ID': t.id,
-        'Team Name': t.teamName,
-        'College': t.college,
-        'Domain': (t.preferredDomain || '').toUpperCase(),
-        'Tech Stack': Array.isArray(t.techStack) ? t.techStack.join(', ') : (t.techStack || ''),
-        'Leader Name': t.leader?.name || '',
-        'Leader Email': t.leader?.email || '',
-        'Leader Phone': t.leader?.phone || '',
+        'Team ID': sanitizeCsvFormula(t.id),
+        'Team Name': sanitizeCsvFormula(t.teamName),
+        'College': sanitizeCsvFormula(t.college),
+        'Domain': sanitizeCsvFormula((t.preferredDomain || '').toUpperCase()),
+        'Tech Stack': sanitizeCsvFormula(Array.isArray(t.techStack) ? t.techStack.join(', ') : (t.techStack || '')),
+        'Leader Name': sanitizeCsvFormula(t.leader?.name || ''),
+        'Leader Email': sanitizeCsvFormula(t.leader?.email || ''),
+        'Leader Phone': sanitizeCsvFormula(t.leader?.phone || ''),
       };
       (t.members || []).forEach((m, mIdx) => {
-        row[`Member ${mIdx + 2} Name`] = m.name || '';
-        row[`Member ${mIdx + 2} Email`] = m.email || '';
-        row[`Member ${mIdx + 2} Phone`] = m.phone || '';
+        row[`Member ${mIdx + 2} Name`] = sanitizeCsvFormula(m.name || '');
+        row[`Member ${mIdx + 2} Email`] = sanitizeCsvFormula(m.email || '');
+        row[`Member ${mIdx + 2} Phone`] = sanitizeCsvFormula(m.phone || '');
       });
       return row;
     });

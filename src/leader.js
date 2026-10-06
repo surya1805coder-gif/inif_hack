@@ -312,3 +312,232 @@ let currentTeam = null;
         });
       });
     }
+
+    // ==========================================
+    // FORGOT PASSWORD MODAL CONTROLLER
+    // ==========================================
+    const modalForgot = document.getElementById('modal-forgot-pwd');
+    const btnOpenForgot = document.getElementById('btn-open-forgot');
+    const btnCloseForgot = document.getElementById('btn-close-forgot');
+
+    const formForgotVerify = document.getElementById('form-forgot-verify');
+    const formForgotReset = document.getElementById('form-forgot-reset');
+    const viewForgotSuccess = document.getElementById('forgot-success-view');
+
+    const fgtVerifyErr = document.getElementById('fgt-verify-err');
+    const fgtResetErr = document.getElementById('fgt-reset-err');
+    const txtVerifyBtn = document.getElementById('txt-verify-btn');
+    const txtResetBtn = document.getElementById('txt-reset-btn');
+
+    const btnToggleNewPwd = document.getElementById('btn-toggle-new-pwd');
+    const fgtNewPwd = document.getElementById('fgt-new-pwd');
+    const btnFgtFinish = document.getElementById('btn-fgt-finish');
+    const fgtTeamNameDisplay = document.getElementById('fgt-team-name-display');
+
+    let currentResetToken = '';
+    let verifiedEmail = '';
+
+    function resetForgotModal() {
+      currentResetToken = '';
+      verifiedEmail = '';
+      if (formForgotVerify) {
+        formForgotVerify.reset();
+        formForgotVerify.style.display = 'block';
+      }
+      if (formForgotReset) {
+        formForgotReset.reset();
+        formForgotReset.style.display = 'none';
+      }
+      if (viewForgotSuccess) viewForgotSuccess.style.display = 'none';
+      if (fgtVerifyErr) {
+        fgtVerifyErr.textContent = '';
+        fgtVerifyErr.style.display = 'none';
+      }
+      if (fgtResetErr) {
+        fgtResetErr.textContent = '';
+        fgtResetErr.style.display = 'none';
+      }
+      if (txtVerifyBtn) txtVerifyBtn.textContent = 'VERIFY IDENTITY & PROCEED →';
+      if (txtResetBtn) txtResetBtn.textContent = 'LOCK IN NEW PASSWORD ✓';
+    }
+
+    function openForgotModal() {
+      resetForgotModal();
+      const loginEmail = document.getElementById('txt-email')?.value?.trim();
+      const fgtEmailInput = document.getElementById('fgt-email');
+      if (loginEmail && fgtEmailInput) {
+        fgtEmailInput.value = loginEmail;
+      }
+      if (modalForgot) modalForgot.style.display = 'flex';
+    }
+
+    function closeForgotModal() {
+      if (modalForgot) modalForgot.style.display = 'none';
+      resetForgotModal();
+    }
+
+    if (btnOpenForgot) {
+      btnOpenForgot.addEventListener('click', (e) => {
+        e.preventDefault();
+        openForgotModal();
+      });
+    }
+
+    if (btnCloseForgot) {
+      btnCloseForgot.addEventListener('click', closeForgotModal);
+    }
+
+    if (modalForgot) {
+      modalForgot.addEventListener('click', (e) => {
+        if (e.target === modalForgot) closeForgotModal();
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modalForgot && modalForgot.style.display === 'flex') {
+        closeForgotModal();
+      }
+    });
+
+    // Toggle password visibility
+    if (btnToggleNewPwd && fgtNewPwd) {
+      btnToggleNewPwd.addEventListener('click', () => {
+        const isPwd = fgtNewPwd.type === 'password';
+        fgtNewPwd.type = isPwd ? 'text' : 'password';
+        btnToggleNewPwd.textContent = isPwd ? '🔒' : '👁';
+      });
+    }
+
+    // Step 1: Submit Identity Verification
+    if (formForgotVerify) {
+      formForgotVerify.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (fgtVerifyErr) fgtVerifyErr.style.display = 'none';
+
+        const email = document.getElementById('fgt-email')?.value?.trim();
+        const phone = document.getElementById('fgt-phone')?.value?.trim();
+        const utr = document.getElementById('fgt-utr')?.value?.trim();
+
+        if (!email || !phone || !utr) {
+          if (fgtVerifyErr) {
+            fgtVerifyErr.textContent = 'All verification fields are required.';
+            fgtVerifyErr.style.display = 'block';
+          }
+          return;
+        }
+
+        try {
+          if (txtVerifyBtn) txtVerifyBtn.textContent = 'VERIFYING IDENTITY...';
+          const btn = document.getElementById('btn-submit-verify');
+          if (btn) btn.disabled = true;
+
+          const res = await fetch('/api/teams/forgot-password/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, phone, utr })
+          });
+          const data = await res.json();
+
+          if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Verification failed. Please check your details.');
+          }
+
+          currentResetToken = data.resetToken;
+          verifiedEmail = email;
+
+          if (fgtTeamNameDisplay) {
+            fgtTeamNameDisplay.textContent = data.teamName || 'Squad';
+          }
+
+          // Transition to Step 2
+          formForgotVerify.style.display = 'none';
+          if (formForgotReset) formForgotReset.style.display = 'block';
+          const newPwdInput = document.getElementById('fgt-new-pwd');
+          if (newPwdInput) newPwdInput.focus();
+        } catch (err) {
+          if (fgtVerifyErr) {
+            fgtVerifyErr.textContent = err.message;
+            fgtVerifyErr.style.display = 'block';
+          }
+        } finally {
+          if (txtVerifyBtn) txtVerifyBtn.textContent = 'VERIFY IDENTITY & PROCEED →';
+          const btn = document.getElementById('btn-submit-verify');
+          if (btn) btn.disabled = false;
+        }
+      });
+    }
+
+    // Step 2: Submit New Password
+    if (formForgotReset) {
+      formForgotReset.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (fgtResetErr) fgtResetErr.style.display = 'none';
+
+        const newPassword = document.getElementById('fgt-new-pwd')?.value || '';
+        const confirmPassword = document.getElementById('fgt-confirm-pwd')?.value || '';
+
+        if (!newPassword || newPassword.length < 6) {
+          if (fgtResetErr) {
+            fgtResetErr.textContent = 'New password must be at least 6 characters.';
+            fgtResetErr.style.display = 'block';
+          }
+          return;
+        }
+
+        if (newPassword !== confirmPassword) {
+          if (fgtResetErr) {
+            fgtResetErr.textContent = 'Passwords do not match. Please re-enter.';
+            fgtResetErr.style.display = 'block';
+          }
+          return;
+        }
+
+        try {
+          if (txtResetBtn) txtResetBtn.textContent = 'UPDATING SINGULARITY CORE...';
+          const btn = document.getElementById('btn-submit-reset');
+          if (btn) btn.disabled = true;
+
+          const res = await fetch('/api/teams/forgot-password/reset', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              resetToken: currentResetToken,
+              newPassword
+            })
+          });
+          const data = await res.json();
+
+          if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Password update failed.');
+          }
+
+          // Transition to Step 3: Success
+          formForgotReset.style.display = 'none';
+          if (viewForgotSuccess) viewForgotSuccess.style.display = 'block';
+
+          // Pre-fill the login form
+          const txtEmail = document.getElementById('txt-email');
+          const txtPassword = document.getElementById('txt-password');
+          if (txtEmail && verifiedEmail) txtEmail.value = verifiedEmail;
+          if (txtPassword) txtPassword.value = '';
+        } catch (err) {
+          if (fgtResetErr) {
+            fgtResetErr.textContent = err.message;
+            fgtResetErr.style.display = 'block';
+          }
+        } finally {
+          if (txtResetBtn) txtResetBtn.textContent = 'LOCK IN NEW PASSWORD ✓';
+          const btn = document.getElementById('btn-submit-reset');
+          if (btn) btn.disabled = false;
+        }
+      });
+    }
+
+    // Step 3 Finish button
+    if (btnFgtFinish) {
+      btnFgtFinish.addEventListener('click', () => {
+        closeForgotModal();
+        const txtPassword = document.getElementById('txt-password');
+        if (txtPassword) txtPassword.focus();
+      });
+    }
