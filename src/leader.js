@@ -244,7 +244,7 @@ let currentTeam = null;
             <div class="lock-icon">🔒</div>
             <h4 class="lock-title">PROBLEM STATEMENTS LOCKED</h4>
             <p class="lock-sub">
-              Classified problem statements for the <strong>${escapeHTML(currentDomain?.domainName || '')}</strong> domain will be unlocked by the organizer command post 1 to 2 days prior to hackathon kickoff.
+              Classified problem statements for the <strong>${escapeHTML(currentDomain?.domainName || '')}</strong> domain will be unlocked by the organizer command post just an hour before the start of the event.
             </p>
           </div>
         `;
