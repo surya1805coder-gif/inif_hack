@@ -15,6 +15,8 @@ import { TechText } from './techText.js';
 import { initCinematicPreloader } from './cinematicPreloader.js';
 import { initMoltenMetal } from './moltenMetal.js';
 import { initScrollReveal } from './scrollReveal.js';
+import { LightspeedEffect } from './lightspeedEffect.js';
+
 
 class InfinityScrollShowcase {
   constructor() {
@@ -25,7 +27,7 @@ class InfinityScrollShowcase {
     this.isConvergenceActive = false;
     this.isWireframe = false;
     this.lastScrollTime = 0;
-    this.scrollCooldown = 700; // ms debounce for clean single-stone step per scroll
+    this.scrollCooldown = 350; // Dynamic debounce, optimized for snappy mobile/desktop responsiveness
 
     this.clock = new THREE.Clock();
     this.infoCard = document.getElementById('info-card');
@@ -73,7 +75,7 @@ class InfinityScrollShowcase {
     // Initial state: locked to 6-stone showcase until all 6 stones are scrolled or nav clicked
     document.body.classList.remove('timeline-unlocked');
 
-    // Initial Presentation of Specimen 1 (Mind Stone // Intelligence)
+    // Initial Presentation of Specimen 1 (Mind Stone // Transportation & Logistics)
     this.displayStone(0, false);
 
     // Initialize Site Video Loader (loading.mp4)
@@ -350,6 +352,12 @@ class InfinityScrollShowcase {
 
     this.starfield = new THREE.Points(starGeo, starMat);
     this.scene.add(this.starfield);
+
+    // Initialize Native React Bits: Lightspeed Hyperspace Streak Engine
+    this.lightspeed = new LightspeedEffect(this.scene, {
+      isMobile: this.isMobile(),
+      initialColor: STONES[0].colorHex
+    });
   }
 
   /* --------------------------------------------------------------------------
@@ -448,6 +456,18 @@ class InfinityScrollShowcase {
           const hits = raycaster.intersectObjects([currentStone.gemMesh, currentStone.coreMesh], true);
           if (hits.length > 0) {
             this.pulseCurrentStone();
+          } else {
+            // Click on empty cosmos: Trigger interactive Lightspeed warp streak pulse!
+            if (this.lightspeed) {
+              audioEngine.playEnergyPulse();
+              const stoneData = STONES[this.currentIndex];
+              this.lightspeed.triggerWarp({
+                colorHex: stoneData ? stoneData.colorHex : '#ffffff',
+                speedMultiplier: 22.0,
+                lengthMultiplier: 24.0,
+                duration: 1.05
+              });
+            }
           }
         }
       }
@@ -962,7 +982,8 @@ class InfinityScrollShowcase {
         if (e.deltaY < 0) {
           if (window.scrollY <= 5) {
             const now = Date.now();
-            if (now - this.lastScrollTime >= this.scrollCooldown) {
+            const cd = this.isMobile() ? 260 : 360;
+            if (now - this.lastScrollTime >= cd && !this.isTransitioning) {
               this.lastScrollTime = now;
               this.lockTimeline();
             }
@@ -971,11 +992,14 @@ class InfinityScrollShowcase {
         }
       }
 
+      if (this.isTransitioning) return;
+
       const now = Date.now();
-      if (now - this.lastScrollTime < this.scrollCooldown) return;
+      const cd = this.isMobile() ? 260 : 360;
+      if (now - this.lastScrollTime < cd) return;
 
       // Threshold to prevent micro-accidental triggers
-      if (Math.abs(e.deltaY) > 18) {
+      if (Math.abs(e.deltaY) > 12) {
         this.lastScrollTime = now;
         if (this.isConvergenceActive) {
           this.endConvergence();
@@ -989,13 +1013,54 @@ class InfinityScrollShowcase {
       }
     }, { passive: true });
 
-    // Touch Gestures: On mobile, vertical touch MUST ONLY SCROLL the page naturally!
+    // Touch Gestures: Ultra-responsive touch navigation with shorter swipe distance
     let touchStartX = 0;
     let touchStartY = 0;
+    let touchTriggeredDuringMove = false;
+
     window.addEventListener('touchstart', (e) => {
       if (!e.touches || !e.touches[0]) return;
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
+      touchTriggeredDuringMove = false;
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!e.touches || !e.touches[0]) return;
+      if (document.body.classList.contains('timeline-unlocked')) return;
+      if (this.isTransitioning) return;
+
+      const currentX = e.touches[0].clientX;
+      const currentY = e.touches[0].clientY;
+      const diffY = touchStartY - currentY;
+      const diffX = touchStartX - currentX;
+      const absY = Math.abs(diffY);
+      const absX = Math.abs(diffX);
+
+      const now = Date.now();
+      const cd = this.isMobile() ? 260 : 360;
+      if (now - this.lastScrollTime < cd) return;
+
+      // Continuous drag threshold: short 65px distance advances stone immediately!
+      if (absY > 65 || absX > 75) {
+        this.lastScrollTime = now;
+        touchTriggeredDuringMove = true;
+        touchStartY = currentY; // Reset anchor so successive dragging can advance further
+        touchStartX = currentX;
+
+        if (this.isConvergenceActive) {
+          this.endConvergence();
+        }
+
+        const isForward = (absY >= absX && diffY > 0) || (absX > absY && diffX > 0);
+        const isBackward = (absY >= absX && diffY < 0) || (absX > absY && diffX < 0);
+
+        if (isForward) {
+          this.stepStone(1);
+        } else if (isBackward) {
+          this.stepStone(-1);
+        }
+      }
     }, { passive: true });
 
     window.addEventListener('touchend', (e) => {
@@ -1008,13 +1073,22 @@ class InfinityScrollShowcase {
 
         if (diffY < 0 && window.scrollY <= 5) {
           const now = Date.now();
-          if (now - this.lastScrollTime >= this.scrollCooldown) {
+          const cd = this.isMobile() ? 260 : 360;
+          if (now - this.lastScrollTime >= cd && !this.isTransitioning) {
             this.lastScrollTime = now;
             this.lockTimeline();
           }
         }
         return;
       }
+
+      // If already triggered during drag, don't duplicate on finger lift
+      if (touchTriggeredDuringMove) {
+        touchTriggeredDuringMove = false;
+        return;
+      }
+
+      if (this.isTransitioning) return;
 
       const diffX = touchStartX - e.changedTouches[0].clientX;
       const diffY = touchStartY - e.changedTouches[0].clientY;
@@ -1023,10 +1097,14 @@ class InfinityScrollShowcase {
 
       // Check cooldown
       const now = Date.now();
-      if (now - this.lastScrollTime < this.scrollCooldown) return;
+      const cd = this.isMobile() ? 260 : 360;
+      if (now - this.lastScrollTime < cd) return;
 
-      // Minimum swipe distance threshold (35px)
-      if (absY > 35 || absX > 40) {
+      // Minimum swipe distance threshold (short 15px vertical, 18px horizontal on mobile)
+      const minDistanceY = this.isMobile() ? 15 : 28;
+      const minDistanceX = this.isMobile() ? 18 : 32;
+
+      if (absY > minDistanceY || absX > minDistanceX) {
         this.lastScrollTime = now;
         if (this.isConvergenceActive) {
           this.endConvergence();
@@ -1063,6 +1141,7 @@ class InfinityScrollShowcase {
   }
 
   stepStone(direction) {
+    if (this.isTransitioning) return;
     if (this.isConvergenceActive) {
       this.endConvergence();
     }
@@ -1092,6 +1171,14 @@ class InfinityScrollShowcase {
     const prevIndex = this.currentIndex;
     this.currentIndex = index;
     const stoneData = STONES[index];
+    const isMobile = this.isMobile();
+
+    // Responsive animation parameters: snappy and light on mobile
+    const animDuration = isMobile ? 0.36 : 0.65;
+    const outgoingDuration = isMobile ? 0.22 : 0.45;
+    const animDelay = isMobile ? 0.03 : 0.12;
+    const cardDelay = isMobile ? 50 : 120;
+    const warpDuration = isMobile ? 0.45 : 0.85;
 
     // Update Theme Accent Color Variables
     document.documentElement.style.setProperty('--active-stone-color', stoneData.colorHex);
@@ -1107,7 +1194,7 @@ class InfinityScrollShowcase {
       r: new THREE.Color(stoneData.colorThree).r,
       g: new THREE.Color(stoneData.colorThree).g,
       b: new THREE.Color(stoneData.colorThree).b,
-      duration: 0.8
+      duration: isMobile ? 0.4 : 0.8
     });
 
     // Update Vertical Pager & Laser Line Segments
@@ -1137,15 +1224,15 @@ class InfinityScrollShowcase {
       if (animate) {
         infoCard.classList.remove('animating');
       }
-    }, animate ? 150 : 0);
+    }, animate ? cardDelay : 0);
 
     // Smoothly restore optimal camera distance to prevent any over-zooming
-    const targetZ = this.isMobile() ? 12.0 : 9.8;
+    const targetZ = isMobile ? 12.0 : 9.8;
     gsap.to(this.camera.position, {
       x: 0,
       y: 0,
       z: targetZ,
-      duration: 0.7,
+      duration: isMobile ? 0.35 : 0.7,
       ease: 'power2.out'
     });
 
@@ -1156,24 +1243,34 @@ class InfinityScrollShowcase {
         r: targetCol.r,
         g: targetCol.g,
         b: targetCol.b,
-        duration: 0.6
+        duration: isMobile ? 0.35 : 0.6
       });
     }
 
     // 3D Stone Swap Animation
-    const targetScale = this.isMobile() ? 0.48 : 1.0;
+    const targetScale = isMobile ? 0.48 : 1.0;
     if (animate) {
       const prevStone = this.stones[prevIndex];
       const nextStone = this.stones[index];
 
       // Subtle bloom surge during stone transmute
       gsap.to(this.bloomPass, {
-        strength: 0.65,
-        duration: 0.35,
+        strength: isMobile ? 0.5 : 0.65,
+        duration: isMobile ? 0.22 : 0.35,
         yoyo: true,
         repeat: 1,
         ease: 'power2.out'
       });
+
+      // React Bits Pro: Native Lightspeed Hyperspace Warp
+      if (this.lightspeed) {
+        this.lightspeed.triggerWarp({
+          colorHex: stoneData.colorHex,
+          speedMultiplier: isMobile ? 18.0 : 16.0,
+          lengthMultiplier: isMobile ? 16.0 : 20.0,
+          duration: warpDuration
+        });
+      }
 
       // Outgoing Stone
       if (prevStone && prevIndex !== index) {
@@ -1181,8 +1278,8 @@ class InfinityScrollShowcase {
           x: 0.001,
           y: 0.001,
           z: 0.001,
-          duration: 0.55,
-          ease: 'back.in(1.4)',
+          duration: outgoingDuration,
+          ease: 'power2.in',
           onComplete: () => {
             prevStone.group.visible = false;
           }
@@ -1203,18 +1300,18 @@ class InfinityScrollShowcase {
       // Incoming Stone
       nextStone.group.visible = true;
       nextStone.group.position.set(0, 0, 0);
-      nextStone.group.rotation.y += Math.PI * 0.5;
+      nextStone.group.rotation.y += Math.PI * 0.4;
 
       gsap.fromTo(
         nextStone.group.scale,
-        { x: 0.1 * targetScale, y: 0.1 * targetScale, z: 0.1 * targetScale },
+        { x: 0.15 * targetScale, y: 0.15 * targetScale, z: 0.15 * targetScale },
         {
           x: targetScale,
           y: targetScale,
           z: targetScale,
-          duration: 0.85,
-          ease: 'elastic.out(1, 0.75)',
-          delay: 0.2,
+          duration: animDuration,
+          ease: isMobile ? 'back.out(1.4)' : 'elastic.out(1, 0.75)',
+          delay: animDelay,
           onComplete: () => {
             this.isTransitioning = false;
             // Absolute guarantee: hide every stone except current
@@ -1233,6 +1330,9 @@ class InfinityScrollShowcase {
         st.group.position.set(0, 0, 0);
         st.group.scale.set(i === index ? targetScale : 0.001, i === index ? targetScale : 0.001, i === index ? targetScale : 0.001);
       });
+      if (this.lightspeed) {
+        this.lightspeed.setThemeColor(stoneData.colorHex, 0.2);
+      }
       this.isTransitioning = false;
     }
   }
@@ -1287,6 +1387,14 @@ class InfinityScrollShowcase {
 
     if (playSound) {
       audioEngine.playConvergenceChord();
+    }
+
+    if (this.lightspeed) {
+      this.lightspeed.triggerWarp({
+        speedMultiplier: 26.0,
+        lengthMultiplier: 24.0,
+        duration: 2.2
+      });
     }
 
     // Pull camera out smoothly to showcase all 6 stones in orbit
@@ -1763,6 +1871,11 @@ class InfinityScrollShowcase {
     // Subtle drift of starfield
     if (this.starfield) {
       this.starfield.rotation.y = elapsedTime * 0.006;
+    }
+
+    // React Bits Pro: Native Lightspeed Hyperspace Engine
+    if (this.lightspeed) {
+      this.lightspeed.update(delta, elapsedTime);
     }
 
     // Update active stone animations

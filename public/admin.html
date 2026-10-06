@@ -1599,12 +1599,12 @@
             <div class="form-group">
               <label class="form-label">DOMAIN / STONE</label>
               <select id="edt-domain" class="form-input custom-select">
-                <option value="intelligence">INTELLIGENCE (MIND STONE)</option>
-                <option value="connectivity">CONNECTIVITY (SPACE STONE)</option>
-                <option value="digital">DIGITAL (REALITY STONE)</option>
-                <option value="automation">AUTOMATION (POWER STONE)</option>
-                <option value="analytics">ANALYTICS (TIME STONE)</option>
-                <option value="impact">IMPACT (SOUL STONE)</option>
+                <option value="transportation">TRANSPORTATION &amp; LOGISTICS (MIND STONE)</option>
+                <option value="cybersecurity">CYBERSECURITY &amp; DIGITAL TRUST (SPACE STONE)</option>
+                <option value="infrastructure">DIGITAL PUBLIC INFRASTRUCTURE (REALITY STONE)</option>
+                <option value="cleantech">CLEAN &amp; GREEN TECHNOLOGY (POWER STONE)</option>
+                <option value="education">SMART EDUCATION (TIME STONE)</option>
+                <option value="healthcare">MEDTECH / BIOTECH / HEALTHCARE (SOUL STONE)</option>
               </select>
             </div>
             <div class="form-group">
@@ -1664,6 +1664,20 @@
             <div class="form-group">
               <label class="form-label">FEE AMOUNT (₹)</label>
               <input type="number" id="edt-pay-amount" class="form-input">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+              <label class="form-label" style="margin:0;">PAYMENT RECEIPT / SCREENSHOT</label>
+              <span id="edt-receipt-link-wrap"></span>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <input type="text" id="edt-pay-screenshot" class="form-input" placeholder="Receipt Image URL (or upload image below)" style="font-size:0.8rem; font-family:'JetBrains Mono', monospace; flex:1;">
+              <label class="qr-upload-btn" style="padding:7px 14px; font-size:0.75rem; white-space:nowrap; margin:0; cursor:pointer;">
+                <span>📁</span>
+                <span id="lbl-file-edt-receipt">Upload File</span>
+                <input type="file" id="file-edt-receipt" accept="image/png,image/jpeg,image/webp" style="display:none;">
+              </label>
             </div>
           </div>
           <div style="margin-top: 12px; display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 8px;">

@@ -151,6 +151,23 @@ let currentTeam = null;
       btnLogout.style.display = 'none';
     });
 
+    // Check URL parameters for direct verification pass link
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const teamParam = urlParams.get('team');
+      const emailParam = urlParams.get('email');
+      if (emailParam) {
+        const txtEmail = document.getElementById('txt-email');
+        if (txtEmail) txtEmail.value = emailParam;
+      }
+      if (teamParam) {
+        const loginSub = document.querySelector('.login-sub');
+        if (loginSub) {
+          loginSub.innerHTML = `Official Pass Verification: <strong style="color:var(--gold); font-family:var(--font-mono);">${escapeHTML(teamParam)}</strong><br>Enter your squad password to verify credentials and access your pass.`;
+        }
+      }
+    } catch (_) {}
+
     // Auto-restore leader session if browser is refreshed (F5 / reload)
     restoreLeaderSession();
 
@@ -184,9 +201,7 @@ let currentTeam = null;
       updateStatusBadge('status-r4', currentTeam.reviews?.r4?.attended || currentTeam.isTop6);
 
       // Food Statuses
-      updateStatusBadge('food-highTea', currentTeam.food?.highTea?.collected);
       updateStatusBadge('food-dinner', currentTeam.food?.dinner?.collected);
-      updateStatusBadge('food-midnightFuel', currentTeam.food?.midnightFuel?.collected);
       updateStatusBadge('food-breakfast', currentTeam.food?.breakfast?.collected);
       updateStatusBadge('food-lunch', currentTeam.food?.lunch?.collected);
 

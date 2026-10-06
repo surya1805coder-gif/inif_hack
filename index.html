@@ -263,17 +263,19 @@
           <h2 class="card-stone-name visually-hidden" id="card-title">MIND STONE</h2>
           <!-- Interactive TechText Wordmark (React Bits Engine) -->
           <div class="card-stone-name-container" id="stone-tech-text-container" aria-label="MIND STONE"></div>
-          <div class="card-domain" id="card-domain">INTELLIGENCE // AI • ML • DECISION SYSTEMS</div>
+          <div class="card-domain" id="card-domain">TRANSPORTATION &amp; LOGISTICS // MOBILITY • SUPPLY CHAIN • ROUTING</div>
         </div>
 
         <div class="card-divider"></div>
 
         <!-- Archival Lore & Description -->
         <div class="card-body">
-          <p class="card-description" id="card-desc">
-            Architect autonomous multi-agent networks, neural cognition models, self-refining LLM pipelines, and
-            intelligent decision systems capable of enterprise-scale problem-solving.
-          </p>
+          <p class="card-description" id="card-desc">Pioneer intelligent traffic management, emergency route optimization, real-time public transit tracking, and dynamic supply chain logistics to eliminate urban congestion.</p>
+          <button id="btn-view-focus-areas" class="btn-focus-areas-trigger" type="button" aria-haspopup="dialog" title="View the 6 key focus areas for this domain">
+            <span class="focus-sparkle">✦</span>
+            <span>EXPLORE FOCUS AREAS (6)</span>
+            <svg class="focus-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+          </button>
         </div>
 
         <!-- ONLY HERO ACTION: WIELD THIS STONE -->
@@ -777,7 +779,7 @@
       <div class="modal-header">
         <div class="modal-badge-row">
           <span class="pulse-dot"></span>
-          <span class="mono-label" id="reg-domain-badge">DOMAIN: MIND STONE // INTELLIGENCE</span>
+          <span class="mono-label" id="reg-domain-badge">DOMAIN: MIND STONE // TRANSPORTATION &amp; LOGISTICS</span>
         </div>
         <h2 class="modal-title" id="reg-modal-title">REGISTER SQUAD</h2>
         <p class="modal-sub">Forge your 3-4 member team and lock in your chosen Infinity Domain.</p>
@@ -795,7 +797,7 @@
         </div>
       </div>
 
-      <form id="form-registration" class="register-form">
+      <form id="form-registration" class="register-form" novalidate>
 
         <!-- STEP 1: SQUAD & DOMAIN DETAILS -->
         <div class="form-section">
@@ -829,7 +831,7 @@
                   </div>
                   <div>
                     <div class="radio-title">Mind Stone</div>
-                    <div class="radio-sub">INTELLIGENCE (AI • ML)</div>
+                    <div class="radio-sub">TRANSPORTATION &amp; LOGISTICS (Mobility • Routing)</div>
                   </div>
                 </div>
               </label>
@@ -842,7 +844,7 @@
                   </div>
                   <div>
                     <div class="radio-title">Space Stone</div>
-                    <div class="radio-sub">CONNECTIVITY (Cloud • Cyber)</div>
+                    <div class="radio-sub">CYBERSECURITY &amp; DIGITAL TRUST (Privacy • Crypto)</div>
                   </div>
                 </div>
               </label>
@@ -855,7 +857,7 @@
                   </div>
                   <div>
                     <div class="radio-title">Reality Stone</div>
-                    <div class="radio-sub">DIGITAL (Web • Mobile)</div>
+                    <div class="radio-sub">DIGITAL PUBLIC INFRASTRUCTURE (E-Governance)</div>
                   </div>
                 </div>
               </label>
@@ -868,7 +870,7 @@
                   </div>
                   <div>
                     <div class="radio-title">Power Stone</div>
-                    <div class="radio-sub">AUTOMATION (IoT • Robotics)</div>
+                    <div class="radio-sub">CLEAN &amp; GREEN TECHNOLOGY (Sustainability)</div>
                   </div>
                 </div>
               </label>
@@ -881,7 +883,7 @@
                   </div>
                   <div>
                     <div class="radio-title">Time Stone</div>
-                    <div class="radio-sub">ANALYTICS (Data • Prediction)</div>
+                    <div class="radio-sub">SMART EDUCATION (EdTech • Learning)</div>
                   </div>
                 </div>
               </label>
@@ -894,7 +896,7 @@
                   </div>
                   <div>
                     <div class="radio-title">Soul Stone</div>
-                    <div class="radio-sub">IMPACT (Health • Social)</div>
+                    <div class="radio-sub">MEDTECH / BIOTECH / HEALTHCARE (Assistive Tech)</div>
                   </div>
                 </div>
               </label>
@@ -967,10 +969,15 @@
               <span class="mono-label">MEMBER 02</span>
             </div>
             <div class="form-grid-3">
-              <input type="text" id="reg-m2-name" class="form-input" placeholder="Full Name *" required>
-              <input type="email" id="reg-m2-email" class="form-input" placeholder="Email *" required>
-              <input type="tel" id="reg-m2-phone" class="form-input" placeholder="10-digit Phone *" maxlength="10"
-                required>
+              <div class="form-group" style="margin-bottom:0;">
+                <input type="text" id="reg-m2-name" class="form-input" placeholder="Full Name *" required>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <input type="email" id="reg-m2-email" class="form-input" placeholder="Email *" required>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <input type="tel" id="reg-m2-phone" class="form-input" placeholder="10-digit Phone *" maxlength="10" required>
+              </div>
             </div>
           </div>
 
@@ -980,10 +987,15 @@
               <span class="mono-label">MEMBER 03</span>
             </div>
             <div class="form-grid-3">
-              <input type="text" id="reg-m3-name" class="form-input" placeholder="Full Name *" required>
-              <input type="email" id="reg-m3-email" class="form-input" placeholder="Email *" required>
-              <input type="tel" id="reg-m3-phone" class="form-input" placeholder="10-digit Phone *" maxlength="10"
-                required>
+              <div class="form-group" style="margin-bottom:0;">
+                <input type="text" id="reg-m3-name" class="form-input" placeholder="Full Name *" required>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <input type="email" id="reg-m3-email" class="form-input" placeholder="Email *" required>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <input type="tel" id="reg-m3-phone" class="form-input" placeholder="10-digit Phone *" maxlength="10" required>
+              </div>
             </div>
           </div>
 
@@ -993,9 +1005,15 @@
               <span class="mono-label">MEMBER 04</span>
             </div>
             <div class="form-grid-3">
-              <input type="text" id="reg-m4-name" class="form-input" placeholder="Full Name">
-              <input type="email" id="reg-m4-email" class="form-input" placeholder="Email">
-              <input type="tel" id="reg-m4-phone" class="form-input" placeholder="10-digit Phone" maxlength="10">
+              <div class="form-group" style="margin-bottom:0;">
+                <input type="text" id="reg-m4-name" class="form-input" placeholder="Full Name">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <input type="email" id="reg-m4-email" class="form-input" placeholder="Email">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <input type="tel" id="reg-m4-phone" class="form-input" placeholder="10-digit Phone" maxlength="10">
+              </div>
             </div>
           </div>
         </div>
@@ -1176,11 +1194,11 @@
         </div>
       </div>
 
-      <div class="modal-actions-row" style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
-        <button type="button" class="btn-modal-secondary" id="btn-back-edit" style="min-width: 130px; font-size: 0.76rem; letter-spacing: 0.06em;">
+      <div class="modal-actions-row confirm-actions-row">
+        <button type="button" class="btn-modal-secondary btn-confirm-back" id="btn-back-edit">
           ← EDIT DETAILS
         </button>
-        <button type="button" class="btn-modal-primary" id="btn-confirm-final" style="background: #ffd000; color: #000; font-weight: 800; min-width: 220px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem; letter-spacing: 0.06em;">
+        <button type="button" class="btn-modal-primary btn-confirm-submit" id="btn-confirm-final">
           <span id="conf-submit-text">CONFIRM &amp; LOCK SQUAD ✦</span>
           <span class="spinner" id="conf-submit-spinner" style="display: none; width: 14px; height: 14px; border-width: 2px;"></span>
         </button>
@@ -1198,6 +1216,19 @@
       <p class="modal-sub">Your team has successfully wielded the singularity and registered with Cloudflare R2
         persistence.</p>
 
+      <!-- Confirmation Email & Verification Notice -->
+      <div class="suc-mail-notice" id="suc-mail-notice" style="margin: 14px 0 16px 0; padding: 12px 14px; border-radius: 8px; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.28); text-align: left; display: flex; align-items: flex-start; gap: 10px;">
+        <span style="color: #22c55e; font-size: 1.15rem; line-height: 1.2;">✓</span>
+        <div style="flex: 1;">
+          <div style="font-family: var(--font-mono); font-size: 0.76rem; font-weight: 700; color: #22c55e; letter-spacing: 0.06em; text-transform: uppercase;">
+            CONFIRMATION MAIL DISPATCHED
+          </div>
+          <p style="margin: 3px 0 0 0; font-size: 0.8rem; color: rgba(255, 255, 255, 0.88); line-height: 1.45;">
+            An official squad pass with complete team details, portal credentials, and an entrance verification link has been emailed to <strong id="suc-mail-recipient" style="color: #ffd000; font-family: var(--font-mono);">leader@email.com</strong>.
+          </p>
+        </div>
+      </div>
+
       <div class="success-summary-box">
         <div class="summary-row">
           <span class="summary-lbl">TEAM ID:</span>
@@ -1213,7 +1244,7 @@
         </div>
         <div class="summary-row">
           <span class="summary-lbl">SELECTED DOMAIN:</span>
-          <span class="summary-val" id="suc-domain" style="color: #00d2ff; font-weight: 700;">Mind Stone // INTELLIGENCE</span>
+          <span class="summary-val" id="suc-domain" style="color: #00d2ff; font-weight: 700;">Mind Stone // TRANSPORTATION &amp; LOGISTICS</span>
         </div>
         <div class="summary-row">
           <span class="summary-lbl">LOGIN EMAIL:</span>
@@ -1245,8 +1276,44 @@
       </p>
 
       <div class="modal-actions-row">
-        <a href="/leader.html" class="btn-modal-primary" id="btn-go-leader">PROCEED TO LEADER DASHBOARD →</a>
+        <a href="/leader.html" class="btn-modal-primary" id="btn-go-leader">VIEW SQUAD PASS &amp; VERIFICATION &rarr;</a>
         <button class="btn-modal-secondary" id="btn-close-success">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MINI PAGE / MODAL: DOMAIN FOCUS AREAS MATRIX (6)
+       ========================================================================= -->
+  <div class="modal-backdrop focus-matrix-modal-backdrop" id="modal-focus-areas" aria-hidden="true">
+    <div class="modal-dialog focus-matrix-dialog" role="dialog" aria-modal="true" aria-labelledby="focus-modal-title">
+      <button class="modal-close-btn" id="btn-close-focus" aria-label="Close Focus Matrix">✕</button>
+
+      <div class="modal-header">
+        <div class="modal-badge-row">
+          <span class="focus-live-dot" id="focus-modal-dot" style="background: #ffd000; box-shadow: 0 0 10px #ffd000;"></span>
+          <span class="mono-label" id="focus-modal-badge" style="color: #ffd000;">MIND STONE // SPECIMEN 01</span>
+        </div>
+        <h2 class="modal-title" id="focus-modal-title">TRANSPORTATION &amp; LOGISTICS</h2>
+        <p class="modal-sub" id="focus-modal-tagline">Mobility • Supply Chain • Routing</p>
+      </div>
+
+      <div class="focus-matrix-intro">
+        <p id="focus-modal-overview" class="focus-matrix-para">
+          Pioneer intelligent traffic management, emergency route optimization, real-time public transit tracking, and dynamic supply chain logistics to eliminate urban congestion.
+        </p>
+      </div>
+
+      <div class="focus-matrix-grid" id="focus-matrix-grid">
+        <!-- Injected via JavaScript for the active stone -->
+      </div>
+
+      <div class="focus-matrix-actions">
+        <button type="button" class="btn-modal-primary" id="btn-focus-wield-now">
+          <span>WIELD THIS DOMAIN &amp; REGISTER</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <button type="button" class="btn-modal-secondary" id="btn-focus-close-alt">CLOSE</button>
       </div>
     </div>
   </div>

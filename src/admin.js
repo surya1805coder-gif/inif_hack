@@ -5,24 +5,53 @@ let filterTeamSize = 'all'; // 'all', '3', '4'
 let filterDate = 'all'; // 'all' or 'YYYY-MM-DD'
 let filterPayment = 'all'; // 'all', 'verified', 'pending', 'rejected'
 let editingTeam = null;
+let uploadedReceiptData = null;
 
 const STONE_DOMAIN_MAP = {
-  mind: 'intelligence',
-  intelligence: 'intelligence',
-  space: 'connectivity',
-  connectivity: 'connectivity',
-  reality: 'digital',
-  digital: 'digital',
-  power: 'automation',
-  automation: 'automation',
-  time: 'analytics',
-  analytics: 'analytics',
-  soul: 'impact',
-  impact: 'impact'
+  mind: 'transportation',
+  transportation: 'transportation',
+  space: 'cybersecurity',
+  cybersecurity: 'cybersecurity',
+  reality: 'infrastructure',
+  infrastructure: 'infrastructure',
+  power: 'cleantech',
+  cleantech: 'cleantech',
+  time: 'education',
+  education: 'education',
+  soul: 'healthcare',
+  healthcare: 'healthcare',
+  // Backward compatibility
+  intelligence: 'transportation',
+  connectivity: 'cybersecurity',
+  digital: 'infrastructure',
+  automation: 'cleantech',
+  analytics: 'education',
+  impact: 'healthcare'
+};
+
+const CANONICAL_DOMAINS_MAP = {
+  mind: { id: 'transportation', domainName: 'TRANSPORTATION & LOGISTICS', tagline: 'Mobility • Supply Chain • Routing' },
+  space: { id: 'cybersecurity', domainName: 'CYBERSECURITY & DIGITAL TRUST', tagline: 'Cybersecurity • Privacy • Cryptography' },
+  reality: { id: 'infrastructure', domainName: 'DIGITAL PUBLIC INFRASTRUCTURE', tagline: 'Digital Platforms • Services • E-Governance' },
+  power: { id: 'cleantech', domainName: 'CLEAN & GREEN TECHNOLOGY', tagline: 'Environment • Waste • Sustainability' },
+  time: { id: 'education', domainName: 'SMART EDUCATION', tagline: 'EdTech • Learning • Assessment' },
+  soul: { id: 'healthcare', domainName: 'MEDTECH / BIOTECH / HEALTHCARE', tagline: 'Healthcare • Medical AI • Assistive Technology' },
+  transportation: { id: 'transportation', domainName: 'TRANSPORTATION & LOGISTICS', tagline: 'Mobility • Supply Chain • Routing' },
+  cybersecurity: { id: 'cybersecurity', domainName: 'CYBERSECURITY & DIGITAL TRUST', tagline: 'Cybersecurity • Privacy • Cryptography' },
+  infrastructure: { id: 'infrastructure', domainName: 'DIGITAL PUBLIC INFRASTRUCTURE', tagline: 'Digital Platforms • Services • E-Governance' },
+  cleantech: { id: 'cleantech', domainName: 'CLEAN & GREEN TECHNOLOGY', tagline: 'Environment • Waste • Sustainability' },
+  education: { id: 'education', domainName: 'SMART EDUCATION', tagline: 'EdTech • Learning • Assessment' },
+  healthcare: { id: 'healthcare', domainName: 'MEDTECH / BIOTECH / HEALTHCARE', tagline: 'Healthcare • Medical AI • Assistive Technology' },
+  intelligence: { id: 'transportation', domainName: 'TRANSPORTATION & LOGISTICS', tagline: 'Mobility • Supply Chain • Routing' },
+  connectivity: { id: 'cybersecurity', domainName: 'CYBERSECURITY & DIGITAL TRUST', tagline: 'Cybersecurity • Privacy • Cryptography' },
+  digital: { id: 'infrastructure', domainName: 'DIGITAL PUBLIC INFRASTRUCTURE', tagline: 'Digital Platforms • Services • E-Governance' },
+  automation: { id: 'cleantech', domainName: 'CLEAN & GREEN TECHNOLOGY', tagline: 'Environment • Waste • Sustainability' },
+  analytics: { id: 'education', domainName: 'SMART EDUCATION', tagline: 'EdTech • Learning • Assessment' },
+  impact: { id: 'healthcare', domainName: 'MEDTECH / BIOTECH / HEALTHCARE', tagline: 'Healthcare • Medical AI • Assistive Technology' }
 };
 
 function normalizeDomainId(val) {
-  if (!val) return 'intelligence';
+  if (!val) return 'transportation';
   const clean = String(val).toLowerCase().replace(/ stone$/i, '').trim();
   return STONE_DOMAIN_MAP[clean] || clean;
 }
@@ -40,8 +69,8 @@ function escapeHTML(str) {
 function safeUrl(url) {
   if (!url || typeof url !== 'string') return '';
   const trimmed = url.trim();
-  // Strictly permit only valid http/https or relative uploads paths
-  if (/^https?:\/\/[^\s"'<>]+$/i.test(trimmed) || /^\/uploads\/[a-zA-Z0-9_\-\.]+$/i.test(trimmed)) {
+  // Strictly permit only valid http/https or relative uploads/receipts/assets paths
+  if (/^https?:\/\/[^\s"'<>]+$/i.test(trimmed) || /^\/(?:uploads|receipts|assets|qrs)\/[a-zA-Z0-9_\-\.\/]+$/i.test(trimmed) || trimmed === '/placeholder-receipt.png') {
     return escapeHTML(trimmed);
   }
   return '';
@@ -49,14 +78,74 @@ function safeUrl(url) {
 
 function getAdminToken() {
   try {
-    const saved = sessionStorage.getItem('infinity_admin_auth');
+    const saved = sessionStorage.getItem('infinity_admin_auth') || localStorage.getItem('infinity_admin_auth');
     if (!saved) return '';
-    const parsed = JSON.parse(saved);
-    return parsed.token || (typeof parsed === 'string' ? parsed : '');
+    try {
+      const parsed = JSON.parse(saved);
+      return parsed.token || (typeof parsed === 'string' ? parsed : '');
+    } catch (_) {
+      return saved;
+    }
   } catch (e) {
     return '';
   }
 }
+
+function showAdminToast(message, isError = false) {
+  let toastContainer = document.getElementById('admin-toast-container');
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.id = 'admin-toast-container';
+    toastContainer.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:420px;';
+    document.body.appendChild(toastContainer);
+  }
+
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    background: ${isError ? 'rgba(30, 5, 10, 0.95)' : 'rgba(10, 15, 25, 0.95)'};
+    color: ${isError ? '#ff4d6d' : '#00e5ff'};
+    border: 1px solid ${isError ? 'rgba(255, 77, 109, 0.4)' : 'rgba(0, 229, 255, 0.4)'};
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px ${isError ? 'rgba(255, 77, 109, 0.2)' : 'rgba(0, 229, 255, 0.2)'};
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    pointer-events: auto;
+    backdrop-filter: blur(12px);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  `;
+
+  const icon = document.createElement('span');
+  icon.style.fontSize = '1.1rem';
+  icon.textContent = isError ? '✕' : '✓';
+  toast.appendChild(icon);
+
+  const text = document.createElement('span');
+  text.textContent = message;
+  toast.appendChild(text);
+
+  toastContainer.appendChild(toast);
+
+  requestAnimationFrame(() => {
+    toast.style.transform = 'translateY(0)';
+    toast.style.opacity = '1';
+  });
+
+  setTimeout(() => {
+    toast.style.transform = 'translateY(10px)';
+    toast.style.opacity = '0';
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
+  }, 4000);
+}
+window.showAdminToast = showAdminToast;
 
 function authHeaders(extra = {}) {
   const token = getAdminToken();
@@ -232,7 +321,19 @@ function authHeaders(extra = {}) {
         const domainsData = await domainsRes.json();
 
         allTeams = teamsData.teams || [];
-        allDomains = domainsData.domains || [];
+        allDomains = (domainsData.domains || []).map(dom => {
+          const normKey = (dom.stoneId || '').toLowerCase() || (dom.stoneName ? dom.stoneName.toLowerCase().replace(/ stone/i, '').trim() : '') || dom.id;
+          const canonical = CANONICAL_DOMAINS_MAP[normKey] || CANONICAL_DOMAINS_MAP[dom.id];
+          if (canonical) {
+            return {
+              ...dom,
+              id: canonical.id,
+              domainName: canonical.domainName,
+              tagline: canonical.tagline
+            };
+          }
+          return dom;
+        });
 
         if (teamsData.settings && typeof teamsData.settings.registrationOpen === 'boolean') {
           updateRegistrationUI(teamsData.settings.registrationOpen);
@@ -556,8 +657,8 @@ function authHeaders(extra = {}) {
         const scores = t.scores || {};
 
         let foodCount = 0;
-        ['highTea', 'dinner', 'midnightFuel', 'breakfast', 'lunch'].forEach(k => {
-          if (food[k]?.collected) foodCount++;
+        ['dinner', 'breakfast', 'lunch'].forEach(k => {
+          if (food[k]?.collected || (Array.isArray(food[k]?.members) && food[k].members.some(Boolean))) foodCount++;
         });
 
         let revCount = 0;
@@ -601,7 +702,7 @@ function authHeaders(extra = {}) {
               ${safeUrl(pay.screenshotUrl) ? `<a href="${safeUrl(pay.screenshotUrl)}" target="_blank" rel="noopener noreferrer" style="font-size:0.68rem; color:var(--cyan);">View Receipt ↗</a>` : (pay.screenshotUrl ? `<span style="font-size:0.68rem; color:#888;">Receipt Attached</span>` : '')}
             </td>
             <td>
-              <span class="font-mono" style="font-weight:700;">${foodCount} / 5</span>
+              <span class="font-mono" style="font-weight:700;">${foodCount} / 3</span>
             </td>
             <td>
               <span class="font-mono" style="font-weight:700;">${revCount} / 3</span>
@@ -777,22 +878,28 @@ function authHeaders(extra = {}) {
       document.getElementById('edt-team-name').value = editingTeam.teamName || '';
       document.getElementById('edt-college').value = editingTeam.college || '';
       document.getElementById('edt-room').value = editingTeam.roomAllocated || '';
-      const rawDomain = (editingTeam.preferredDomain || 'intelligence').toLowerCase();
+      const rawDomain = (editingTeam.preferredDomain || 'transportation').toLowerCase();
       const domainMap = {
-        mind: 'intelligence',
-        space: 'connectivity',
-        reality: 'digital',
-        power: 'automation',
-        time: 'analytics',
-        soul: 'impact',
-        intelligence: 'intelligence',
-        connectivity: 'connectivity',
-        digital: 'digital',
-        automation: 'automation',
-        analytics: 'analytics',
-        impact: 'impact'
+        mind: 'transportation',
+        space: 'cybersecurity',
+        reality: 'infrastructure',
+        power: 'cleantech',
+        time: 'education',
+        soul: 'healthcare',
+        transportation: 'transportation',
+        cybersecurity: 'cybersecurity',
+        infrastructure: 'infrastructure',
+        cleantech: 'cleantech',
+        education: 'education',
+        healthcare: 'healthcare',
+        intelligence: 'transportation',
+        connectivity: 'cybersecurity',
+        digital: 'infrastructure',
+        automation: 'cleantech',
+        analytics: 'education',
+        impact: 'healthcare'
       };
-      document.getElementById('edt-domain').value = domainMap[rawDomain] || 'intelligence';
+      document.getElementById('edt-domain').value = domainMap[rawDomain] || 'transportation';
       document.getElementById('edt-size').value = editingTeam.teamSize || 4;
       const pwdInput = document.getElementById('edt-password');
       if (pwdInput) {
@@ -808,6 +915,34 @@ function authHeaders(extra = {}) {
       document.getElementById('edt-pay-status').value = pay.status || 'pending';
       document.getElementById('edt-pay-utr').value = pay.utr || '';
       document.getElementById('edt-pay-amount').value = pay.amount || (editingTeam.teamSize || 4) * 349;
+
+      uploadedReceiptData = null;
+      const edtPayScreenshot = document.getElementById('edt-pay-screenshot');
+      const fileEdtReceipt = document.getElementById('file-edt-receipt');
+      const lblFileEdtReceipt = document.getElementById('lbl-file-edt-receipt');
+      const edtReceiptLinkWrap = document.getElementById('edt-receipt-link-wrap');
+
+      if (edtPayScreenshot) {
+        edtPayScreenshot.value = pay.screenshotUrl || '';
+      }
+      if (fileEdtReceipt) {
+        fileEdtReceipt.value = '';
+      }
+      if (lblFileEdtReceipt) {
+        lblFileEdtReceipt.textContent = 'Upload File';
+      }
+      if (edtReceiptLinkWrap) {
+        if (pay.screenshotUrl && pay.screenshotUrl !== '/placeholder-receipt.png') {
+          const validUrl = safeUrl(pay.screenshotUrl) || pay.screenshotUrl;
+          edtReceiptLinkWrap.innerHTML = `
+            <a href="${escapeHTML(validUrl)}" target="_blank" rel="noopener noreferrer" style="color:var(--cyan); font-size:0.75rem; text-decoration:underline; font-family:'JetBrains Mono', monospace;">
+              ↗ View Current Receipt
+            </a>
+          `;
+        } else {
+          edtReceiptLinkWrap.innerHTML = `<span style="color:var(--text-muted); font-size:0.72rem; font-family:'JetBrains Mono', monospace;">(No receipt attached)</span>`;
+        }
+      }
 
       const isMailed = Boolean(pay.mailSent);
       const mailStatusEl = document.getElementById('edt-mail-status');
@@ -870,11 +1005,12 @@ function authHeaders(extra = {}) {
       }
 
       const food = editingTeam.food || {};
-      document.getElementById('edt-food-ht').checked = Boolean(food.highTea?.collected);
-      document.getElementById('edt-food-din').checked = Boolean(food.dinner?.collected);
-      document.getElementById('edt-food-mid').checked = Boolean(food.midnightFuel?.collected);
-      document.getElementById('edt-food-bf').checked = Boolean(food.breakfast?.collected);
-      document.getElementById('edt-food-ln').checked = Boolean(food.lunch?.collected);
+      const elDin = document.getElementById('edt-food-din');
+      const elBf = document.getElementById('edt-food-bf');
+      const elLn = document.getElementById('edt-food-ln');
+      if (elDin) elDin.checked = Boolean(food.dinner?.collected);
+      if (elBf) elBf.checked = Boolean(food.breakfast?.collected);
+      if (elLn) elLn.checked = Boolean(food.lunch?.collected);
 
       const rev = editingTeam.reviews || {};
       document.getElementById('edt-rev-r1').checked = Boolean(rev.r1?.attended);
@@ -891,6 +1027,62 @@ function authHeaders(extra = {}) {
     }
 
     btnCloseEdit.addEventListener('click', () => modalEdit.classList.remove('is-open'));
+
+    // Receipt File & URL Handlers
+    const fileEdtReceipt = document.getElementById('file-edt-receipt');
+    const lblFileEdtReceipt = document.getElementById('lbl-file-edt-receipt');
+    const edtPayScreenshot = document.getElementById('edt-pay-screenshot');
+    const edtReceiptLinkWrap = document.getElementById('edt-receipt-link-wrap');
+
+    if (fileEdtReceipt) {
+      fileEdtReceipt.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+          alert('Please select a valid image file (PNG, JPG, WebP).');
+          return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          alert('Receipt image exceeds 5MB limit. Please upload a smaller compressed image.');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (loadEvt) => {
+          uploadedReceiptData = loadEvt.target.result;
+          if (lblFileEdtReceipt) {
+            lblFileEdtReceipt.textContent = `Selected: ${file.name} (${Math.round(file.size / 1024)} KB)`;
+          }
+          if (edtPayScreenshot) {
+            edtPayScreenshot.value = `[Uploaded File: ${file.name}]`;
+          }
+          if (edtReceiptLinkWrap) {
+            edtReceiptLinkWrap.innerHTML = `
+              <span style="color:var(--green); font-size:0.72rem; font-family:'JetBrains Mono', monospace;">
+                ✓ Attached: ${escapeHTML(file.name)}
+              </span>
+            `;
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    if (edtPayScreenshot) {
+      edtPayScreenshot.addEventListener('input', () => {
+        const val = edtPayScreenshot.value.trim();
+        if (val && !val.startsWith('[Uploaded File:')) {
+          uploadedReceiptData = null;
+          if (lblFileEdtReceipt) lblFileEdtReceipt.textContent = 'Upload File';
+          if (edtReceiptLinkWrap) {
+            edtReceiptLinkWrap.innerHTML = `
+              <a href="${escapeHTML(val)}" target="_blank" rel="noopener noreferrer" style="color:var(--cyan); font-size:0.75rem; text-decoration:underline; font-family:'JetBrains Mono', monospace;">
+                ↗ Test Link
+              </a>
+            `;
+          }
+        }
+      });
+    }
 
     function createMemberRowHtml(member = {}, memberIndex = 0) {
       const memberNum = String(memberIndex + 2).padStart(2, '0');
@@ -1009,6 +1201,16 @@ function authHeaders(extra = {}) {
         }
       });
 
+      let finalScreenshotUrl = editingTeam.payment?.screenshotUrl || '';
+      if (uploadedReceiptData) {
+        finalScreenshotUrl = uploadedReceiptData;
+      } else if (edtPayScreenshot) {
+        const txtVal = edtPayScreenshot.value.trim();
+        if (txtVal && !txtVal.startsWith('[Uploaded File:')) {
+          finalScreenshotUrl = txtVal;
+        }
+      }
+
       const updates = {
         teamName: document.getElementById('edt-team-name').value.trim(),
         college: document.getElementById('edt-college').value.trim(),
@@ -1026,13 +1228,12 @@ function authHeaders(extra = {}) {
           status: document.getElementById('edt-pay-status').value,
           utr: document.getElementById('edt-pay-utr').value.trim(),
           amount: parseFloat(document.getElementById('edt-pay-amount').value) || 0,
+          screenshotUrl: finalScreenshotUrl,
         },
         food: {
-          highTea: { collected: document.getElementById('edt-food-ht').checked },
-          dinner: { collected: document.getElementById('edt-food-din').checked },
-          midnightFuel: { collected: document.getElementById('edt-food-mid').checked },
-          breakfast: { collected: document.getElementById('edt-food-bf').checked },
-          lunch: { collected: document.getElementById('edt-food-ln').checked },
+          dinner: { collected: Boolean(document.getElementById('edt-food-din')?.checked) },
+          breakfast: { collected: Boolean(document.getElementById('edt-food-bf')?.checked) },
+          lunch: { collected: Boolean(document.getElementById('edt-food-ln')?.checked) },
         },
         reviews: {
           r1: { attended: document.getElementById('edt-rev-r1').checked },
@@ -1051,6 +1252,13 @@ function authHeaders(extra = {}) {
         updates.teamPassword = newPwd;
       }
 
+      const btnSubmit = formEdit.querySelector('button[type="submit"]');
+      const originalSubmitText = btnSubmit ? btnSubmit.textContent : 'COMMIT ALL SQUAD EDITS TO CLOUDFLARE R2';
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.textContent = 'COMMITTING CHANGES TO R2...';
+      }
+
       try {
         const res = await fetch(`/api/admin/teams/${editingTeam.id}`, {
           method: 'PUT',
@@ -1058,20 +1266,29 @@ function authHeaders(extra = {}) {
           body: JSON.stringify(updates),
         });
         const data = await res.json();
-        if (data.success) {
+        if (res.ok && data.success) {
           const idx = allTeams.findIndex(t => t.id === editingTeam.id);
           if (idx >= 0) allTeams[idx] = data.team;
+          editingTeam = data.team;
           modalEdit.classList.remove('is-open');
           renderTable();
           updateKPIs();
           updateDailyRegistrationsTelemetry();
+          showAdminToast(`✓ Squad "${data.team?.teamName || editingTeam.teamName}" updated successfully!`);
+        } else {
+          alert('Failed to update squad: ' + (data.error || 'Server error. Please verify admin credentials.'));
         }
       } catch (err) {
         alert('Error updating team: ' + err.message);
+      } finally {
+        if (btnSubmit) {
+          btnSubmit.disabled = false;
+          btnSubmit.textContent = originalSubmitText;
+        }
       }
     });
 
-    // BULK SEND VERIFICATION MAILS TO ALL VERIFIED SQUADS
+    // BULK SEND CONFIRMATION PASSES TO ALL VERIFIED SQUADS
     const btnBatchMail = document.getElementById('btn-batch-mail');
     if (btnBatchMail) {
       btnBatchMail.addEventListener('click', async () => {
@@ -1079,29 +1296,31 @@ function authHeaders(extra = {}) {
         const unmailedTeams = verifiedTeams.filter(t => !t.payment?.mailSent);
 
         if (verifiedTeams.length === 0) {
-          alert('No verified squads found. Please verify squad payments before sending confirmation emails.');
+          alert('No verified squads found. Please verify squad payments before sending official confirmation passes.');
           return;
         }
 
         let force = false;
         let targetCount = unmailedTeams.length;
 
+        const mailDetails = `The email includes:\n• Assigned Track Domain & Lab Room Allocation\n• Official Pass ID & Team Name\n• Mandatory Rules: Own Laptops & Chargers, Electric Spikes (Multi-Plug Boards), Zero Tolerance for Misbehavior, and Original College IDs.`;
+
         if (targetCount === 0) {
-          if (confirm(`All ${verifiedTeams.length} verified squad(s) have already received confirmation emails.\n\nDo you want to FORCE re-send to ALL ${verifiedTeams.length} verified squads?`)) {
+          if (confirm(`All ${verifiedTeams.length} verified squad(s) have already received confirmation passes.\n\nDo you want to FORCE re-send to ALL ${verifiedTeams.length} verified squads?\n\n${mailDetails}`)) {
             force = true;
             targetCount = verifiedTeams.length;
           } else {
             return;
           }
         } else {
-          if (!confirm(`Dispatch official payment verification emails to ${targetCount} verified squad(s) that haven't received mail yet?`)) {
+          if (!confirm(`Dispatch Official Confirmation Passes to ${targetCount} verified squad(s) that haven't received their pass yet?\n\n(${verifiedTeams.length - unmailedTeams.length} already sent, ${targetCount} pending)\n\n${mailDetails}`)) {
             return;
           }
         }
 
         btnBatchMail.disabled = true;
         const originalContent = btnBatchMail.innerHTML;
-        btnBatchMail.innerHTML = '<span>⏳</span><span>DISPATCHING EMAILS...</span>';
+        btnBatchMail.innerHTML = `<span>⏳</span><span>DISPATCHING PASSES (${targetCount})...</span>`;
 
         try {
           const res = await fetch('/api/admin/send-all-verification-mails', {
@@ -1113,15 +1332,15 @@ function authHeaders(extra = {}) {
           if (data.success) {
             await loadData();
             if (data.simulated) {
-              alert(`⚡ [SIMULATION MODE]\nProcessed ${data.sentCount} squad emails!\n\n(Configure RESEND_API_KEY in .env.local to send live emails via Resend's free tier).`);
+              alert(`⚡ [SIMULATION MODE]\nProcessed ${data.sentCount} squad passes!\n\n(Configure RESEND_API_KEY in .env.local to send live emails via Resend).`);
             } else {
-              alert(`✅ Verification emails sent: ${data.sentCount} squads notified successfully (${data.failCount || 0} failed).`);
+              alert(`✅ Official Confirmation Passes Dispatched!\n\n${data.sentCount} verified squads notified with their room allocation, event timings, and rules (${data.failCount || 0} failed).`);
             }
           } else {
-            alert('Failed to send batch emails: ' + (data.error || 'Unknown error'));
+            alert('Failed to send batch confirmation passes: ' + (data.error || 'Unknown error'));
           }
         } catch (err) {
-          alert('Error sending batch emails: ' + err.message);
+          alert('Error sending batch confirmation passes: ' + err.message);
         } finally {
           btnBatchMail.disabled = false;
           btnBatchMail.innerHTML = originalContent;
@@ -1139,25 +1358,36 @@ function authHeaders(extra = {}) {
 
     function renderPsManager() {
       const prefixMap = {
-        intelligence: 'INTEL',
-        connectivity: 'CONN',
-        digital: 'DIG',
-        automation: 'AUTO',
-        analytics: 'ANA',
-        impact: 'IMP',
-        mind: 'INTEL',
-        space: 'CONN',
-        reality: 'DIG',
-        power: 'AUTO',
-        time: 'ANA',
-        soul: 'IMP'
+        transportation: 'TRANS',
+        cybersecurity: 'CYBER',
+        infrastructure: 'INFRA',
+        cleantech: 'CLEAN',
+        education: 'EDU',
+        healthcare: 'HEALTH',
+        mind: 'TRANS',
+        space: 'CYBER',
+        reality: 'INFRA',
+        power: 'CLEAN',
+        time: 'EDU',
+        soul: 'HEALTH',
+        intelligence: 'TRANS',
+        connectivity: 'CYBER',
+        digital: 'INFRA',
+        automation: 'CLEAN',
+        analytics: 'EDU',
+        impact: 'HEALTH'
       };
 
       let html = '';
       allDomains.forEach(dom => {
         const isReleased = Boolean(dom.isPsReleased);
         const psList = dom.problemStatements || [];
-        const pfx = prefixMap[dom.id] || dom.id.substring(0, 4).toUpperCase();
+        const normKey = (dom.stoneId || '').toLowerCase() || (dom.stoneName ? dom.stoneName.toLowerCase().replace(/ stone/i, '').trim() : '') || dom.id;
+        const canonical = CANONICAL_DOMAINS_MAP[normKey] || CANONICAL_DOMAINS_MAP[dom.id];
+        const displayDomainName = canonical ? canonical.domainName : dom.domainName;
+        const displayTagline = canonical ? canonical.tagline : (dom.tagline || '');
+        const targetId = canonical ? canonical.id : dom.id;
+        const pfx = prefixMap[targetId] || prefixMap[dom.id] || targetId.substring(0, 4).toUpperCase();
         const nextCode = `PS-${pfx}-${String(psList.length + 1).padStart(2, '0')}`;
         const accent = dom.accentHex || '#ffd000';
 
@@ -1166,10 +1396,10 @@ function authHeaders(extra = {}) {
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:12px;">
               <div>
                 <h4 style="font-size:1.15rem; color:#fff; display:flex; align-items:center; gap:8px;">
-                  <span>${escapeHTML(dom.domainName)}</span>
+                  <span>${escapeHTML(displayDomainName)}</span>
                   <span style="font-family:'JetBrains Mono'; font-size:0.75rem; color:${accent}; font-weight:700;">(${escapeHTML(dom.stoneName)})</span>
                 </h4>
-                <div style="font-size:0.75rem; color:var(--text-muted);">${escapeHTML(dom.tagline || '')}</div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">${escapeHTML(displayTagline)}</div>
               </div>
 
               <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
@@ -1199,7 +1429,7 @@ function authHeaders(extra = {}) {
             <!-- Expandable Add Problem Statement Panel -->
             <div id="add-panel-${escapeHTML(dom.id)}" style="display:none; margin: 12px 0 16px 0; padding:16px; border-radius:10px; background:rgba(6,6,12,0.95); border:1px solid ${accent}60; box-shadow:0 8px 25px rgba(0,0,0,0.6);">
               <div style="font-family:'Syne',sans-serif; font-size:0.86rem; font-weight:700; color:${accent}; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
-                <span>✦</span> NEW PROBLEM STATEMENT // ${escapeHTML(dom.stoneName.toUpperCase())} (${escapeHTML(dom.domainName)})
+                <span>✦</span> NEW PROBLEM STATEMENT // ${escapeHTML(dom.stoneName.toUpperCase())} (${escapeHTML(displayDomainName)})
               </div>
 
               <div class="edit-grid-3" style="margin-bottom:10px;">
@@ -1224,7 +1454,7 @@ function authHeaders(extra = {}) {
               <div class="edit-grid-2" style="margin-bottom:10px;">
                 <div class="form-group" style="margin:0;">
                   <label class="form-label">CATEGORY / TRACK</label>
-                  <input type="text" id="new-cat-${escapeHTML(dom.id)}" class="form-input" value="${escapeHTML(dom.domainName)} & Systems" style="padding:8px 10px; font-size:0.82rem;">
+                  <input type="text" id="new-cat-${escapeHTML(dom.id)}" class="form-input" value="${escapeHTML(displayDomainName)}" style="padding:8px 10px; font-size:0.82rem;">
                 </div>
                 <div class="form-group" style="margin:0;">
                   <label class="form-label">DELIVERABLES (COMMA-SEPARATED)</label>
@@ -1712,6 +1942,7 @@ function authHeaders(extra = {}) {
               qrMgrStatus.textContent = '✓ Payment QR codes updated and deployed to Cloudflare R2 successfully!';
               qrMgrStatus.style.color = 'var(--green)';
             }
+            showAdminToast('✓ Payment QR codes updated and deployed to Cloudflare R2!');
           } else {
             throw new Error(data.error || 'Failed to update payment QR codes.');
           }
@@ -1766,6 +1997,7 @@ function authHeaders(extra = {}) {
               qrMgrStatus.textContent = '✓ Restored default payment QR codes.';
               qrMgrStatus.style.color = 'var(--green)';
             }
+            showAdminToast('✓ Payment QR codes restored to defaults.');
           }
         } catch (err) {
           if (qrMgrStatus) {
@@ -1961,4 +2193,97 @@ function authHeaders(extra = {}) {
           alert('Error: ' + err.message);
         }
       });
+    }
+
+    // ==========================================
+    // DANGER ZONE: PURGE ALL SQUADS MODAL
+    // ==========================================
+    const modalPurge = document.getElementById('modal-purge');
+    const btnOpenPurge = document.getElementById('btn-open-purge');
+    const btnClosePurge = document.getElementById('btn-close-purge');
+    const btnCancelPurge = document.getElementById('btn-cancel-purge');
+    const txtPurgeConfirm = document.getElementById('txt-purge-confirm');
+    const btnConfirmPurge = document.getElementById('btn-confirm-purge');
+    const purgeStatus = document.getElementById('purge-status');
+
+    if (btnOpenPurge && modalPurge) {
+      btnOpenPurge.addEventListener('click', () => {
+        if (txtPurgeConfirm) txtPurgeConfirm.value = '';
+        if (btnConfirmPurge) {
+          btnConfirmPurge.disabled = true;
+          btnConfirmPurge.style.opacity = '0.5';
+          btnConfirmPurge.style.cursor = 'not-allowed';
+        }
+        if (purgeStatus) purgeStatus.style.display = 'none';
+        modalPurge.classList.add('is-open');
+        setTimeout(() => {
+          if (txtPurgeConfirm) txtPurgeConfirm.focus();
+        }, 100);
+      });
+
+      const closePurgeModal = () => modalPurge.classList.remove('is-open');
+      if (btnClosePurge) btnClosePurge.addEventListener('click', closePurgeModal);
+      if (btnCancelPurge) btnCancelPurge.addEventListener('click', closePurgeModal);
+      modalPurge.addEventListener('click', (e) => {
+        if (e.target === modalPurge) closePurgeModal();
+      });
+
+      if (txtPurgeConfirm) {
+        txtPurgeConfirm.addEventListener('input', () => {
+          const isValid = txtPurgeConfirm.value.trim().toUpperCase() === 'ERASE';
+          if (btnConfirmPurge) {
+            btnConfirmPurge.disabled = !isValid;
+            btnConfirmPurge.style.opacity = isValid ? '1' : '0.5';
+            btnConfirmPurge.style.cursor = isValid ? 'pointer' : 'not-allowed';
+          }
+        });
+
+        txtPurgeConfirm.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && btnConfirmPurge && !btnConfirmPurge.disabled) {
+            e.preventDefault();
+            btnConfirmPurge.click();
+          }
+        });
+      }
+
+      if (btnConfirmPurge) {
+        btnConfirmPurge.addEventListener('click', async () => {
+          if (!txtPurgeConfirm || txtPurgeConfirm.value.trim().toUpperCase() !== 'ERASE') return;
+          btnConfirmPurge.disabled = true;
+          btnConfirmPurge.textContent = 'ERASING ALL DATA...';
+          if (purgeStatus) {
+            purgeStatus.style.display = 'block';
+            purgeStatus.style.color = 'var(--gold)';
+            purgeStatus.textContent = 'Purging squad database on Cloudflare R2...';
+          }
+
+          try {
+            const res = await fetch('/api/admin/purge-data', {
+              method: 'POST',
+              headers: authHeaders({ 'Content-Type': 'application/json' }),
+              body: JSON.stringify({ confirm: 'ERASE' })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+              throw new Error(data.error || 'Failed to purge data.');
+            }
+
+            allTeams = [];
+            renderTable();
+            updateKPIs();
+            closePurgeModal();
+            alert(`✓ Purge complete! ${data.purgedCount} squad(s) have been permanently deleted from the database.`);
+          } catch (err) {
+            if (purgeStatus) {
+              purgeStatus.style.display = 'block';
+              purgeStatus.style.color = 'var(--red)';
+              purgeStatus.textContent = `Error: ${err.message}`;
+            }
+            alert(`Error purging data: ${err.message}`);
+          } finally {
+            btnConfirmPurge.disabled = false;
+            btnConfirmPurge.textContent = '🗑️ PERMANENTLY ERASE ALL DATA';
+          }
+        });
+      }
     }
