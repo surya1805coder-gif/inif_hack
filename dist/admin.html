@@ -401,6 +401,18 @@
       box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
     }
 
+    .btn-stone-area {
+      background: rgba(168, 85, 247, 0.12) !important;
+      border-color: #c084fc !important;
+      color: #c084fc !important;
+    }
+
+    .btn-stone-area:hover {
+      background: #c084fc !important;
+      color: #000 !important;
+      box-shadow: 0 0 20px rgba(192, 132, 252, 0.4);
+    }
+
     /* Payment QR Manager Modal */
     .qr-mgr-grid {
       display: grid;
@@ -492,6 +504,118 @@
       }
     }
 
+    /* Registration Open/Close Button */
+    .btn-reg-toggle {
+      border: 1px solid rgba(0, 255, 136, 0.4) !important;
+      background: rgba(0, 255, 136, 0.08) !important;
+      color: #00ff88 !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .btn-reg-toggle:hover {
+      background: rgba(0, 255, 136, 0.16) !important;
+      border-color: #00ff88 !important;
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.3) !important;
+    }
+
+    .btn-reg-toggle.closed {
+      border: 1px solid rgba(255, 42, 75, 0.5) !important;
+      background: rgba(255, 42, 75, 0.12) !important;
+      color: #ff4a68 !important;
+    }
+
+    .btn-reg-toggle.closed:hover {
+      background: rgba(255, 42, 75, 0.22) !important;
+      border-color: #ff2a4b !important;
+      box-shadow: 0 0 15px rgba(255, 42, 75, 0.4) !important;
+    }
+
+    /* Danger Purge Button */
+    .btn-danger-purge {
+      border: 1px solid rgba(255, 42, 75, 0.35) !important;
+      background: rgba(255, 42, 75, 0.06) !important;
+      color: #ff8597 !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .btn-danger-purge:hover {
+      background: rgba(255, 42, 75, 0.2) !important;
+      border-color: #ff2a4b !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 16px rgba(255, 42, 75, 0.4) !important;
+    }
+
+    /* Purge Modal Styles */
+    .purge-dialog {
+      max-width: 520px !important;
+      border: 1px solid rgba(255, 42, 75, 0.5) !important;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 42, 75, 0.2) !important;
+      text-align: center;
+      padding: 30px !important;
+    }
+
+    .purge-warning-icon {
+      font-size: 2.8rem;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 0 12px rgba(255, 42, 75, 0.6));
+    }
+
+    .purge-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+
+    .purge-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .purge-alert-box {
+      background: rgba(255, 42, 75, 0.12);
+      border: 1px solid rgba(255, 42, 75, 0.35);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 0.78rem;
+      color: #ff99a8;
+      line-height: 1.45;
+      text-align: left;
+    }
+
+    .btn-danger-confirm {
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: 1px solid var(--red);
+      background: var(--red);
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.04em;
+    }
+
+    .btn-danger-confirm:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      filter: grayscale(0.8);
+      border-color: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      color: #888;
+    }
+
+    .btn-danger-confirm:not(:disabled):hover {
+      background: #ff4a68;
+      box-shadow: 0 0 25px rgba(255, 42, 75, 0.6);
+      transform: translateY(-1px);
+    }
+
     .search-box {
       min-width: 320px;
       padding: 10px 14px;
@@ -505,6 +629,243 @@
 
     .search-box:focus {
       border-color: var(--red);
+    }
+
+    /* Admin Filters Bar */
+    .admin-filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      background: rgba(14, 14, 22, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+    }
+
+    .filter-left-controls {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.66rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .segmented-control {
+      display: inline-flex;
+      background: #08080d;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .filter-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .filter-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .filter-btn.active {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .filter-btn-3mem.active {
+      background: rgba(255, 208, 0, 0.15) !important;
+      color: var(--gold) !important;
+      border-color: var(--gold) !important;
+      box-shadow: 0 0 12px rgba(255, 208, 0, 0.25) !important;
+    }
+
+    .filter-btn-4mem.active {
+      background: rgba(0, 210, 255, 0.15) !important;
+      color: var(--cyan) !important;
+      border-color: var(--cyan) !important;
+      box-shadow: 0 0 12px rgba(0, 210, 255, 0.25) !important;
+    }
+
+    .filter-badge {
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: inherit;
+    }
+
+    .badge-gold {
+      background: rgba(255, 208, 0, 0.2);
+      color: var(--gold);
+    }
+
+    .badge-cyan {
+      background: rgba(0, 210, 255, 0.2);
+      color: var(--cyan);
+    }
+
+    .date-filter-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .date-select-input {
+      padding: 7px 30px 7px 10px !important;
+      font-size: 0.76rem !important;
+      border-radius: 8px !important;
+      height: 34px;
+      min-width: 220px;
+    }
+
+    .date-picker-input {
+      color-scheme: dark;
+      background-color: #0e0e16;
+      border: 1px solid var(--border-subtle);
+      color: #fff;
+      border-radius: 8px;
+      padding: 6px 10px;
+      outline: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.74rem;
+      height: 34px;
+      transition: border-color 0.2s;
+    }
+
+    .date-picker-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 10px rgba(0, 210, 255, 0.25);
+    }
+
+    .payment-select-input {
+      padding: 7px 30px 7px 10px !important;
+      font-size: 0.76rem !important;
+      border-radius: 8px !important;
+      height: 34px;
+      min-width: 140px;
+    }
+
+    .btn-clear-date {
+      height: 34px;
+      padding: 0 10px;
+      border-radius: 6px;
+      background: rgba(255, 42, 75, 0.15);
+      border: 1px solid var(--red);
+      color: #ff6b81;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-clear-date:hover {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .filter-meta-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .filter-count-feedback {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .filter-count-feedback strong {
+      color: #fff;
+    }
+
+    .btn-reset-filters {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: rgba(255, 42, 75, 0.12);
+      border: 1px solid var(--red);
+      color: #ff8598;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-reset-filters:hover {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(255, 42, 75, 0.4);
+    }
+
+    .badge-size-pill {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .size-3mem {
+      background: rgba(255, 208, 0, 0.12);
+      border: 1px solid rgba(255, 208, 0, 0.4);
+      color: var(--gold);
+    }
+
+    .size-4mem {
+      background: rgba(0, 210, 255, 0.12);
+      border: 1px solid rgba(0, 210, 255, 0.4);
+      color: var(--cyan);
+    }
+
+    .kpi-sub {
+      font-size: 0.66rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-weight: 600;
     }
 
     /* Master Teams Table */
@@ -652,6 +1013,103 @@
     .sel-quick-status option[value="rejected"] {
       color: var(--red) !important;
     }
+
+    /* Enhanced Mail Action Button */
+    .btn-tbl-mail {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      padding: 6px 12px !important;
+      min-height: 28px !important;
+      line-height: 1 !important;
+      border-radius: 6px !important;
+      background: rgba(0, 210, 255, 0.12) !important;
+      border: 1px solid #00d2ff !important;
+      color: #00d2ff !important;
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 0.72rem !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.04em !important;
+      text-transform: uppercase !important;
+      cursor: pointer !important;
+      white-space: nowrap !important;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      box-shadow: 0 0 10px rgba(0, 210, 255, 0.2) !important;
+      outline: none !important;
+      user-select: none !important;
+      vertical-align: middle !important;
+    }
+
+    .btn-tbl-mail:hover {
+      background: #00d2ff !important;
+      color: #06060c !important;
+      box-shadow: 0 0 16px rgba(0, 210, 255, 0.5) !important;
+      transform: translateY(-1px);
+    }
+
+    .btn-tbl-mail:active {
+      transform: translateY(0);
+    }
+
+    .btn-tbl-mail.is-sent {
+      background: rgba(0, 255, 136, 0.14) !important;
+      border: 1px solid #00ff88 !important;
+      color: #00ff88 !important;
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.25) !important;
+    }
+
+    .btn-tbl-mail.is-sent:hover {
+      background: #00ff88 !important;
+      color: #06060c !important;
+      box-shadow: 0 0 16px rgba(0, 255, 136, 0.55) !important;
+      transform: translateY(-1px);
+    }
+
+    .btn-tbl-mail:disabled {
+      opacity: 0.5 !important;
+      cursor: not-allowed !important;
+      pointer-events: none !important;
+      transform: none !important;
+    }
+
+    .btn-bulk-mail {
+      background: rgba(0, 210, 255, 0.1) !important;
+      border-color: rgba(0, 210, 255, 0.4) !important;
+      color: var(--cyan) !important;
+    }
+
+    .btn-bulk-mail:hover {
+      background: var(--cyan) !important;
+      color: #000 !important;
+      box-shadow: 0 0 16px rgba(0, 210, 255, 0.4) !important;
+    }
+
+    .btn-confirm-mail-all {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(5, 150, 105, 0.12) 100%) !important;
+      border: 1px solid #10b981 !important;
+      color: #34d399 !important;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-confirm-mail-all:hover {
+      background: #10b981 !important;
+      color: #000 !important;
+      box-shadow: 0 0 24px rgba(16, 185, 129, 0.5) !important;
+      transform: translateY(-1px);
+    }
+
 
     .btn-tbl-edit {
       padding: 6px 12px;
@@ -950,7 +1408,7 @@
       }
     }
   </style>
-  <script type="module" crossorigin src="/assets/admin-BVF5iZof.js"></script>
+  <script type="module" crossorigin src="/assets/admin-DKuncJMA.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
 </head>
 
@@ -1009,6 +1467,7 @@
       <div class="kpi-card">
         <div class="kpi-val" id="kpi-total-teams">0</div>
         <div class="kpi-lbl">TOTAL SQUADS</div>
+        <div class="kpi-sub font-mono" id="kpi-sub-teams">3-Mem: 0 • 4-Mem: 0</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-val" id="kpi-total-fees">₹0</div>
@@ -1031,6 +1490,10 @@
           <span>📊</span>
           <span>EXPORT SQUADS TO EXCEL (.XLSX)</span>
         </a>
+        <button class="btn-confirm-mail-all" id="btn-batch-mail" title="Send Official Confirmation Pass (Domain, Room Allocation, Timings & Rules) to All Payment-Verified Squads">
+          <span>📧</span>
+          <span>SEND CONFIRMATION PASS TO ALL VERIFIED</span>
+        </button>
         <button class="btn-ps-mgr" id="btn-open-ps-mgr">
           <span>🎯</span>
           <span>MANAGE PROBLEM STATEMENTS & DOMAINS</span>
@@ -1039,10 +1502,77 @@
           <span>💳</span>
           <span>MANAGE PAYMENT QR CODES</span>
         </button>
+        <button class="btn-ps-mgr btn-stone-area" id="btn-open-stone-areas">
+          <span>🏛️</span>
+          <span>STONE AREAS &amp; LABS</span>
+        </button>
+        <button class="btn-ps-mgr btn-reg-toggle open" id="btn-toggle-reg" title="Toggle Public Registrations Open / Closed">
+          <span id="reg-status-icon">🟢</span>
+          <span id="reg-status-text">REGISTRATION: OPEN</span>
+        </button>
+        <button class="btn-ps-mgr btn-danger-purge" id="btn-open-purge" title="Permanently Purge All Squad Data">
+          <span>🗑️</span>
+          <span>PURGE SQUADS</span>
+        </button>
       </div>
 
       <input type="text" id="admin-search" class="search-box"
         placeholder="🔍 Search squad, college, UTR, leader email...">
+    </div>
+
+    <!-- Master Squads Filter Bar -->
+    <div class="admin-filter-bar">
+      <div class="filter-left-controls">
+        <!-- Team Size Segmented Control: 3 vs 4 Members -->
+        <div class="filter-group">
+          <label class="filter-label">MEMBERS IN TEAM</label>
+          <div class="segmented-control" id="filter-team-size-group">
+            <button type="button" class="filter-btn active" data-size="all" id="btn-filter-size-all" title="Show squads of all sizes">
+              <span>ALL SIZES</span>
+              <span class="filter-badge" id="badge-count-all">0</span>
+            </button>
+            <button type="button" class="filter-btn filter-btn-3mem" data-size="3" id="btn-filter-size-3" title="Filter squads with 3 members">
+              <span>3 MEMBERS</span>
+              <span class="filter-badge badge-gold" id="badge-count-3">0</span>
+            </button>
+            <button type="button" class="filter-btn filter-btn-4mem" data-size="4" id="btn-filter-size-4" title="Filter squads with 4 members">
+              <span>4 MEMBERS</span>
+              <span class="filter-badge badge-cyan" id="badge-count-4">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Search by Registration Date Input -->
+        <div class="filter-group">
+          <label class="filter-label">SEARCH BY DATE</label>
+          <div class="date-filter-wrap">
+            <input type="date" id="filter-date-picker" class="date-picker-input" title="Search squads registered on this date">
+            <span id="date-match-badge" class="filter-badge badge-cyan font-mono" style="display:none;"></span>
+            <button type="button" id="btn-clear-date" class="btn-clear-date" title="Clear Date Filter" style="display:none;">✕</button>
+          </div>
+        </div>
+
+        <!-- Payment Verification Filter -->
+        <div class="filter-group">
+          <label class="filter-label">PAYMENT</label>
+          <select id="filter-payment-status" class="form-input custom-select font-mono payment-select-input" title="Filter by payment status">
+            <option value="all">ALL PAYMENTS</option>
+            <option value="verified">VERIFIED ONLY</option>
+            <option value="pending">PENDING ONLY</option>
+            <option value="rejected">REJECTED ONLY</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Filter Metadata & Reset -->
+      <div class="filter-meta-wrap">
+        <div class="filter-count-feedback font-mono" id="filter-count-feedback">
+          Showing <strong>0</strong> of 0 squads
+        </div>
+        <button type="button" id="btn-reset-filters" class="btn-reset-filters" style="display: none;" title="Reset all search & filters">
+          ↺ RESET FILTERS
+        </button>
+      </div>
     </div>
 
     <!-- Master Teams Table -->
@@ -1101,12 +1631,12 @@
             <div class="form-group">
               <label class="form-label">DOMAIN / STONE</label>
               <select id="edt-domain" class="form-input custom-select">
-                <option value="intelligence">INTELLIGENCE (MIND STONE)</option>
-                <option value="connectivity">CONNECTIVITY (SPACE STONE)</option>
-                <option value="digital">DIGITAL (REALITY STONE)</option>
-                <option value="automation">AUTOMATION (POWER STONE)</option>
-                <option value="analytics">ANALYTICS (TIME STONE)</option>
-                <option value="impact">IMPACT (SOUL STONE)</option>
+                <option value="transportation">TRANSPORTATION &amp; LOGISTICS (MIND STONE)</option>
+                <option value="cybersecurity">CYBERSECURITY &amp; DIGITAL TRUST (SPACE STONE)</option>
+                <option value="infrastructure">DIGITAL PUBLIC INFRASTRUCTURE (REALITY STONE)</option>
+                <option value="cleantech">CLEAN &amp; GREEN TECHNOLOGY (POWER STONE)</option>
+                <option value="education">SMART EDUCATION (TIME STONE)</option>
+                <option value="healthcare">MEDTECH / BIOTECH / HEALTHCARE (SOUL STONE)</option>
               </select>
             </div>
             <div class="form-group">
@@ -1139,9 +1669,17 @@
           </div>
         </div>
 
+        <!-- Squad Members Details -->
+        <div class="field-card">
+          <div class="field-card-title">3. Squad Members Information</div>
+          <div id="edt-members-container" style="display: flex; flex-direction: column; gap: 14px;">
+            <!-- Dynamically populated with member cards based on squad size -->
+          </div>
+        </div>
+
         <!-- Payment Details -->
         <div class="field-card">
-          <div class="field-card-title">3. Payment & Receipt Telemetry</div>
+          <div class="field-card-title">4. Payment & Receipt Telemetry</div>
           <div class="edit-grid-3">
             <div class="form-group">
               <label class="form-label">PAYMENT STATUS</label>
@@ -1160,15 +1698,35 @@
               <input type="number" id="edt-pay-amount" class="form-input">
             </div>
           </div>
+          <div class="form-group" style="margin-top: 10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+              <label class="form-label" style="margin:0;">PAYMENT RECEIPT / SCREENSHOT</label>
+              <span id="edt-receipt-link-wrap"></span>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <input type="text" id="edt-pay-screenshot" class="form-input" placeholder="Receipt Image URL (or upload image below)" style="font-size:0.8rem; font-family:'JetBrains Mono', monospace; flex:1;">
+              <label class="qr-upload-btn" style="padding:7px 14px; font-size:0.75rem; white-space:nowrap; margin:0; cursor:pointer;">
+                <span>📁</span>
+                <span id="lbl-file-edt-receipt">Upload File</span>
+                <input type="file" id="file-edt-receipt" accept="image/png,image/jpeg,image/webp" style="display:none;">
+              </label>
+            </div>
+          </div>
+          <div style="margin-top: 12px; display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 8px;">
+            <div style="font-size: 0.74rem; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">
+              CONFIRMATION EMAIL: <span id="edt-mail-status" style="font-weight: 700; color: var(--gold);">NOT SENT</span>
+            </div>
+            <button type="button" id="btn-edt-send-mail" class="btn-tbl-mail" style="font-size: 0.72rem; padding: 6px 12px;">
+              📧 SEND CONFIRMATION EMAIL NOW
+            </button>
+          </div>
         </div>
 
         <!-- Food Checkbox Overrides -->
         <div class="field-card">
-          <div class="field-card-title">4. Food Received Status</div>
+          <div class="field-card-title">5. Food Received Status</div>
           <div style="display: flex; gap: 18px; flex-wrap: wrap;">
-            <label class="switch-wrap"><input type="checkbox" id="edt-food-ht"> High Tea</label>
             <label class="switch-wrap"><input type="checkbox" id="edt-food-din"> Dinner</label>
-            <label class="switch-wrap"><input type="checkbox" id="edt-food-mid"> Midnight</label>
             <label class="switch-wrap"><input type="checkbox" id="edt-food-bf"> Breakfast</label>
             <label class="switch-wrap"><input type="checkbox" id="edt-food-ln"> Lunch</label>
           </div>
@@ -1176,7 +1734,7 @@
 
         <!-- Review Checkbox Overrides -->
         <div class="field-card">
-          <div class="field-card-title">5. Reviews Attended</div>
+          <div class="field-card-title">6. Reviews Attended</div>
           <div style="display: flex; gap: 18px; flex-wrap: wrap;">
             <label class="switch-wrap"><input type="checkbox" id="edt-rev-r1"> Review 1 (Ideation)</label>
             <label class="switch-wrap"><input type="checkbox" id="edt-rev-r2"> Review 2 (Logic)</label>
@@ -1186,7 +1744,7 @@
 
         <!-- Judges Scores Override -->
         <div class="field-card">
-          <div class="field-card-title">6. Evaluation Marks Override</div>
+          <div class="field-card-title">7. Evaluation Marks Override</div>
           <div class="edit-grid-2">
             <div class="form-group">
               <label class="form-label">TOTAL SCORE (MAX 100)</label>
@@ -1309,6 +1867,86 @@
           </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       STONE AREAS & LABS ALLOCATION MODAL
+       ========================================================================= -->
+  <div class="admin-modal" id="modal-stone-areas">
+    <div class="admin-dialog" style="max-width: 920px;">
+      <button class="modal-close" id="btn-close-stone-areas">✕</button>
+
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+        <span class="portal-badge" style="color:var(--gold); border-color:var(--gold);">VENUE LOGISTICS</span>
+        <span class="portal-badge font-mono" style="color:#c084fc; border-color:#c084fc;">6 INFINITY STONES</span>
+      </div>
+      <h3 class="font-display" style="font-size: 1.35rem; margin: 4px 0 8px 0;">INFINITY STONES // LAB &amp; AREA ALLOCATION</h3>
+
+      <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+        Assign designated campus labs, halls, or rooms to each Infinity Stone.
+        Saving changes will instantly update the venue across leader dashboards, coordinator rosters, and squad badges.
+      </p>
+
+      <div id="stone-areas-status" style="font-family:'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--cyan); margin-bottom: 14px;">
+        ✦ Load complete. Ready to adjust stone areas.
+      </div>
+
+      <div id="stone-areas-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 14px; margin-bottom: 20px;">
+        <!-- Injected dynamically via src/admin.js -->
+      </div>
+
+      <!-- Action Row -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-top:8px; padding-top:16px; border-top:1px solid var(--border-subtle);">
+        <label style="display:inline-flex; align-items:center; gap:8px; font-size:0.75rem; color:#bbb; cursor:pointer; font-family:'JetBrains Mono', monospace;">
+          <input type="checkbox" id="chk-sync-existing-teams" checked style="accent-color:var(--gold); width:16px; height:16px;">
+          <span>Automatically synchronize all existing registered squads to updated areas</span>
+        </label>
+
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <button id="btn-cancel-stone-areas" class="modal-cancel-btn" type="button" style="padding:10px 16px; font-size:0.75rem; font-weight:700; background:transparent; border:1px solid var(--border-subtle); color:var(--text-muted); border-radius:6px; cursor:pointer;">
+            CLOSE
+          </button>
+          <button id="btn-save-stone-areas" class="btn-save-admin" type="button" style="width:auto; padding:10px 22px; font-size:0.8rem; background:linear-gradient(135deg, #c084fc, #9333ea); color:#fff; font-weight:800; border:none; cursor:pointer; box-shadow:0 0 15px rgba(192,132,252,0.3);">
+            💾 SAVE &amp; PROPAGATE STONE AREAS
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       DANGER PURGE DATA MODAL
+       ========================================================================= -->
+  <div class="admin-modal" id="modal-purge">
+    <div class="admin-dialog purge-dialog">
+      <button class="modal-close" id="btn-close-purge">✕</button>
+
+      <div class="purge-warning-icon">⚠️</div>
+      <h3 class="purge-title">PERMANENTLY PURGE ALL SQUADS</h3>
+      <p class="purge-sub">
+        This destructive action will permanently erase all registered squads, leader accounts, payment proofs, reviews, and judge score allocations from the database.
+      </p>
+
+      <div class="purge-alert-box" style="margin-bottom: 20px;">
+        <strong>⚠️ IRREVERSIBLE ACTION:</strong> Once deleted, squad records cannot be recovered unless restored from an administrative backup file.
+      </div>
+
+      <div style="margin-bottom: 20px; text-align: left;">
+        <label style="display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; font-family: 'JetBrains Mono', monospace;">
+          Type <strong style="color:var(--red);">ERASE</strong> to confirm:
+        </label>
+        <input type="text" id="txt-purge-confirm" class="form-input font-mono" placeholder="Type ERASE" style="text-align: center; font-weight: 800; letter-spacing: 0.1em; color: var(--red);">
+      </div>
+
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <button type="button" class="modal-cancel-btn" id="btn-cancel-purge" style="padding: 10px 20px; border-radius: 8px;">CANCEL</button>
+        <button type="button" class="btn-danger-confirm" id="btn-confirm-purge" disabled style="opacity: 0.5; cursor: not-allowed;">
+          🗑️ PERMANENTLY ERASE ALL DATA
+        </button>
+      </div>
+
+      <div id="purge-status" style="margin-top: 14px; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; display: none;"></div>
     </div>
   </div>
 

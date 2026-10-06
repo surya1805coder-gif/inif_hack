@@ -1,14 +1,36 @@
 import { audioEngine } from './audio.js';
 import { STONES } from './stonesData.js';
 
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export function initRegistrationModule() {
   const modalRegister = document.getElementById('modal-register');
   const modalSuccess = document.getElementById('modal-success');
+  const modalConfirm = document.getElementById('modal-confirm');
   const btnCloseRegister = document.getElementById('btn-close-register');
   const btnCloseSuccess = document.getElementById('btn-close-success');
+  const btnCloseConfirm = document.getElementById('btn-close-confirm');
+  const btnBackEdit = document.getElementById('btn-back-edit');
+  const btnConfirmFinal = document.getElementById('btn-confirm-final');
+  const confSubmitText = document.getElementById('conf-submit-text');
+  const confSubmitSpinner = document.getElementById('conf-submit-spinner');
+  const btnToggleConfPw = document.getElementById('btn-toggle-conf-pw');
+  const confPassword = document.getElementById('conf-password');
+  let pendingFormData = null;
+
   const btnNavRegister = document.getElementById('btn-nav-register');
   const btnWieldStone = document.getElementById('btn-wield-stone');
   const formReg = document.getElementById('form-registration');
+  const regClosedNotice = document.getElementById('reg-closed-notice');
+  let isRegistrationOpen = true;
 
   const regDomainBadge = document.getElementById('reg-domain-badge');
   const domainCards = document.querySelectorAll('.domain-radio-card');
@@ -35,6 +57,45 @@ export function initRegistrationModule() {
     member3: '/3mem.png',
     member4: '/4mem.png'
   };
+
+  async function checkRegistrationStatus() {
+    try {
+      const res = await fetch('/api/registration-status');
+      if (res.ok) {
+        const data = await res.json();
+        if (typeof data.registrationOpen === 'boolean') {
+          isRegistrationOpen = data.registrationOpen;
+          applyRegistrationStatusUI(isRegistrationOpen);
+        }
+      }
+    } catch (_) {}
+  }
+
+  function applyRegistrationStatusUI(isOpen) {
+    if (!isOpen) {
+      if (formReg) formReg.style.display = 'none';
+      if (regClosedNotice) regClosedNotice.style.display = 'block';
+      if (btnNavRegister) {
+        btnNavRegister.innerHTML = '<span>🔒 REGISTRATION CLOSED</span>';
+        btnNavRegister.classList.add('reg-nav-closed');
+      }
+      if (btnWieldStone) {
+        btnWieldStone.innerHTML = '<span>🔒 REGISTRATIONS CLOSED</span>';
+      }
+    } else {
+      if (formReg) formReg.style.display = 'block';
+      if (regClosedNotice) regClosedNotice.style.display = 'none';
+      if (btnNavRegister) {
+        btnNavRegister.innerHTML = '<span class="btn-text"><span class="txt-desktop">✦ REGISTER SQUAD</span><span class="txt-mobile">✦ REGISTER</span></span>';
+        btnNavRegister.classList.remove('reg-nav-closed');
+      }
+      if (btnWieldStone) {
+        btnWieldStone.innerHTML = '<span class="wield-icon">✦</span><span class="wield-title">WIELD THIS STONE</span><svg class="wield-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+      }
+    }
+  }
+
+  checkRegistrationStatus();
 
   async function fetchDynamicPaymentQrs() {
     try {
@@ -83,6 +144,7 @@ export function initRegistrationModule() {
   // 1. OPEN MODAL
   function openModal(stoneId = 'mind') {
     if (!modalRegister) return;
+    checkRegistrationStatus();
     fetchDynamicPaymentQrs();
     modalRegister.classList.add('is-open');
     modalRegister.setAttribute('aria-hidden', 'false');
@@ -166,9 +228,104 @@ export function initRegistrationModule() {
     });
   }
 
+  // Focus Areas Matrix Modal Elements
+  const modalFocus = document.getElementById('modal-focus-areas');
+  const btnCloseFocus = document.getElementById('btn-close-focus');
+  const btnCloseFocusAlt = document.getElementById('btn-focus-close-alt');
+  const btnViewFocusAreas = document.getElementById('btn-view-focus-areas');
+  const btnFocusWieldNow = document.getElementById('btn-focus-wield-now');
+  const focusGrid = document.getElementById('focus-matrix-grid');
+  const focusTitle = document.getElementById('focus-modal-title');
+  const focusTagline = document.getElementById('focus-modal-tagline');
+  const focusOverview = document.getElementById('focus-modal-overview');
+  const focusBadge = document.getElementById('focus-modal-badge');
+  const focusDot = document.getElementById('focus-modal-dot');
+
+  function openFocusAreasModal(stoneId) {
+    if (!modalFocus) return;
+    const stone = STONES.find(s => s.id === stoneId) || STONES[0];
+
+    if (focusTitle) focusTitle.textContent = stone.domain;
+    if (focusTagline) focusTagline.textContent = stone.domainTagline || '';
+    if (focusOverview) focusOverview.textContent = stone.description;
+    if (focusBadge) {
+      focusBadge.textContent = `${stone.name} // SPECIMEN ${stone.index}`;
+      focusBadge.style.color = stone.colorHex;
+    }
+    if (focusDot) {
+      focusDot.style.background = stone.colorHex;
+      focusDot.style.boxShadow = `0 0 10px ${stone.colorHex}`;
+    }
+
+    if (focusGrid) {
+      const areas = stone.focusAreas || [];
+      focusGrid.innerHTML = areas.map((item, idx) => `
+        <div class="focus-area-card" style="--card-accent: ${stone.colorHex}">
+          <div class="focus-area-header">
+            <span class="focus-area-num">${String(idx + 1).padStart(2, '0')}</span>
+            <h4 class="focus-area-title">${item.title}</h4>
+          </div>
+          <p class="focus-area-desc">${item.desc}</p>
+        </div>
+      `).join('');
+    }
+
+    if (btnFocusWieldNow) {
+      btnFocusWieldNow.setAttribute('data-stone-id', stone.id);
+    }
+
+    modalFocus.classList.add('is-open');
+    modalFocus.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    safePlayChime(640);
+  }
+
+  function closeFocusAreasModal() {
+    if (!modalFocus) return;
+    modalFocus.classList.remove('is-open');
+    modalFocus.setAttribute('aria-hidden', 'true');
+    if (document.body.classList.contains('timeline-unlocked')) {
+      document.body.style.overflowY = 'auto';
+    } else {
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  if (btnViewFocusAreas) {
+    btnViewFocusAreas.addEventListener('click', () => {
+      const activeId = btnWieldStone?.getAttribute('data-stone-id') || 'mind';
+      audioEngine.playClick();
+      openFocusAreasModal(activeId);
+    });
+  }
+
+  if (btnCloseFocus) {
+    btnCloseFocus.addEventListener('click', () => {
+      audioEngine.playClick();
+      closeFocusAreasModal();
+    });
+  }
+
+  if (btnCloseFocusAlt) {
+    btnCloseFocusAlt.addEventListener('click', () => {
+      audioEngine.playClick();
+      closeFocusAreasModal();
+    });
+  }
+
+  if (btnFocusWieldNow) {
+    btnFocusWieldNow.addEventListener('click', () => {
+      const activeId = btnFocusWieldNow.getAttribute('data-stone-id') || 'mind';
+      closeFocusAreasModal();
+      audioEngine.playClick();
+      openModal(activeId);
+    });
+  }
+
   // Close on backdrop click
   window.addEventListener('click', (e) => {
     if (e.target === modalRegister) closeModal();
+    if (e.target === modalFocus) closeFocusAreasModal();
     if (e.target === modalSuccess) {
       modalSuccess.classList.remove('is-open');
       modalSuccess.setAttribute('aria-hidden', 'true');
@@ -180,6 +337,9 @@ export function initRegistrationModule() {
     if (e.key === 'Escape' || e.key === 'Esc') {
       if (modalRegister && modalRegister.classList.contains('is-open')) {
         closeModal();
+      }
+      if (modalFocus && modalFocus.classList.contains('is-open')) {
+        closeFocusAreasModal();
       }
       if (modalSuccess && modalSuccess.classList.contains('is-open')) {
         modalSuccess.classList.remove('is-open');
@@ -641,13 +801,12 @@ export function initRegistrationModule() {
         console.warn('OCR processing watchdog / fallback triggered:', err);
         isScanningReceipt = false;
 
-        // FAIL-SOFT FOR HACKATHONS: If image passed dimensions/magic bytes but OCR timed out
-        // or was inconclusive on budget mobile hardware, KEEP the receipt attached for organizer review
-        // and allow the student to manually provide their 12-digit UTR!
-        const isWatchdogTimeout = err.message && (err.message.includes('Timeout') || err.message.includes('OCR_WATCHDOG_TIMEOUT'));
-        const isOcrUnavailable = err.message && (err.message.includes('OCR not available') || err.message.includes('Worker'));
+        // FAIL-SOFT FOR MOBILE & HACKATHONS:
+        // If image passed dimensions/size, do NOT discard the file on mobile devices!
+        // Allow the participant to proceed by manually entering their 12-digit bank UTR!
+        const isTooSmall = err.message && err.message.startsWith('IMAGE_TOO_SMALL');
 
-        if ((isWatchdogTimeout || isOcrUnavailable) && file && file.size >= 10 * 1024) {
+        if (file && file.size >= MIN_FILE_SIZE && !isTooSmall) {
           isReceiptVerified = true;
           verifiedReceiptUtr = null;
           regScreenshot.classList.remove('is-invalid');
@@ -670,11 +829,11 @@ export function initRegistrationModule() {
 
         isReceiptVerified = false;
         verifiedReceiptUtr = null;
-        regScreenshot.value = ''; // Drop rejected file
+        regScreenshot.value = ''; // Drop rejected tiny file
         regScreenshot.classList.add('is-invalid');
 
         let msg = 'Could not verify image as an authentic payment receipt.';
-        if (err.message && err.message.startsWith('IMAGE_TOO_SMALL')) {
+        if (isTooSmall) {
           msg = 'Image dimensions are too small to be a payment receipt screenshot. Logos, icons, and small images are not accepted.';
         }
 
@@ -687,7 +846,7 @@ export function initRegistrationModule() {
           }
         }
         safePlayChime(220);
-        showError(`❌ ${msg}`);
+        showError(`❌ ${msg}`, regScreenshot);
       }
     });
   }
@@ -716,11 +875,11 @@ export function initRegistrationModule() {
     if (!inputEl) return;
     inputEl.classList.add('is-invalid');
     let parent = inputEl.parentElement;
-    let hint = parent.querySelector('.field-error-hint');
+    let hint = parent ? parent.querySelector(':scope > .field-error-hint') : null;
     if (!hint) {
       hint = document.createElement('span');
       hint.className = 'field-error-hint';
-      parent.appendChild(hint);
+      inputEl.insertAdjacentElement('afterend', hint);
     }
     hint.textContent = msg;
   }
@@ -728,7 +887,7 @@ export function initRegistrationModule() {
   function clearInputError(inputEl) {
     if (!inputEl) return;
     inputEl.classList.remove('is-invalid');
-    const hint = inputEl.parentElement.querySelector('.field-error-hint');
+    const hint = inputEl.parentElement ? inputEl.parentElement.querySelector(':scope > .field-error-hint') : null;
     if (hint) hint.remove();
   }
 
@@ -740,7 +899,8 @@ export function initRegistrationModule() {
       const res = await fetch(`/api/verify-participant?${param}`);
       const data = await res.json();
       if (data.exists) {
-        setInputError(inputEl, `❌ Already registered in team '${data.teamName}' (${data.teamId})`);
+        const fieldLabel = field === 'email' ? 'Email' : 'Mobile number';
+        setInputError(inputEl, `❌ ${fieldLabel} already registered in team '${data.teamName}' (${data.teamId})`);
         safePlayChime(220);
       }
     } catch (e) {
@@ -812,37 +972,42 @@ export function initRegistrationModule() {
 
       // 1. Mandatory Core Validation
       if (!teamName) {
-        showError('Please enter your Squad / Team Name.');
-        document.getElementById('reg-team-name')?.focus();
+        const el = document.getElementById('reg-team-name');
+        showError('Please enter your Squad / Team Name.', el);
+        el?.focus();
         return;
       }
       if (!college) {
-        showError('Please enter your College or Institution name.');
-        document.getElementById('reg-college')?.focus();
+        const el = document.getElementById('reg-college');
+        showError('Please enter your College or Institution name.', el);
+        el?.focus();
         return;
       }
       if (!leaderName) {
-        showError('Please enter Leader Full Name.');
-        document.getElementById('reg-leader-name')?.focus();
+        const el = document.getElementById('reg-leader-name');
+        showError('Please enter Leader Full Name.', el);
+        el?.focus();
         return;
       }
       if (!isValidEmail(leaderEmail)) {
-        showError('Please enter a valid Leader Email address (e.g. name@domain.com).');
         const el = document.getElementById('reg-leader-email');
         setInputError(el, 'Invalid email format');
+        showError('Please enter a valid Leader Email address (e.g. name@domain.com).', el);
         el?.focus();
         return;
       }
       if (!isValidPhone(leaderPhone)) {
-        showError('Please enter a valid 10-digit Leader Mobile Number.');
         const el = document.getElementById('reg-leader-phone');
         setInputError(el, 'Enter a valid 10-digit number');
+        showError('Please enter a valid 10-digit Leader Mobile Number.', el);
         el?.focus();
         return;
       }
       if (!teamPassword || teamPassword.length < 6) {
-        showError('Team Password must be at least 6 characters (used for Leader Portal login).');
-        document.getElementById('reg-team-password')?.focus();
+        const el = document.getElementById('reg-team-password');
+        setInputError(el, 'Minimum 6 characters');
+        showError('Team Password must be at least 6 characters (used for Leader Portal login).', el);
+        el?.focus();
         return;
       }
 
@@ -851,21 +1016,23 @@ export function initRegistrationModule() {
       const m2Email = document.getElementById('reg-m2-email')?.value.trim();
       const m2Phone = document.getElementById('reg-m2-phone')?.value.trim();
       if (!m2Name) {
-        showError('Member 02 Full Name is required.');
-        document.getElementById('reg-m2-name')?.focus();
+        const el = document.getElementById('reg-m2-name');
+        setInputError(el, 'Member 02 name required');
+        showError('Member 02 Full Name is required.', el);
+        el?.focus();
         return;
       }
       if (!isValidEmail(m2Email)) {
-        showError('Member 02 has an invalid email format.');
         const el = document.getElementById('reg-m2-email');
         setInputError(el, 'Invalid email format');
+        showError('Member 02 has an invalid email format.', el);
         el?.focus();
         return;
       }
       if (!isValidPhone(m2Phone)) {
-        showError('Member 02 requires a valid 10-digit phone number.');
         const el = document.getElementById('reg-m2-phone');
         setInputError(el, 'Enter a valid 10-digit number');
+        showError('Member 02 requires a valid 10-digit phone number.', el);
         el?.focus();
         return;
       }
@@ -875,21 +1042,23 @@ export function initRegistrationModule() {
       const m3Email = document.getElementById('reg-m3-email')?.value.trim();
       const m3Phone = document.getElementById('reg-m3-phone')?.value.trim();
       if (!m3Name) {
-        showError('Member 03 Full Name is required.');
-        document.getElementById('reg-m3-name')?.focus();
+        const el = document.getElementById('reg-m3-name');
+        setInputError(el, 'Member 03 name required');
+        showError('Member 03 Full Name is required.', el);
+        el?.focus();
         return;
       }
       if (!isValidEmail(m3Email)) {
-        showError('Member 03 has an invalid email format.');
         const el = document.getElementById('reg-m3-email');
         setInputError(el, 'Invalid email format');
+        showError('Member 03 has an invalid email format.', el);
         el?.focus();
         return;
       }
       if (!isValidPhone(m3Phone)) {
-        showError('Member 03 requires a valid 10-digit phone number.');
         const el = document.getElementById('reg-m3-phone');
         setInputError(el, 'Enter a valid 10-digit number');
+        showError('Member 03 requires a valid 10-digit phone number.', el);
         el?.focus();
         return;
       }
@@ -905,21 +1074,23 @@ export function initRegistrationModule() {
         const m4Email = document.getElementById('reg-m4-email')?.value.trim();
         const m4Phone = document.getElementById('reg-m4-phone')?.value.trim();
         if (!m4Name) {
-          showError('Member 04 Full Name is required for 4-member squads.');
-          document.getElementById('reg-m4-name')?.focus();
+          const el = document.getElementById('reg-m4-name');
+          setInputError(el, 'Member 04 name required');
+          showError('Member 04 Full Name is required for 4-member squads.', el);
+          el?.focus();
           return;
         }
         if (!isValidEmail(m4Email)) {
-          showError('Member 04 has an invalid email format.');
           const el = document.getElementById('reg-m4-email');
           setInputError(el, 'Invalid email format');
+          showError('Member 04 has an invalid email format.', el);
           el?.focus();
           return;
         }
         if (!isValidPhone(m4Phone)) {
-          showError('Member 04 requires a valid 10-digit phone number.');
           const el = document.getElementById('reg-m4-phone');
           setInputError(el, 'Enter a valid 10-digit number');
+          showError('Member 04 requires a valid 10-digit phone number.', el);
           el?.focus();
           return;
         }
@@ -947,8 +1118,8 @@ export function initRegistrationModule() {
         if (seenEmails.has(p.email)) {
           const prev = seenEmails.get(p.email);
           const msg = `Duplicate email '${p.email}' in squad (${prev} and ${p.role}). Every member must have a unique email.`;
-          showError(msg);
           setInputError(p.el, 'Duplicate email in squad');
+          showError(msg, p.el);
           p.el?.focus();
           return;
         }
@@ -960,8 +1131,8 @@ export function initRegistrationModule() {
         if (seenPhones.has(p.phone)) {
           const prev = seenPhones.get(p.phone);
           const msg = `Duplicate mobile number in squad (${prev} and ${p.role}). Every member must have their own unique phone number.`;
-          showError(msg);
           setInputError(p.phoneEl, 'Duplicate phone in squad');
+          showError(msg, p.phoneEl);
           p.phoneEl?.focus();
           return;
         }
@@ -970,42 +1141,64 @@ export function initRegistrationModule() {
 
       // 6. Payment & Receipt Verification
       if (isScanningReceipt) {
-        showError('⏳ AI OCR is currently analyzing your receipt screenshot. Please wait a moment...');
+        const el = document.getElementById('ocr-banner') || document.getElementById('reg-screenshot');
+        showError('⏳ AI OCR is currently analyzing your receipt screenshot. Please wait a moment...', el);
         return;
       }
 
       if (!screenshotFile) {
-        showError('Please upload your payment confirmation screenshot.');
-        document.getElementById('reg-screenshot')?.focus();
+        const el = document.getElementById('reg-screenshot');
+        setInputError(el, 'Payment screenshot required');
+        showError('Please upload your payment confirmation screenshot.', el);
+        el?.focus();
         return;
       }
 
       if (screenshotFile.size < MIN_FILE_SIZE) {
-        showError(`Image file too small (${(screenshotFile.size / 1024).toFixed(1)} KB). Logos, icons, and small images are not accepted. Please upload an authentic receipt screenshot.`);
-        document.getElementById('reg-screenshot')?.focus();
+        const el = document.getElementById('reg-screenshot');
+        setInputError(el, 'Image file too small');
+        showError(`Image file too small (${(screenshotFile.size / 1024).toFixed(1)} KB). Logos, icons, and small images are not accepted. Please upload an authentic receipt screenshot.`, el);
+        el?.focus();
         return;
       }
 
       if (screenshotFile.size > MAX_FILE_SIZE) {
         const sizeMb = (screenshotFile.size / (1024 * 1024)).toFixed(1);
-        showError(`Payment screenshot file size (${sizeMb} MB) exceeds the 20MB limit. Please upload an image under 20MB.`);
-        document.getElementById('reg-screenshot')?.focus();
+        const el = document.getElementById('reg-screenshot');
+        setInputError(el, 'File exceeds 20MB');
+        showError(`Payment screenshot file size (${sizeMb} MB) exceeds the 20MB limit. Please upload an image under 20MB.`, el);
+        el?.focus();
         return;
       }
 
       if (!isReceiptVerified) {
-        showError('❌ Valid Payment Receipt Required: The uploaded image was not verified as an authentic payment receipt. Logos, icons, and non-payment photos are not allowed. Please upload an authentic receipt from Google Pay, PhonePe, Paytm, or netbanking.');
-        document.getElementById('reg-screenshot')?.focus();
+        const el = document.getElementById('reg-screenshot');
+        setInputError(el, 'Valid receipt required');
+        showError('❌ Valid Payment Receipt Required: The uploaded image was not verified as an authentic payment receipt. Logos, icons, and non-payment photos are not allowed. Please upload an authentic receipt from Google Pay, PhonePe, Paytm, or netbanking.', el);
+        el?.focus();
         return;
       }
 
       if (!paymentUtr) {
-        showError('Please enter your payment bank UTR / transaction reference number.');
-        document.getElementById('reg-utr')?.focus();
+        const el = document.getElementById('reg-utr');
+        setInputError(el, '12-digit UTR required');
+        showError('Please enter your payment bank UTR / transaction reference number.', el);
+        el?.focus();
         return;
       }
 
       const cleanUtr = paymentUtr.trim();
+
+      // Escape helper for safe confirmation rendering
+      function escapeHtml(str) {
+        if (str == null) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
 
       // Build FormData payload
       const formData = new FormData();
@@ -1023,14 +1216,142 @@ export function initRegistrationModule() {
       formData.append('members', JSON.stringify(members));
       formData.append('paymentScreenshot', screenshotFile);
 
-      // UI Loading state
-      if (btnSubmit) btnSubmit.disabled = true;
-      if (regSpinner) regSpinner.style.display = 'inline-block';
+      pendingFormData = formData;
+
+      // Populate Confirmation Modal with all entered details
+      const confTeamName = document.getElementById('conf-team-name');
+      const confCollege = document.getElementById('conf-college');
+      const confDomain = document.getElementById('conf-domain');
+      const confTeamSize = document.getElementById('conf-team-size');
+      const confTechStack = document.getElementById('conf-tech-stack');
+      const confAmount = document.getElementById('conf-amount');
+      const confUtr = document.getElementById('conf-utr');
+      const confPayPhone = document.getElementById('conf-pay-phone');
+      const confRosterList = document.getElementById('conf-roster-list');
+      const confReceiptThumb = document.getElementById('conf-receipt-thumb');
+      const confReceiptNoThumb = document.getElementById('conf-receipt-no-thumb');
+      const confReceiptFilename = document.getElementById('conf-receipt-filename');
+
+      if (confTeamName) confTeamName.textContent = teamName;
+      if (confCollege) confCollege.textContent = college;
+
+      const chosenStone = STONES.find(s => s.id === preferredDomain) || STONES[0];
+      if (confDomain) {
+        confDomain.textContent = `${chosenStone.name} // ${chosenStone.domain}`;
+        confDomain.style.color = chosenStone.colorHex || '#00d2ff';
+      }
+
+      const totalFee = parseInt(teamSize, 10) * 349;
+      if (confTeamSize) confTeamSize.textContent = `${teamSize} Members (₹${totalFee.toLocaleString('en-IN')})`;
+      if (confTechStack) confTechStack.textContent = techStack || 'General Hackathon Track';
+      if (confAmount) confAmount.textContent = `₹${totalFee.toLocaleString('en-IN')}`;
+      if (confUtr) confUtr.textContent = cleanUtr;
+      if (confPayPhone) confPayPhone.textContent = paymentPhone;
+
+      if (confPassword) {
+        confPassword.textContent = '••••••••';
+        confPassword.dataset.raw = teamPassword;
+      }
+      if (btnToggleConfPw) {
+        btnToggleConfPw.textContent = 'VIEW';
+      }
+
+      // Populate Roster list
+      if (confRosterList) {
+        confRosterList.innerHTML = '';
+        const rosterEntries = [
+          { role: 'LEADER / CAPTAIN', name: leaderName, email: leaderEmail, phone: leaderPhone, isLeader: true },
+          { role: 'MEMBER 02', name: m2Name, email: m2Email, phone: m2Phone, isLeader: false },
+          { role: 'MEMBER 03', name: m3Name, email: m3Email, phone: m3Phone, isLeader: false }
+        ];
+        if (teamSize === '4' && members[2]) {
+          rosterEntries.push({ role: 'MEMBER 04', name: members[2].name, email: members[2].email, phone: members[2].phone, isLeader: false });
+        }
+
+        rosterEntries.forEach(entry => {
+          const row = document.createElement('div');
+          row.className = 'confirm-roster-item';
+          row.innerHTML = `
+            <div class="confirm-member-info">
+              <div class="confirm-member-name">${escapeHtml(entry.name)}</div>
+              <div class="confirm-member-meta">${escapeHtml(entry.email)} • ${escapeHtml(entry.phone)}</div>
+            </div>
+            <span class="confirm-member-role-badge" style="${entry.isLeader ? 'background:rgba(255,208,0,0.15); color:#ffd000; border-color:#ffd000;' : ''}">${entry.role}</span>
+          `;
+          confRosterList.appendChild(row);
+        });
+      }
+
+      // Receipt preview
+      if (screenshotFile) {
+        try {
+          const thumbUrl = URL.createObjectURL(screenshotFile);
+          if (confReceiptThumb) {
+            confReceiptThumb.src = thumbUrl;
+            confReceiptThumb.style.display = 'block';
+          }
+          if (confReceiptNoThumb) confReceiptNoThumb.style.display = 'none';
+        } catch (_) {}
+        if (confReceiptFilename) {
+          confReceiptFilename.textContent = `${screenshotFile.name} (${(screenshotFile.size / 1024).toFixed(1)} KB)`;
+        }
+      }
+
+      // Open the confirmation window
+      if (modalConfirm) {
+        const scrollArea = modalConfirm.querySelector('.confirm-details-scroll');
+        if (scrollArea) scrollArea.scrollTop = 0;
+        modalConfirm.classList.add('is-open');
+        modalConfirm.setAttribute('aria-hidden', 'false');
+      }
+      safePlayChime(580, 0.25);
+    });
+  }
+
+  // Confirmation Modal Handlers
+  function closeConfirmModal() {
+    if (!modalConfirm) return;
+    modalConfirm.classList.remove('is-open');
+    modalConfirm.setAttribute('aria-hidden', 'true');
+  }
+
+  if (btnCloseConfirm) btnCloseConfirm.addEventListener('click', closeConfirmModal);
+  if (btnBackEdit) btnBackEdit.addEventListener('click', closeConfirmModal);
+  if (modalConfirm) {
+    modalConfirm.addEventListener('click', (e) => {
+      if (e.target === modalConfirm) closeConfirmModal();
+    });
+  }
+
+  // Toggle Password in Confirmation Modal
+  if (btnToggleConfPw) {
+    btnToggleConfPw.addEventListener('click', () => {
+      if (!confPassword) return;
+      const isMasked = confPassword.textContent.includes('•');
+      if (isMasked) {
+        confPassword.textContent = confPassword.dataset.raw || '';
+        btnToggleConfPw.textContent = 'HIDE';
+      } else {
+        confPassword.textContent = '••••••••';
+        btnToggleConfPw.textContent = 'VIEW';
+      }
+    });
+  }
+
+  // Final Submission Trigger from Confirmation Modal
+  if (btnConfirmFinal) {
+    btnConfirmFinal.addEventListener('click', async () => {
+      if (!pendingFormData) return;
+
+      if (btnConfirmFinal) btnConfirmFinal.disabled = true;
+      if (confSubmitSpinner) confSubmitSpinner.style.display = 'inline-block';
+      if (confSubmitText) confSubmitText.textContent = 'COMMISSIONING SQUAD...';
+      if (btnBackEdit) btnBackEdit.disabled = true;
 
       try {
         const response = await fetch('/api/register', {
           method: 'POST',
-          body: formData,
+          body: pendingFormData,
         });
 
         const resData = await response.json();
@@ -1040,28 +1361,126 @@ export function initRegistrationModule() {
         }
 
         // Successful registration!
+        closeConfirmModal();
         closeModal();
-        audioEngine.playConvergenceChord();
+        try { audioEngine.playConvergenceChord(); } catch (_) {}
 
-        // Populate Success Modal
-        const sucTeamId = document.getElementById('suc-team-id');
-        const sucTeamName = document.getElementById('suc-team-name');
-        const sucDomain = document.getElementById('suc-domain');
-        const sucEmail = document.getElementById('suc-email');
-        const sucAmount = document.getElementById('suc-amount');
-
-        if (sucTeamId) sucTeamId.textContent = resData.team.id;
-        if (sucTeamName) sucTeamName.textContent = resData.team.teamName;
-        if (sucDomain) sucDomain.textContent = `${resData.team.preferredDomain.toUpperCase()} STONE`;
-        if (sucEmail) sucEmail.textContent = resData.team.leaderEmail;
-        if (sucAmount) sucAmount.textContent = `₹${resData.team.amount.toLocaleString('en-IN')}`;
-
+        // Ensure Success Modal opens immediately
         if (modalSuccess) {
           modalSuccess.classList.add('is-open');
           modalSuccess.setAttribute('aria-hidden', 'false');
         }
 
-        formReg.reset();
+        // Populate Success Modal safely
+        try {
+          const sucTeamId = document.getElementById('suc-team-id');
+          const sucTeamName = document.getElementById('suc-team-name');
+          const sucCollege = document.getElementById('suc-college');
+          const sucDomain = document.getElementById('suc-domain');
+          const sucEmail = document.getElementById('suc-email');
+          const sucAmount = document.getElementById('suc-amount');
+          const sucUtr = document.getElementById('suc-utr');
+          const sucRosterList = document.getElementById('suc-roster-list');
+
+          const submittedCollege = resData.team?.college || pendingFormData?.get('college') || '-';
+          const submittedUtr = resData.team?.utr || pendingFormData?.get('paymentUtr') || '-';
+          const leaderNameVal = resData.team?.leader?.name || pendingFormData?.get('leaderName') || 'Team Captain';
+          const leaderEmailVal = resData.team?.leader?.email || resData.team?.leaderEmail || pendingFormData?.get('leaderEmail') || '-';
+          const leaderPhoneVal = resData.team?.leader?.phone || pendingFormData?.get('leaderPhone') || '';
+          const teamAmountVal = resData.team?.amount != null ? Number(resData.team.amount) : 1047;
+
+          let membersList = [];
+          try {
+            if (Array.isArray(resData.team?.members) && resData.team.members.length > 0) {
+              membersList = resData.team.members;
+            } else {
+              const raw = pendingFormData?.get('members');
+              membersList = raw ? JSON.parse(raw) : [];
+            }
+          } catch (_) {
+            membersList = [];
+          }
+
+          const preferredDom = resData.team?.preferredDomain || pendingFormData?.get('preferredDomain');
+          const stoneObj = STONES.find(s => s.id === preferredDom || s.domainKey === preferredDom) || STONES[0];
+
+          if (sucTeamId) sucTeamId.textContent = resData.team?.id || 'INF-OK';
+          if (sucTeamName) sucTeamName.textContent = resData.team?.teamName || 'Your Squad';
+          if (sucCollege) sucCollege.textContent = submittedCollege;
+          if (sucDomain) {
+            sucDomain.textContent = `${stoneObj.name} // ${stoneObj.domain}`;
+            sucDomain.style.color = stoneObj.colorHex || '#00d2ff';
+          }
+          if (sucEmail) sucEmail.textContent = leaderEmailVal;
+          if (sucAmount) sucAmount.textContent = `₹${teamAmountVal.toLocaleString('en-IN')}`;
+          if (sucUtr) sucUtr.textContent = submittedUtr;
+
+          const sucMailRecipient = document.getElementById('suc-mail-recipient');
+          if (sucMailRecipient) sucMailRecipient.textContent = leaderEmailVal;
+
+          // Auto-login session preparation
+          if (resData.token) {
+            try {
+              sessionStorage.setItem('infinity_leader_auth', JSON.stringify({ token: resData.token }));
+              localStorage.setItem('infinity_leader_auth', JSON.stringify({ token: resData.token }));
+            } catch (_) {}
+          }
+
+          const btnGoLeader = document.getElementById('btn-go-leader');
+          if (btnGoLeader) {
+            const autoLoginUrl = resData.token
+              ? `/leader.html?autologin=1#token=${encodeURIComponent(resData.token)}`
+              : `/leader.html?team=${encodeURIComponent(resData.team?.id || '')}&email=${encodeURIComponent(leaderEmailVal)}`;
+
+            btnGoLeader.href = autoLoginUrl;
+            btnGoLeader.innerHTML = `<span>⚡ AUTO-LOGIN TO LEADER PAGE</span> &rarr;`;
+
+            btnGoLeader.onclick = () => {
+              if (resData.token) {
+                try {
+                  sessionStorage.setItem('infinity_leader_auth', JSON.stringify({ token: resData.token }));
+                  localStorage.setItem('infinity_leader_auth', JSON.stringify({ token: resData.token }));
+                } catch (_) {}
+              }
+            };
+          }
+
+          // Populate Member Roster in Success Modal
+          if (sucRosterList) {
+            sucRosterList.innerHTML = '';
+
+            const fullRoster = [
+              { role: 'LEADER / CAPTAIN', name: leaderNameVal, email: leaderEmailVal, phone: leaderPhoneVal, isLeader: true },
+              ...membersList.map((m, idx) => ({
+                role: `MEMBER 0${idx + 2}`,
+                name: m?.name || `Member ${idx + 2}`,
+                email: m?.email || '',
+                phone: m?.phone || '',
+                isLeader: false
+              }))
+            ];
+
+            fullRoster.forEach(m => {
+              const row = document.createElement('div');
+              row.className = 'suc-member-row';
+              row.innerHTML = `
+                <div class="suc-member-info">
+                  <div class="suc-member-name">
+                    <span>${escapeHtml(m.name)}</span>
+                    <span class="suc-member-badge ${m.isLeader ? '' : 'member'}">${m.role}</span>
+                  </div>
+                  <div class="suc-member-meta">${escapeHtml(m.email)} • ${escapeHtml(m.phone)}</div>
+                </div>
+              `;
+              sucRosterList.appendChild(row);
+            });
+          }
+        } catch (renderErr) {
+          console.warn('Success modal rendering fallback notice:', renderErr);
+        }
+
+        if (formReg) formReg.reset();
+        pendingFormData = null;
         isReceiptVerified = false;
         verifiedReceiptUtr = null;
         isUtrUnique = false;
@@ -1077,19 +1496,58 @@ export function initRegistrationModule() {
         });
 
       } catch (err) {
-        showError(err.message);
+        console.error('Registration submission failed:', err);
+        if (modalConfirm && modalConfirm.classList.contains('is-open')) {
+          const confSubTitle = document.getElementById('confirm-modal-title');
+          if (confSubTitle) {
+            confSubTitle.textContent = `FAILED: ${err.message}`;
+            confSubTitle.style.color = '#ff2a4b';
+          }
+          if (confSubmitText) {
+            confSubmitText.textContent = 'VERIFY DETAILS & RETRY';
+          }
+          safePlayChime(220);
+          setTimeout(() => {
+            if (confSubTitle) {
+              confSubTitle.textContent = 'REVIEW SQUAD REGISTRATION';
+              confSubTitle.style.color = '#ffffff';
+            }
+            if (confSubmitText) {
+              confSubmitText.textContent = 'CONFIRM & LOCK SQUAD ✦';
+            }
+          }, 4500);
+        } else {
+          closeConfirmModal();
+          if (modalRegister) {
+            modalRegister.classList.add('is-open');
+            modalRegister.setAttribute('aria-hidden', 'false');
+          }
+          showError(err.message || 'Registration failed. Please check your details.');
+        }
       } finally {
+        if (btnConfirmFinal) btnConfirmFinal.disabled = false;
+        if (confSubmitSpinner) confSubmitSpinner.style.display = 'none';
+        if (confSubmitText && !confSubmitText.textContent.includes('FAILED') && !confSubmitText.textContent.includes('RETRY')) {
+          confSubmitText.textContent = 'CONFIRM & LOCK SQUAD ✦';
+        }
+        if (btnBackEdit) btnBackEdit.disabled = false;
         if (btnSubmit) btnSubmit.disabled = false;
         if (regSpinner) regSpinner.style.display = 'none';
       }
     });
   }
 
-  function showError(msg) {
+  function showError(msg, targetEl = null) {
     if (regErrorMsg) {
       regErrorMsg.textContent = msg;
       regErrorMsg.style.display = 'block';
       safePlayChime(220); // alert tone
+    }
+    const scrollTarget = targetEl || regErrorMsg;
+    if (scrollTarget) {
+      try {
+        scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch (_) {}
     }
   }
 

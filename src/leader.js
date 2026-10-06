@@ -21,12 +21,51 @@ let currentTeam = null;
 
     function getSavedToken() {
       try {
-        // Purge legacy storage to ensure no plaintext passwords linger in localStorage
-        localStorage.removeItem('infinity_leader_auth');
-        const raw = sessionStorage.getItem('infinity_leader_auth');
-        if (!raw) return '';
-        const parsed = JSON.parse(raw);
-        return parsed.token || (typeof parsed === 'string' ? parsed : '');
+        // 1. Check URL hash (e.g., #token=... or #autologin=1&token=...)
+        let urlToken = '';
+        if (window.location.hash) {
+          const hashString = window.location.hash.replace(/^#/, '');
+          const hashParams = new URLSearchParams(hashString);
+          urlToken = hashParams.get('token') || (hashString.startsWith('token=') ? hashString.split('=')[1] : '');
+        }
+
+        // 2. Check query parameters (e.g., ?token=...)
+        if (!urlToken && window.location.search) {
+          const queryParams = new URLSearchParams(window.location.search);
+          urlToken = queryParams.get('token') || '';
+        }
+
+        // If token arrived via URL, store it and sanitize URL cleanly without reloading
+        if (urlToken) {
+          try {
+            sessionStorage.setItem('infinity_leader_auth', JSON.stringify({ token: urlToken }));
+            localStorage.setItem('infinity_leader_auth', JSON.stringify({ token: urlToken }));
+            const cleanUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+          } catch (_) {}
+          return urlToken;
+        }
+
+        // 3. Check sessionStorage
+        const rawSession = sessionStorage.getItem('infinity_leader_auth');
+        if (rawSession) {
+          const parsed = JSON.parse(rawSession);
+          const t = parsed.token || (typeof parsed === 'string' ? parsed : '');
+          if (t) return t;
+        }
+
+        // 4. Check localStorage fallback (for cross-tab navigation from registration)
+        const rawLocal = localStorage.getItem('infinity_leader_auth');
+        if (rawLocal) {
+          const parsed = JSON.parse(rawLocal);
+          const t = parsed.token || (typeof parsed === 'string' ? parsed : '');
+          if (t) {
+            sessionStorage.setItem('infinity_leader_auth', JSON.stringify({ token: t }));
+            return t;
+          }
+        }
+
+        return '';
       } catch (e) {
         return '';
       }
@@ -46,6 +85,7 @@ let currentTeam = null;
         const data = await res.json();
         if (!res.ok || !data.success) {
           sessionStorage.removeItem('infinity_leader_auth');
+          localStorage.removeItem('infinity_leader_auth');
           secLogin.style.display = 'block';
           return;
         }
@@ -151,6 +191,23 @@ let currentTeam = null;
       btnLogout.style.display = 'none';
     });
 
+    // Check URL parameters for direct verification pass link
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const teamParam = urlParams.get('team');
+      const emailParam = urlParams.get('email');
+      if (emailParam) {
+        const txtEmail = document.getElementById('txt-email');
+        if (txtEmail) txtEmail.value = emailParam;
+      }
+      if (teamParam) {
+        const loginSub = document.querySelector('.login-sub');
+        if (loginSub) {
+          loginSub.innerHTML = `Official Pass Verification: <strong style="color:var(--gold); font-family:var(--font-mono);">${escapeHTML(teamParam)}</strong><br>Enter your squad password to verify credentials and access your pass.`;
+        }
+      }
+    } catch (_) {}
+
     // Auto-restore leader session if browser is refreshed (F5 / reload)
     restoreLeaderSession();
 
@@ -184,9 +241,7 @@ let currentTeam = null;
       updateStatusBadge('status-r4', currentTeam.reviews?.r4?.attended || currentTeam.isTop6);
 
       // Food Statuses
-      updateStatusBadge('food-highTea', currentTeam.food?.highTea?.collected);
       updateStatusBadge('food-dinner', currentTeam.food?.dinner?.collected);
-      updateStatusBadge('food-midnightFuel', currentTeam.food?.midnightFuel?.collected);
       updateStatusBadge('food-breakfast', currentTeam.food?.breakfast?.collected);
       updateStatusBadge('food-lunch', currentTeam.food?.lunch?.collected);
 

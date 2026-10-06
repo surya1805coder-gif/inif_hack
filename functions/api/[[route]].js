@@ -1,254 +1,296 @@
 import * as XLSX from 'xlsx';
 
-// Initial Domains & Problem Statements — Marvel Infinity Stones
+// Stone & Domain Normalization Map
+export const STONE_DOMAIN_MAP = {
+  mind: 'transportation',
+  transportation: 'transportation',
+  space: 'cybersecurity',
+  cybersecurity: 'cybersecurity',
+  reality: 'infrastructure',
+  infrastructure: 'infrastructure',
+  power: 'cleantech',
+  cleantech: 'cleantech',
+  time: 'education',
+  education: 'education',
+  soul: 'healthcare',
+  healthcare: 'healthcare',
+  // Backward compatibility with previous keys
+  intelligence: 'transportation',
+  connectivity: 'cybersecurity',
+  digital: 'infrastructure',
+  automation: 'cleantech',
+  analytics: 'education',
+  impact: 'healthcare'
+};
+
+export function normalizeDomainId(val) {
+  if (!val) return 'transportation';
+  const clean = String(val).toLowerCase().replace(/ stone$/i, '').trim();
+  return STONE_DOMAIN_MAP[clean] || clean;
+}
+
+// Initial Domains — Marvel Infinity Stones
 const INITIAL_DOMAINS = [
   {
-    id: 'intelligence',
-    stoneId: 'mind',
-    stoneName: 'Mind Stone',
-    domainName: 'INTELLIGENCE',
-    tagline: 'AI • ML • Decision Systems',
-    marvelTheme: 'Vision Neural Gold',
-    accentHex: '#ffd000',
-    techStackSuggestions: ['Python', 'PyTorch', 'LangChain', 'FastAPI', 'Gemini API', 'TensorFlow'],
-    isPsReleased: false,
-    psReleaseDate: '2026-10-10T09:00:00Z',
-    description: 'Architect autonomous multi-agent networks, neural cognition models, self-refining LLM pipelines, and intelligent decision systems capable of enterprise-scale problem-solving.',
-    problemStatements: [
-      {
-        id: 'ps-intel-01',
-        code: 'PS-INTEL-01',
-        title: 'Autonomous Multi-Agent Synthesis & Dynamic Self-Correction Engine',
-        category: 'AI & Decision Systems',
-        description: 'Build an autonomous team of specialized AI agents (Architect, Auditor, Coder, Verifier) that debate trade-offs, execute verification loops, and generate verified artifact packages.',
-        difficulty: 'Advanced',
-        deliverables: [
-          'Interactive agent trace visualizer UI',
-          'Self-correcting verification testbench',
-          'Multi-modal decision engine integration'
-        ]
-      },
-      {
-        id: 'ps-intel-02',
-        code: 'PS-INTEL-02',
-        title: 'Neuro-Symbolic Automated Theorem Prover & Code Certifier',
-        category: 'Formal AI Verification',
-        description: 'Construct a neural-guided symbolic solver that produces formally verified correctness certificates for distributed protocols and cryptographic smart contracts.',
-        difficulty: 'Hardcore',
-        deliverables: [
-          'Automated proof trace generation visualizer',
-          'CLI benchmark suite verifying real-world protocols',
-          'Exportable formal verification certificate'
-        ]
-      }
-    ]
+    "id": "transportation",
+    "stoneId": "mind",
+    "stoneName": "Mind Stone",
+    "domainName": "TRANSPORTATION & LOGISTICS",
+    "tagline": "Mobility • Supply Chain • Routing",
+    "marvelTheme": "Vision Neural Gold",
+    "accentHex": "#ffd000",
+    "accentRgb": "255, 208, 0",
+    "iconName": "Navigation",
+    "stoneSymbol": "The Vision Core",
+    "roomAllocated": "Lab Block 3 (CS-301)",
+    "techStackSuggestions": [
+      "Python",
+      "FastAPI",
+      "Mapbox / GIS",
+      "Kafka",
+      "React",
+      "OR-Tools"
+    ],
+    "isPsReleased": false,
+    "psReleaseDate": "2026-10-10T09:00:00Z",
+    "description": "Pioneer intelligent traffic management, emergency route optimization, real-time public transit tracking, and dynamic supply chain logistics to eliminate urban congestion.",
+    "problemStatements": []
   },
   {
-    id: 'connectivity',
-    stoneId: 'space',
-    stoneName: 'Space Stone',
-    domainName: 'CONNECTIVITY',
-    tagline: 'Cybersecurity • Cloud • Networks',
-    marvelTheme: 'Tesseract Cyan',
-    accentHex: '#00d2ff',
-    techStackSuggestions: ['Rust', 'Go', 'Kubernetes', 'eBPF', 'Cloudflare Workers', 'WireGuard'],
-    isPsReleased: false,
-    psReleaseDate: '2026-10-10T09:00:00Z',
-    description: 'Forge zero-trust defense architectures, planet-scale cloud networks, high-throughput distributed protocols, and resilient cybersecurity fabrics.',
-    problemStatements: [
-      {
-        id: 'ps-conn-01',
-        code: 'PS-CONN-01',
-        title: 'Zero-Trust Multi-Cloud Mesh Failover & Network Threat Shield',
-        category: 'Cybersecurity & Cloud',
-        description: 'Design a self-healing reverse proxy and global routing daemon that dynamically migrates stateful traffic across multiple cloud providers and edge nodes during regional outages or active DDoS attacks.',
-        difficulty: 'Hardcore',
-        deliverables: [
-          'Working distributed controller and lightweight edge proxy agent',
-          'Zero-loss connection migration benchmark demonstration',
-          'Real-time threat detection & firewall isolation rules'
-        ]
-      },
-      {
-        id: 'ps-conn-02',
-        code: 'PS-CONN-02',
-        title: 'Post-Quantum Encrypted Peer-to-Peer Mesh Fabric',
-        category: 'Quantum Cryptography',
-        description: 'Engineer a lightweight decentralized P2P transport layer implementing Kyber/Dilithium lattice-based key exchanges with zero external central coordinator dependency.',
-        difficulty: 'Hardcore',
-        deliverables: [
-          'Working multi-node mesh simulator daemon',
-          'Quantum-resistant handshake latency benchmark',
-          'Live packet telemetry visualizer'
-        ]
-      }
-    ]
+    "id": "cybersecurity",
+    "stoneId": "space",
+    "stoneName": "Space Stone",
+    "domainName": "CYBERSECURITY & DIGITAL TRUST",
+    "tagline": "Cybersecurity • Privacy • Cryptography",
+    "marvelTheme": "Tesseract Cyan",
+    "accentHex": "#00d2ff",
+    "accentRgb": "0, 210, 255",
+    "iconName": "Shield",
+    "stoneSymbol": "The Tesseract",
+    "roomAllocated": "Lab Block 2 (IoT-204)",
+    "techStackSuggestions": [
+      "Rust",
+      "Go",
+      "Python",
+      "eBPF",
+      "Cryptography",
+      "SIEM / ELK"
+    ],
+    "isPsReleased": false,
+    "psReleaseDate": "2026-10-10T09:00:00Z",
+    "description": "Engineer resilient digital trust architectures, intelligent phishing and fraud detection, secure digital identity verification, and proactive cyber threat defense.",
+    "problemStatements": []
   },
   {
-    id: 'digital',
-    stoneId: 'reality',
-    stoneName: 'Reality Stone',
-    domainName: 'DIGITAL',
-    tagline: 'Web • Mobile • Digital Platforms',
-    marvelTheme: 'Aether Crimson',
-    accentHex: '#ff2a4b',
-    techStackSuggestions: ['TypeScript', 'React', 'Flutter', 'Next.js', 'Node.js', 'WebGL'],
-    isPsReleased: false,
-    psReleaseDate: '2026-10-10T09:00:00Z',
-    description: 'Bend digital reality. Build hyper-responsive web applications, cross-platform mobile architectures, immersive real-time canvases, and scalable modern platforms.',
-    problemStatements: [
-      {
-        id: 'ps-dig-01',
-        code: 'PS-DIG-01',
-        title: 'Sub-30ms Collaborative Digital Canvas & Universal Component Mesh',
-        category: 'Web & Mobile Platforms',
-        description: 'Construct a browser-based and mobile-first real-time workspace enabling multi-user manipulation of high-fidelity state with cryptographic attribution and instant offline synchronization.',
-        difficulty: 'Advanced',
-        deliverables: [
-          'Interactive cross-platform collaboration UI',
-          'Sub-30ms CRDT state synchronization pipeline',
-          'Offline-first progressive synchronization'
-        ]
-      },
-      {
-        id: 'ps-dig-02',
-        code: 'PS-DIG-02',
-        title: 'Generative Spatial Reality Studio for WebXR & Mobile AR',
-        category: 'Spatial Realities',
-        description: 'Build an in-browser 3D WebXR workspace enabling instantaneous procedural generation of reactive 3D worlds controllable across VR headsets, desktops, and mobile devices.',
-        difficulty: 'Advanced',
-        deliverables: [
-          'Fully functional Three.js/WebXR interactive world',
-          'Procedural asset generator with real-time lighting',
-          'Cross-device responsive controls'
-        ]
-      }
-    ]
+    "id": "infrastructure",
+    "stoneId": "reality",
+    "stoneName": "Reality Stone",
+    "domainName": "DIGITAL PUBLIC INFRASTRUCTURE",
+    "tagline": "Digital Platforms • Services • E-Governance",
+    "marvelTheme": "Aether Crimson",
+    "accentHex": "#ff2a4b",
+    "accentRgb": "255, 42, 75",
+    "iconName": "Globe",
+    "stoneSymbol": "The Aether Prism",
+    "roomAllocated": "Innovation Wing (IW-102)",
+    "techStackSuggestions": [
+      "TypeScript",
+      "React",
+      "Next.js",
+      "Node.js",
+      "PostgreSQL",
+      "Flutter"
+    ],
+    "isPsReleased": false,
+    "psReleaseDate": "2026-10-10T09:00:00Z",
+    "description": "Construct unified digital public infrastructure, smart civic grievance platforms, transparent governance dashboards, and verified digital citizen services.",
+    "problemStatements": []
   },
   {
-    id: 'automation',
-    stoneId: 'power',
-    stoneName: 'Power Stone',
-    domainName: 'AUTOMATION',
-    tagline: 'IoT • Robotics • Embedded Systems',
-    marvelTheme: 'Thanos Void Purple',
-    accentHex: '#b026ff',
-    techStackSuggestions: ['C++', 'Rust', 'ESP32 / Arduino', 'ROS2', 'MQTT', 'FreeRTOS'],
-    isPsReleased: false,
-    psReleaseDate: '2026-10-10T09:00:00Z',
-    description: 'Unleash physical and digital kinetic power. Develop autonomous robotics, smart hardware controllers, industrial IoT pipelines, and embedded real-time systems.',
-    problemStatements: [
-      {
-        id: 'ps-auto-01',
-        code: 'PS-AUTO-01',
-        title: 'Autonomous Edge Robotics Fleet Controller & Sensor Telemetry Hub',
-        category: 'Robotics & Embedded Systems',
-        description: 'Develop a microsecond telemetry agent and swarm control hub that continuously coordinates robotic actuators and IoT sensors, isolating hardware faults automatically.',
-        difficulty: 'Hardcore',
-        deliverables: [
-          'Hardware-in-the-loop or simulation telemetry interface',
-          'Autonomous failover daemon for robotic actuators',
-          'Real-time metrics visualizer with latency histograms'
-        ]
-      },
-      {
-        id: 'ps-auto-02',
-        code: 'PS-AUTO-02',
-        title: 'Industrial Energy Grid Balancer & Automated Micro-Inverter Mesh',
-        category: 'Embedded IoT & Power Systems',
-        description: 'Design an ultra-low-power embedded firmware orchestrator that coordinates distributed renewable energy sources, balancing load across power nodes in real time.',
-        difficulty: 'Advanced',
-        deliverables: [
-          'Embedded firmware code compatible with ESP32/ARM Cortex',
-          'Hardware simulation testbench with load surges',
-          'Interactive telemetry dashboard'
-        ]
-      }
-    ]
+    "id": "cleantech",
+    "stoneId": "power",
+    "stoneName": "Power Stone",
+    "domainName": "CLEAN & GREEN TECHNOLOGY",
+    "tagline": "Environment • Waste • Sustainability",
+    "marvelTheme": "Thanos Void Purple",
+    "accentHex": "#b026ff",
+    "accentRgb": "176, 38, 255",
+    "iconName": "Zap",
+    "stoneSymbol": "The Orb of Morag",
+    "roomAllocated": "Hardware & IoT Arena (HA-01)",
+    "techStackSuggestions": [
+      "Python",
+      "IoT / ESP32",
+      "React",
+      "MQTT",
+      "TensorFlow",
+      "FastAPI"
+    ],
+    "isPsReleased": false,
+    "psReleaseDate": "2026-10-10T09:00:00Z",
+    "description": "Develop sustainable clean technologies, intelligent waste and recycling systems, smart water conservation platforms, and real-time carbon footprint optimization.",
+    "problemStatements": []
   },
   {
-    id: 'analytics',
-    stoneId: 'time',
-    stoneName: 'Time Stone',
-    domainName: 'ANALYTICS',
-    tagline: 'Data • Prediction • Optimization',
-    marvelTheme: 'Doctor Strange Emerald',
-    accentHex: '#00ff88',
-    techStackSuggestions: ['Python', 'Kafka', 'ClickHouse', 'Pandas', 'DuckDB', 'Scikit-Learn'],
-    isPsReleased: false,
-    psReleaseDate: '2026-10-10T09:00:00Z',
-    description: 'Control temporal velocity. Engineer real-time streaming pipelines, high-throughput predictive time-series models, algorithmic optimization engines, and big data intelligence.',
-    problemStatements: [
-      {
-        id: 'ps-ana-01',
-        code: 'PS-ANA-01',
-        title: 'Sub-Millisecond Streaming Prediction & Algorithmic Optimization Pipeline',
-        category: 'Data & Prediction',
-        description: 'Engineer an event-driven analytical router that processes high-throughput telemetry streams, predicts impending anomaly spikes using micro-statistical models, and dynamically optimizes execution paths.',
-        difficulty: 'Hardcore',
-        deliverables: [
-          'Real-time streaming pipeline processing benchmarks',
-          'Live statistical prediction vs naive forecast models',
-          'Visual telemetry interface with latency histograms'
-        ]
-      },
-      {
-        id: 'ps-ana-02',
-        code: 'PS-ANA-02',
-        title: 'Temporal Graph Analytics & Supply Chain Bottleneck Oracle',
-        category: 'Graph Analytics',
-        description: 'Build a temporal graph processing engine capable of querying millions of dynamic shipment nodes and calculating optimal routing adjustments seconds before cascading delays occur.',
-        difficulty: 'Advanced',
-        deliverables: [
-          'Interactive graph visualization canvas with time-slider',
-          'Predictive bottleneck alert daemon',
-          'Benchmarking report showing speedup vs standard algorithms'
-        ]
-      }
-    ]
+    "id": "education",
+    "stoneId": "time",
+    "stoneName": "Time Stone",
+    "domainName": "SMART EDUCATION",
+    "tagline": "EdTech • Learning • Assessment",
+    "marvelTheme": "Doctor Strange Emerald",
+    "accentHex": "#00ff88",
+    "accentRgb": "0, 255, 136",
+    "iconName": "BookOpen",
+    "stoneSymbol": "Eye of Agamotto",
+    "roomAllocated": "CS Block (DataLab-401)",
+    "techStackSuggestions": [
+      "Python",
+      "LangChain",
+      "React",
+      "FastAPI",
+      "Node.js",
+      "PostgreSQL"
+    ],
+    "isPsReleased": false,
+    "psReleaseDate": "2026-10-10T09:00:00Z",
+    "description": "Architect personalized AI learning platforms, intelligent academic mentors, student performance analytics, and accessible assistive education tools.",
+    "problemStatements": []
   },
   {
-    id: 'impact',
-    stoneId: 'soul',
-    stoneName: 'Soul Stone',
-    domainName: 'IMPACT',
-    tagline: 'Healthcare • Agriculture • Education • Social Good',
-    marvelTheme: 'Vormir Sunset Orange',
-    accentHex: '#ff7700',
-    techStackSuggestions: ['Python', 'Flutter', 'PostgreSQL', 'FastAPI', 'Edge AI', 'OpenCV'],
-    isPsReleased: false,
-    psReleaseDate: '2026-10-10T09:00:00Z',
-    description: 'Channel technology to transform lives. Pioneer accessible healthcare diagnostics, precision agricultural sensors, adaptive educational tools, and sustainable social impact networks.',
-    problemStatements: [
-      {
-        id: 'ps-imp-01',
-        code: 'PS-IMP-01',
-        title: 'Decentralized Community Healthcare Triage & Precision Agriculture Telemetry',
-        category: 'HealthTech & Social Impact',
-        description: 'Construct a privacy-preserving triage engine and sensor aggregation hub for underserved rural communities that pairs offline-first inference with automated resource distribution.',
-        difficulty: 'Advanced',
-        deliverables: [
-          'Offline-first progressive web and mobile application',
-          'Differential-privacy epidemiological & soil telemetry dashboard',
-          'SMS/WhatsApp fallback alerting pipeline'
-        ]
-      },
-      {
-        id: 'ps-imp-02',
-        code: 'PS-IMP-02',
-        title: 'Adaptive Multi-Lingual AI Tutor for Low-Resource Classrooms',
-        category: 'EdTech & Inclusivity',
-        description: 'Develop a localized voice and text pedagogical assistant that adapts curriculum lessons into indigenous languages without requiring high-speed cloud internet connectivity.',
-        difficulty: 'Advanced',
-        deliverables: [
-          'Accessible PWA optimized for low-end mobile devices',
-          'Local offline speech-to-text / text-to-speech fallback engine',
-          'Student mastery & gamified progress tracker'
-        ]
-      }
-    ]
+    "id": "healthcare",
+    "stoneId": "soul",
+    "stoneName": "Soul Stone",
+    "domainName": "MEDTECH / BIOTECH / HEALTHCARE",
+    "tagline": "Healthcare • Medical AI • Assistive Technology",
+    "marvelTheme": "Vormir Sunset Orange",
+    "accentHex": "#ff7700",
+    "accentRgb": "255, 119, 0",
+    "iconName": "Heart",
+    "stoneSymbol": "Vormir Altar",
+    "roomAllocated": "Seminar Hall 2",
+    "techStackSuggestions": [
+      "Python",
+      "Flutter",
+      "FastAPI",
+      "OpenCV",
+      "PyTorch",
+      "PostgreSQL"
+    ],
+    "isPsReleased": false,
+    "psReleaseDate": "2026-10-10T09:00:00Z",
+    "description": "Advance transformative medical AI, remote patient diagnostic networks, emergency healthcare coordination, and accessible assistive health technologies.",
+    "problemStatements": []
   }
 ];
+
+export function syncCanonicalDomains(db) {
+  if (!db || !Array.isArray(db.domains)) return false;
+  let changed = false;
+
+  const stoneOrder = ['mind', 'space', 'reality', 'power', 'time', 'soul'];
+  const canonicalMap = {
+    mind: {
+      id: "transportation",
+      stoneId: "mind",
+      stoneName: "Mind Stone",
+      domainName: "TRANSPORTATION & LOGISTICS",
+      tagline: "Mobility • Supply Chain • Routing",
+      description: "Pioneer intelligent traffic management, emergency route optimization, real-time public transit tracking, and dynamic supply chain logistics to eliminate urban congestion.",
+      accentHex: "#ffd000",
+      accentRgb: "255, 208, 0"
+    },
+    space: {
+      id: "cybersecurity",
+      stoneId: "space",
+      stoneName: "Space Stone",
+      domainName: "CYBERSECURITY & DIGITAL TRUST",
+      tagline: "Cybersecurity • Privacy • Cryptography",
+      description: "Engineer resilient digital trust architectures, intelligent phishing and fraud detection, secure digital identity verification, and proactive cyber threat defense.",
+      accentHex: "#00d2ff",
+      accentRgb: "0, 210, 255"
+    },
+    reality: {
+      id: "infrastructure",
+      stoneId: "reality",
+      stoneName: "Reality Stone",
+      domainName: "DIGITAL PUBLIC INFRASTRUCTURE",
+      tagline: "Digital Platforms • Services • E-Governance",
+      description: "Construct unified digital public infrastructure, smart civic grievance platforms, transparent governance dashboards, and verified digital citizen services.",
+      accentHex: "#ff2a4b",
+      accentRgb: "255, 42, 75"
+    },
+    power: {
+      id: "cleantech",
+      stoneId: "power",
+      stoneName: "Power Stone",
+      domainName: "CLEAN & GREEN TECHNOLOGY",
+      tagline: "Environment • Waste • Sustainability",
+      description: "Develop sustainable clean technologies, intelligent waste and recycling systems, smart water conservation platforms, and real-time carbon footprint optimization.",
+      accentHex: "#b026ff",
+      accentRgb: "176, 38, 255"
+    },
+    time: {
+      id: "education",
+      stoneId: "time",
+      stoneName: "Time Stone",
+      domainName: "SMART EDUCATION",
+      tagline: "EdTech • Learning • Assessment",
+      description: "Architect personalized AI learning platforms, intelligent academic mentors, student performance analytics, and accessible assistive education tools.",
+      accentHex: "#00ff88",
+      accentRgb: "0, 255, 136"
+    },
+    soul: {
+      id: "healthcare",
+      stoneId: "soul",
+      stoneName: "Soul Stone",
+      domainName: "MEDTECH / BIOTECH / HEALTHCARE",
+      tagline: "Healthcare • Medical AI • Assistive Technology",
+      description: "Advance transformative medical AI, remote patient diagnostic networks, emergency healthcare coordination, and accessible assistive health technologies.",
+      accentHex: "#ff7700",
+      accentRgb: "255, 119, 0"
+    }
+  };
+
+  stoneOrder.forEach((stoneKey, idx) => {
+    const canonical = canonicalMap[stoneKey];
+    let dom = db.domains.find(d => 
+      (d.stoneId && d.stoneId.toLowerCase() === stoneKey) ||
+      (d.stoneName && d.stoneName.toLowerCase().includes(stoneKey)) ||
+      (STONE_DOMAIN_MAP[d.id] === canonical.id)
+    );
+
+    if (!dom && db.domains[idx]) {
+      dom = db.domains[idx];
+    }
+
+    if (dom) {
+      if (
+        dom.domainName !== canonical.domainName ||
+        dom.tagline !== canonical.tagline ||
+        dom.id !== canonical.id ||
+        dom.stoneId !== canonical.stoneId
+      ) {
+        dom.id = canonical.id;
+        dom.stoneId = canonical.stoneId;
+        dom.stoneName = canonical.stoneName;
+        dom.domainName = canonical.domainName;
+        dom.tagline = canonical.tagline;
+        dom.description = canonical.description;
+        dom.accentHex = canonical.accentHex;
+        dom.accentRgb = canonical.accentRgb;
+        changed = true;
+      }
+    } else {
+      const initial = INITIAL_DOMAINS.find(d => d.id === canonical.id);
+      if (initial) {
+        db.domains.push(JSON.parse(JSON.stringify(initial)));
+        changed = true;
+      }
+    }
+  });
+
+  return changed;
+}
 
 const R2_DB_KEY = 'state/database.json';
 const R2_DB_BACKUP_KEY = 'state/database.backup.json';
@@ -317,7 +359,7 @@ function makeJsonResponse(data, status = 200, extraHeaders = {}, request = null,
     status,
     headers: {
       'Content-Type': 'application/json',
-      'X-RateLimit-Limit': '120',
+      'X-RateLimit-Limit': '600',
       ...corsHeaders,
       ...extraHeaders,
     },
@@ -470,7 +512,7 @@ function stripHtmlTags(str) {
 function sanitizeUrl(url) {
   if (!url || typeof url !== 'string') return '';
   const trimmed = url.trim();
-  if (/^https?:\/\/[^\s"'<>]+$/i.test(trimmed) || /^\/uploads\/[a-zA-Z0-9_\-\.]+$/i.test(trimmed)) {
+  if (/^https?:\/\/[^\s"'<>]+$/i.test(trimmed) || /^\/(?:uploads|receipts|assets|qrs)\/[a-zA-Z0-9_\-\.\/]+$/i.test(trimmed) || trimmed === '/placeholder-receipt.png') {
     return trimmed;
   }
   return '/placeholder-receipt.png';
@@ -818,6 +860,13 @@ async function loadDbWithMeta(env) {
         if (text && text.trim().length > 10) {
           const parsed = JSON.parse(text);
           if (parsed && Array.isArray(parsed.domains) && Array.isArray(parsed.teams)) {
+            if (!parsed.settings) parsed.settings = { registrationOpen: true };
+            const migrated = syncCanonicalDomains(parsed);
+            if (migrated && env && env.BUCKET) {
+              env.BUCKET.put(R2_DB_KEY, JSON.stringify(parsed, null, 2)).catch((e) => {
+                console.warn('Background sync R2 canonical domains error:', e);
+              });
+            }
             return {
               db: parsed,
               etag: obj.etag,
@@ -839,6 +888,7 @@ async function loadDbWithMeta(env) {
           const backupParsed = JSON.parse(backupText);
           if (backupParsed && Array.isArray(backupParsed.domains) && Array.isArray(backupParsed.teams)) {
             console.warn('⚠️ RESTORED DATABASE FROM SHADOW BACKUP R2_DB_BACKUP_KEY!');
+            if (!backupParsed.settings) backupParsed.settings = { registrationOpen: true };
             return {
               db: backupParsed,
               etag: backupObj.etag,
@@ -852,7 +902,7 @@ async function loadDbWithMeta(env) {
     }
   }
   return {
-    db: { domains: INITIAL_DOMAINS, teams: [], _version: 0 },
+    db: { domains: INITIAL_DOMAINS, teams: [], settings: { registrationOpen: true }, _version: 0 },
     etag: null,
     version: 0,
   };
@@ -1007,21 +1057,764 @@ function getClientIp(request) {
 
 const apiRateLimiter = new MemoryRateLimiter({
   windowMs: 60 * 1000,
-  maxRequests: 120,
+  maxRequests: 600,
   message: 'API rate limit exceeded. Please slow down.'
 });
 
 const authRateLimiter = new MemoryRateLimiter({
-  windowMs: 15 * 60 * 1000,
-  maxRequests: 5,
-  message: 'Too many failed login attempts. Access temporarily locked. Please wait 15 minutes before trying again.'
+  windowMs: 5 * 60 * 1000,
+  maxRequests: 30,
+  message: 'Too many failed login attempts. Access temporarily locked. Please wait 5 minutes before trying again.'
 });
 
 const regRateLimiter = new MemoryRateLimiter({
   windowMs: 15 * 60 * 1000,
-  maxRequests: 5,
-  message: 'Registration rate limit reached. Please wait 15 minutes before submitting another registration.'
+  maxRequests: 50,
+  message: 'Registration rate limit reached. Please wait a few minutes before submitting another registration.'
 });
+export function escapeEmailHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+async function dispatchEmailTransport({ to, cc = [], subject, html, env = {}, team = {}, debugLabel = 'Email' }) {
+  const resendApiKey = (env.RESEND_API_KEY || (typeof process !== 'undefined' ? process.env?.RESEND_API_KEY : '') || '').trim();
+  const brevoApiKey = (env.BREVO_API_KEY || (typeof process !== 'undefined' ? process.env?.BREVO_API_KEY : '') || '').trim();
+  const emailFrom = (env.EMAIL_FROM || (typeof process !== 'undefined' ? process.env?.EMAIL_FROM : '') || 'Infinity Hackathon 2026 <hackathon@infinity.akao.in>').trim();
+
+  // 1. Resend API (Recommended)
+  if (resendApiKey) {
+    const payload = {
+      from: emailFrom,
+      to: [to],
+      ...(cc.length > 0 ? { cc } : {}),
+      reply_to: 'support@infinity.akao.in',
+      subject,
+      html,
+    };
+
+    let res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    let resData = await res.json().catch(() => ({}));
+
+    // If CC failed due to invalid teammate addresses, retry strictly with leaderEmail
+    if (!res.ok && payload.cc) {
+      const fallbackPayload = {
+        from: emailFrom,
+        to: [to],
+        reply_to: 'support@infinity.akao.in',
+        subject,
+        html,
+      };
+      res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${resendApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(fallbackPayload)
+      });
+      resData = await res.json().catch(() => ({}));
+    }
+
+    if (!res.ok) {
+      let errMsg = resData.message || resData.error || `HTTP ${res.status}`;
+      if (errMsg.includes('only send testing emails to your own email address')) {
+        errMsg = `Resend Free Sandbox restriction: To send emails to all student addresses, please verify your domain at resend.com/domains. (For testing now, you can send to your registered email: white018899@gmail.com).`;
+      }
+      throw new Error(`Resend email dispatch: ${errMsg}`);
+    }
+    return { success: true, provider: 'resend', id: resData.id };
+  }
+
+  // 2. Brevo API (Fallback)
+  if (brevoApiKey) {
+    const senderParts = emailFrom.match(/^(.*)<(.*)>$/) || [null, 'Infinity Hackathon 2026', emailFrom];
+    const senderName = (senderParts[1] || 'Infinity Hackathon 2026').trim();
+    const senderEmail = (senderParts[2] || emailFrom).trim();
+
+    const payload = {
+      sender: { name: senderName, email: senderEmail },
+      to: [{ email: to, name: team?.leader?.name || 'Captain' }],
+      subject,
+      htmlContent: html
+    };
+    if (cc.length > 0) {
+      payload.cc = cc.map(email => ({ email }));
+    }
+
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'api-key': brevoApiKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const resData = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const errMsg = resData.message || `HTTP ${res.status}`;
+      throw new Error(`Brevo email dispatch error: ${errMsg}`);
+    }
+    return { success: true, provider: 'brevo', id: resData.messageId };
+  }
+
+  // 3. Simulated Dev Mode
+  console.log(`\n======================================================`);
+  console.log(`[EMAIL SIMULATION] ${debugLabel} Dispatched`);
+  console.log(`Squad:       ${team?.id} (${team?.teamName})`);
+  console.log(`To:          ${to}`);
+  console.log(`CC Members:  ${cc.join(', ') || 'None'}`);
+  console.log(`Subject:     ${subject}`);
+  console.log(`UTR:         ${team?.payment?.utr || 'N/A'}`);
+  console.log(`======================================================\n`);
+
+  return {
+    success: true,
+    simulated: true,
+    message: 'Simulated email sent! Configure RESEND_API_KEY in .env.local for live delivery.'
+  };
+}
+
+export async function sendRegistrationPendingEmail({ team, appUrl = 'https://infinity.akao.in', env = {}, rawPassword = null }) {
+  const leader = team.leader || {};
+  const leaderEmail = (leader.email || '').trim().toLowerCase();
+  if (!leaderEmail || !leaderEmail.includes('@')) {
+    throw new Error(`Squad ${team.id} (${team.teamName}) has no valid leader email address.`);
+  }
+
+  const teamMembers = Array.isArray(team.members) ? team.members : [];
+  const memberEmails = teamMembers
+    .map(m => (m.email || '').trim().toLowerCase())
+    .filter(e => e && e.includes('@') && e !== leaderEmail);
+
+  const teamId = escapeEmailHtml(team.id);
+  const teamName = escapeEmailHtml(team.teamName);
+  const college = escapeEmailHtml(team.college || 'N/A');
+  const domain = escapeEmailHtml((team.preferredDomain || 'intelligence').toUpperCase());
+  const utr = escapeEmailHtml(team.payment?.utr || 'PENDING');
+  const amount = escapeEmailHtml(team.payment?.amount || (team.teamSize || 4) * 349);
+  const size = escapeEmailHtml(team.teamSize || (teamMembers.length + 1));
+
+  let rosterRows = `
+    <tr>
+      <td style="padding:10px 14px; border-bottom:1px solid #e4e4e7; width:80px;">
+        <span style="display:inline-block; padding:3px 8px; border-radius:4px; background:#09090b; color:#ffffff; font-size:9px; font-weight:800; letter-spacing:0.06em; font-family:monospace;">CAPTAIN</span>
+      </td>
+      <td style="padding:10px 14px; border-bottom:1px solid #e4e4e7; color:#09090b; font-weight:600; font-size:13px;">
+        ${escapeEmailHtml(leader.name || 'Captain')}
+      </td>
+      <td style="padding:10px 14px; border-bottom:1px solid #e4e4e7; color:#71717a; font-size:12px; font-family:monospace;">
+        ${escapeEmailHtml(leader.email || '')} ${leader.phone ? `&bull; ${escapeEmailHtml(leader.phone)}` : ''}
+      </td>
+    </tr>
+  `;
+
+  teamMembers.forEach((m, idx) => {
+    const isLast = idx === teamMembers.length - 1;
+    const borderStyle = isLast ? '' : 'border-bottom:1px solid #e4e4e7;';
+    rosterRows += `
+      <tr>
+        <td style="padding:10px 14px; ${borderStyle} width:80px;">
+          <span style="display:inline-block; padding:3px 8px; border-radius:4px; background:#f4f4f5; border:1px solid #e4e4e7; color:#52525b; font-size:9px; font-weight:700; letter-spacing:0.06em; font-family:monospace;">MEMBER</span>
+        </td>
+        <td style="padding:10px 14px; ${borderStyle} color:#18181b; font-weight:500; font-size:13px;">
+          ${escapeEmailHtml(m.name || 'Squad Member')}
+        </td>
+        <td style="padding:10px 14px; ${borderStyle} color:#71717a; font-size:12px; font-family:monospace;">
+          ${escapeEmailHtml(m.email || '')} ${m.phone ? `&bull; ${escapeEmailHtml(m.phone)}` : ''}
+        </td>
+      </tr>
+    `;
+  });
+
+  const subject = `Registration Received — Pending Review | Squad ${team.teamName} [${team.id}]`;
+  const cleanAppUrl = (appUrl || 'https://infinity.akao.in').replace(/\/$/, '');
+
+  const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="margin:0; padding:0; background-color:#ffffff; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#09090b; -webkit-font-smoothing:antialiased;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f4f4f5; min-height:100vh; padding:36px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" style="max-width:580px; background-color:#ffffff; border:1px solid #e4e4e7; border-radius:10px; overflow:hidden; margin:0 auto; box-shadow:0 4px 16px rgba(0,0,0,0.04);" cellspacing="0" cellpadding="0" border="0">
+          
+          <!-- Header Section -->
+          <tr>
+            <td style="padding:36px 28px 24px 28px; text-align:center; border-bottom:1px solid #f4f4f5;">
+              <div style="font-size:10px; font-weight:700; letter-spacing:0.22em; color:#71717a; text-transform:uppercase; margin-bottom:8px;">DEPARTMENT OF COMPUTER SCIENCE &amp; ENGINEERING</div>
+              <div style="font-size:18px; font-weight:800; letter-spacing:0.1em; color:#09090b; text-transform:uppercase; margin-bottom:16px;">INFINITY HACKATHON 2026</div>
+              
+              <!-- Pending Status Badge -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto 16px auto;">
+                <tr>
+                  <td style="padding:6px 14px; border-radius:9999px; background:#fffbeb; border:1px solid #fde68a; color:#b45309; font-size:10px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase;">
+                    ⏳ REGISTRATION RECEIVED &bull; VERIFICATION PENDING
+                  </td>
+                </tr>
+              </table>
+
+              <h1 style="margin:0 0 8px 0; font-size:24px; font-weight:800; color:#09090b; letter-spacing:-0.02em;">Squad ${teamName}</h1>
+              <p style="margin:0 auto; font-size:13px; color:#71717a; line-height:1.6; max-width:460px;">
+                Your registration has been successfully received and is currently under administrative review. Once your payment is verified, you will receive an official Confirmed Squad Pass.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Summary Section -->
+          <tr>
+            <td style="padding:24px 28px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fafafa; border:1px solid #e4e4e7; border-radius:8px; overflow:hidden;">
+                <tr>
+                  <td style="padding:14px 18px; border-bottom:1px solid #e4e4e7; background:#f4f4f5;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td align="left">
+                          <span style="font-size:10px; font-weight:600; color:#71717a; letter-spacing:0.14em; text-transform:uppercase;">REGISTRATION REFERENCE ID</span>
+                          <div style="font-size:19px; font-weight:800; color:#09090b; font-family:monospace; margin-top:2px;">${teamId}</div>
+                        </td>
+                        <td align="right">
+                          <span style="display:inline-block; padding:4px 10px; border-radius:4px; background:#ffffff; border:1px solid #e4e4e7; color:#09090b; font-size:11px; font-weight:700; font-family:monospace;">${size} MEMBERS</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:16px 18px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="6" border="0" style="font-size:12px;">
+                      <tr>
+                        <td style="color:#71717a; font-weight:500; width:34%;">Payment Status</td>
+                        <td style="color:#b45309; font-weight:700;">
+                          <span style="display:inline-block; padding:3px 8px; border-radius:4px; background:#fffbeb; border:1px solid #fde68a;">⏳ PENDING ADMIN VERIFICATION</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Institution</td>
+                        <td style="color:#09090b; font-weight:600;">${college}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Track / Domain</td>
+                        <td style="color:#09090b; font-weight:700;">${domain}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Bank UTR / Ref</td>
+                        <td style="color:#18181b; font-family:monospace;">${utr}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Total Fee Submitted</td>
+                        <td style="color:#09090b; font-weight:700;">₹${amount}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Leader Username</td>
+                        <td style="color:#09090b; font-family:monospace; font-weight:700;">${leaderEmail}</td>
+                      </tr>
+                      ${rawPassword ? `
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Team Password</td>
+                        <td style="color:#09090b; font-family:monospace; font-weight:700;">${escapeEmailHtml(rawPassword)}</td>
+                      </tr>
+                      ` : ''}
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Status Check Link</td>
+                        <td style="color:#09090b; font-family:monospace; font-size:11px;">
+                          <a href="${cleanAppUrl}/leader?team=${teamId}" target="_blank" style="color:#09090b; text-decoration:underline;">${cleanAppUrl}/leader?team=${teamId}</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Roster Section -->
+          <tr>
+            <td style="padding:0 28px 24px 28px;">
+              <div style="font-size:10px; font-weight:700; letter-spacing:0.14em; color:#71717a; text-transform:uppercase; margin-bottom:8px;">
+                REGISTERED SQUAD ROSTER
+              </div>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fafafa; border:1px solid #e4e4e7; border-radius:8px; overflow:hidden;">
+                ${rosterRows}
+              </table>
+            </td>
+          </tr>
+
+          <!-- What Happens Next Note -->
+          <tr>
+            <td style="padding:0 28px 24px 28px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fafafa; border:1px solid #e4e4e7; border-radius:8px; padding:16px 18px;">
+                <tr>
+                  <td>
+                    <div style="font-size:10px; font-weight:700; color:#71717a; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:8px;">
+                      What Happens Next?
+                    </div>
+                    <ul style="margin:0; padding-left:16px; color:#52525b; font-size:12px; line-height:1.6;">
+                      <li>Our administrative desk is verifying your payment UTR (<strong style="color:#09090b;">${utr}</strong>) against the banking statement.</li>
+                      <li>Once verified, you will receive an official <strong style="color:#09090b;">Payment Verified &bull; Official Pass Issued</strong> email.</li>
+                      <li>You can log into your Leader Portal anytime to check live verification status and track event announcements.</li>
+                    </ul>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Portal CTA Button -->
+          <tr>
+            <td style="padding:0 28px 32px 28px; text-align:center;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto;">
+                <tr>
+                  <td align="center" style="border-radius:6px; background:#09090b;">
+                    <a href="${cleanAppUrl}/leader?team=${teamId}" target="_blank" rel="noopener noreferrer" style="display:inline-block; padding:13px 34px; font-size:12px; font-weight:700; color:#ffffff; text-decoration:none; text-transform:uppercase; letter-spacing:0.08em;">
+                      ACCESS SQUAD PORTAL &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <div style="margin-top:12px; font-size:11px; color:#71717a;">
+                Reference ID: <strong style="color:#09090b; font-family:monospace;">${teamId}</strong> &bull; Log in with your leader email &amp; squad password.
+              </div>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#f4f4f5; padding:20px 24px; text-align:center; border-top:1px solid #e4e4e7; font-size:11px; color:#71717a; line-height:1.6;">
+              <p style="margin:0 0 4px 0; color:#52525b; font-weight:500;">Infinity Hackathon 2026 &bull; Department of Computer Science &amp; Engineering</p>
+              <p style="margin:0;">Need assistance? Contact <a href="mailto:support@infinity.akao.in" style="color:#09090b; text-decoration:underline;">support@infinity.akao.in</a></p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  return await dispatchEmailTransport({
+    to: leaderEmail,
+    cc: memberEmails,
+    subject,
+    html: htmlContent,
+    env,
+    team,
+    debugLabel: 'Registration Pending Email'
+  });
+}
+
+export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinity.akao.in', env = {}, rawPassword = null, domains = null }) {
+  const leader = team.leader || {};
+  const leaderEmail = (leader.email || '').trim().toLowerCase();
+  if (!leaderEmail || !leaderEmail.includes('@')) {
+    throw new Error(`Squad ${team.id} (${team.teamName}) has no valid leader email address.`);
+  }
+
+  const teamMembers = Array.isArray(team.members) ? team.members : [];
+  const memberEmails = teamMembers
+    .map(m => (m.email || '').trim().toLowerCase())
+    .filter(e => e && e.includes('@') && e !== leaderEmail);
+
+  const teamId = escapeEmailHtml(team.id);
+  const teamName = escapeEmailHtml(team.teamName);
+  const college = escapeEmailHtml(team.college || 'N/A');
+  const domain = escapeEmailHtml((team.preferredDomain || 'intelligence').toUpperCase());
+
+  // Dynamically load active domains from database if not passed directly to ensure latest admin venue changes
+  let activeDomains = domains;
+  if (!activeDomains || !Array.isArray(activeDomains)) {
+    try {
+      const db = await loadDb(env);
+      activeDomains = db.domains;
+    } catch (e) {
+      activeDomains = null;
+    }
+  }
+
+  // Find live room allocated for this domain from activeDomains (updated by admin)
+  const normTeamDomain = normalizeDomainId(team.preferredDomain);
+  const matchedDomain = Array.isArray(activeDomains) ? activeDomains.find(d => {
+    const dNorm = normalizeDomainId(d.id || d.stoneId);
+    return dNorm === normTeamDomain || d.id === team.preferredDomain || d.stoneId === team.preferredDomain;
+  }) : null;
+
+  // Domain fallback mappings if database has not set a custom room
+  const fallbackRooms = {
+    transportation: 'Lab Block 3 (CS-301) — Transportation & Logistics Hub',
+    cybersecurity: 'Lab Block 2 (IoT-204) — Cybersecurity & Digital Trust Wing',
+    infrastructure: 'Innovation Wing (IW-102) — Digital Public Infrastructure Arena',
+    cleantech: 'Hardware & IoT Arena (HA-01) — Clean & Green Tech Lab',
+    education: 'CS Block (DataLab-401) — Smart Education Lab',
+    healthcare: 'Seminar Hall 2 — MedTech & Healthcare Deck'
+  };
+
+  // Live room resolution:
+  // 1. If admin updated the domain's room in db.domains, use that live venue!
+  // 2. If the squad has a specific desk/table assigned (e.g. Table A-12), incorporate it.
+  // 3. Fallback to fallbackRooms[normTeamDomain]
+  let room = '';
+  if (matchedDomain && matchedDomain.roomAllocated && String(matchedDomain.roomAllocated).trim() && !String(matchedDomain.roomAllocated).trim().startsWith('TBA')) {
+    const liveRoom = String(matchedDomain.roomAllocated).trim();
+    if (team.roomAllocated && (team.roomAllocated.startsWith('Table') || team.roomAllocated.startsWith('Desk'))) {
+      room = `${team.roomAllocated} (${liveRoom})`;
+    } else {
+      room = liveRoom;
+    }
+  } else if (team.roomAllocated && !team.roomAllocated.startsWith('TBA')) {
+    room = team.roomAllocated.trim();
+  } else {
+    room = fallbackRooms[normTeamDomain] || 'Main Campus Innovation Arena (Lab Block 3)';
+  }
+
+  const roomEscaped = escapeEmailHtml(room);
+
+  const utr = escapeEmailHtml(team.payment?.utr || 'VERIFIED');
+  const amount = escapeEmailHtml(team.payment?.amount || (team.teamSize || 4) * 349);
+  const size = escapeEmailHtml(team.teamSize || (teamMembers.length + 1));
+
+  let rosterRows = `
+    <tr>
+      <td style="padding:10px 14px; border-bottom:1px solid #e4e4e7; width:80px;">
+        <span style="display:inline-block; padding:3px 8px; border-radius:4px; background:#09090b; color:#ffffff; font-size:9px; font-weight:800; letter-spacing:0.06em; font-family:monospace;">CAPTAIN</span>
+      </td>
+      <td style="padding:10px 14px; border-bottom:1px solid #e4e4e7; color:#09090b; font-weight:700; font-size:13px;">
+        ${escapeEmailHtml(leader.name || 'Captain')}
+      </td>
+      <td style="padding:10px 14px; border-bottom:1px solid #e4e4e7; color:#71717a; font-size:12px; font-family:monospace;">
+        ${escapeEmailHtml(leader.email || '')} ${leader.phone ? `&bull; ${escapeEmailHtml(leader.phone)}` : ''}
+      </td>
+    </tr>
+  `;
+
+  teamMembers.forEach((m, idx) => {
+    const isLast = idx === teamMembers.length - 1;
+    const borderStyle = isLast ? '' : 'border-bottom:1px solid #e4e4e7;';
+    rosterRows += `
+      <tr>
+        <td style="padding:10px 14px; ${borderStyle} width:80px;">
+          <span style="display:inline-block; padding:3px 8px; border-radius:4px; background:#f4f4f5; border:1px solid #e4e4e7; color:#52525b; font-size:9px; font-weight:700; letter-spacing:0.06em; font-family:monospace;">MEMBER</span>
+        </td>
+        <td style="padding:10px 14px; ${borderStyle} color:#18181b; font-weight:600; font-size:13px;">
+          ${escapeEmailHtml(m.name || 'Squad Member')}
+        </td>
+        <td style="padding:10px 14px; ${borderStyle} color:#71717a; font-size:12px; font-family:monospace;">
+          ${escapeEmailHtml(m.email || '')} ${m.phone ? `&bull; ${escapeEmailHtml(m.phone)}` : ''}
+        </td>
+      </tr>
+    `;
+  });
+
+  const subject = `✓ Confirmed Squad Pass & Venue Allocation — Infinity Hackathon 2026 | Squad ${team.teamName} [${team.id}]`;
+  const cleanAppUrl = (appUrl || 'https://infinity.akao.in').replace(/\/$/, '');
+
+  const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f4f5; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#09090b; -webkit-font-smoothing:antialiased;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f4f4f5; min-height:100vh; padding:32px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" style="max-width:620px; background-color:#ffffff; border:1px solid #e4e4e7; border-radius:12px; overflow:hidden; margin:0 auto; box-shadow:0 8px 30px rgba(0,0,0,0.06);" cellspacing="0" cellpadding="0" border="0">
+          
+          <!-- Header Banner -->
+          <tr>
+            <td style="padding:36px 32px 24px 32px; text-align:center; background:linear-gradient(180deg, #ffffff 0%, #fafafa 100%); border-bottom:1px solid #e4e4e7;">
+              <div style="font-size:10px; font-weight:800; letter-spacing:0.22em; color:#71717a; text-transform:uppercase; margin-bottom:8px;">DEPARTMENT OF COMPUTER SCIENCE &amp; ENGINEERING</div>
+              <div style="font-size:20px; font-weight:900; letter-spacing:0.08em; color:#09090b; text-transform:uppercase; margin-bottom:16px;">INFINITY HACKATHON 2026</div>
+              
+              <!-- Verified Status Pill -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto 16px auto;">
+                <tr>
+                  <td style="padding:7px 18px; border-radius:9999px; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; font-size:11px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase;">
+                    ✓ PAYMENT VERIFIED &bull; OFFICIAL SQUAD PASS ISSUED
+                  </td>
+                </tr>
+              </table>
+
+              <h1 style="margin:0 0 10px 0; font-size:26px; font-weight:900; color:#09090b; letter-spacing:-0.03em;">Squad ${teamName}</h1>
+              <p style="margin:0 auto; font-size:14px; color:#52525b; line-height:1.6; max-width:480px;">
+                Congratulations! Your payment has been successfully verified. Squad <strong>${teamName}</strong> is officially confirmed for <strong>Infinity Hackathon 2026</strong>. Review your venue allocation, event timings, and mandatory rules below.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Official Pass & Allocation Summary -->
+          <tr>
+            <td style="padding:24px 28px 16px 28px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fafafa; border:1px solid #e4e4e7; border-radius:10px; overflow:hidden;">
+                
+                <!-- Ticket ID Bar -->
+                <tr>
+                  <td style="padding:14px 20px; border-bottom:1px solid #e4e4e7; background:#f4f4f5;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td align="left">
+                          <span style="font-size:10px; font-weight:700; color:#71717a; letter-spacing:0.14em; text-transform:uppercase;">OFFICIAL SQUAD PASS ID</span>
+                          <div style="font-size:22px; font-weight:900; color:#09090b; font-family:monospace; margin-top:2px; letter-spacing:0.04em;">${teamId}</div>
+                        </td>
+                        <td align="right">
+                          <span style="display:inline-block; padding:5px 12px; border-radius:6px; background:#ffffff; border:1px solid #d4d4d8; color:#09090b; font-size:11px; font-weight:800; font-family:monospace;">${size} MEMBERS</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Venue & Domain Callout Highlight -->
+                <tr>
+                  <td style="padding:16px 20px; background:#f0fdf4; border-bottom:1px solid #bbf7d0;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td style="width:28px; vertical-align:top; font-size:20px; line-height:1;">🏛️</td>
+                        <td style="padding-left:10px;">
+                          <div style="font-size:10px; font-weight:800; color:#15803d; letter-spacing:0.14em; text-transform:uppercase;">ALLOCATED VENUE &amp; LAB ROOM</div>
+                          <div style="font-size:16px; font-weight:800; color:#14532d; margin-top:3px;">${roomEscaped}</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Key Specs Grid -->
+                <tr>
+                  <td style="padding:16px 20px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="6" border="0" style="font-size:13px;">
+                      <tr>
+                        <td style="color:#71717a; font-weight:600; width:36%;">Team Name</td>
+                        <td style="color:#09090b; font-weight:800;">${teamName}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:600;">Track / Domain</td>
+                        <td style="color:#09090b; font-weight:800;">
+                          <span style="display:inline-block; padding:3px 8px; border-radius:4px; background:#f4f4f5; border:1px solid #e4e4e7; font-family:monospace;">${domain}</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:600;">Institution / College</td>
+                        <td style="color:#09090b; font-weight:600;">${college}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:600;">Payment Status</td>
+                        <td style="color:#047857; font-weight:800;">
+                          <span style="display:inline-block; padding:3px 8px; border-radius:4px; background:#ecfdf5; border:1px solid #a7f3d0;">✓ VERIFIED &bull; APPROVED</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:600;">Bank UTR / Transaction Ref</td>
+                        <td style="color:#18181b; font-family:monospace; font-weight:700;">${utr}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:600;">Registration Fee Paid</td>
+                        <td style="color:#09090b; font-weight:800;">₹${amount}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:600;">Leader Email (Login ID)</td>
+                        <td style="color:#09090b; font-family:monospace; font-weight:700;">${leaderEmail}</td>
+                      </tr>
+                      ${rawPassword ? `
+                      <tr>
+                        <td style="color:#71717a; font-weight:600;">Team Password</td>
+                        <td style="color:#09090b; font-family:monospace; font-weight:800;">${escapeEmailHtml(rawPassword)}</td>
+                      </tr>
+                      ` : ''}
+                      <tr>
+                        <td style="color:#71717a; font-weight:600;">Leader Portal</td>
+                        <td style="color:#09090b; font-family:monospace; font-size:12px;">
+                          <a href="${cleanAppUrl}/leader?team=${teamId}" target="_blank" style="color:#09090b; font-weight:700; text-decoration:underline;">${cleanAppUrl}/leader?team=${teamId}</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Squad Roster Table -->
+          <tr>
+            <td style="padding:8px 28px 20px 28px;">
+              <div style="font-size:11px; font-weight:800; letter-spacing:0.14em; color:#71717a; text-transform:uppercase; margin-bottom:8px;">
+                CONFIRMED SQUAD ROSTER (${size} PARTICIPANTS)
+              </div>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fafafa; border:1px solid #e4e4e7; border-radius:8px; overflow:hidden;">
+                ${rosterRows}
+              </table>
+            </td>
+          </tr>
+
+
+          <!-- Mandatory Rules & Guidelines Highlighted with Icons -->
+          <tr>
+            <td style="padding:0 28px 24px 28px;">
+              <div style="font-size:11px; font-weight:800; letter-spacing:0.14em; color:#71717a; text-transform:uppercase; margin-bottom:10px;">
+                MANDATORY RULES &amp; PARTICIPATION GUIDELINES
+              </div>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#ffffff; border:1px solid #e4e4e7; border-radius:10px; overflow:hidden;">
+                
+                <!-- Rule 1: Own Laptops & Chargers -->
+                <tr>
+                  <td style="padding:14px 16px; border-bottom:1px solid #f4f4f5; background:#fafafa;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td style="width:36px; vertical-align:top; font-size:22px; line-height:1;">💻</td>
+                        <td style="padding-left:12px;">
+                          <div style="font-size:13px; font-weight:800; color:#09090b; margin-bottom:3px;">
+                            Bring Your Own Laptops &amp; Original Chargers
+                          </div>
+                          <div style="font-size:12px; color:#52525b; line-height:1.5;">
+                            Every participant must bring their own personal laptop and dedicated power charger. Ensure code editors, compilers, package managers, and runtime SDKs are installed before arriving on campus.
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Rule 2: Charging Ports & Electric Spikes / Extension Boards -->
+                <tr>
+                  <td style="padding:14px 16px; border-bottom:1px solid #f4f4f5; background:#fafafa;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td style="width:36px; vertical-align:top; font-size:22px; line-height:1;">🔌</td>
+                        <td style="padding-left:12px;">
+                          <div style="font-size:13px; font-weight:800; color:#09090b; margin-bottom:3px;">
+                            Charging Ports &amp; Electric Spikes (Multi-Plug Boards)
+                          </div>
+                          <div style="font-size:12px; color:#52525b; line-height:1.5;">
+                            Each squad must carry at least one <strong>3-pin / 4-pin electric spike extension strip (multi-plug board)</strong>. This guarantees that all team members can power their laptops and mobile devices simultaneously at your assigned desk without socket congestion.
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Rule 3: Zero Tolerance for Misbehavior -->
+                <tr>
+                  <td style="padding:14px 16px; border-bottom:1px solid #f4f4f5; background:#fff1f2;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td style="width:36px; vertical-align:top; font-size:22px; line-height:1;">🚫</td>
+                        <td style="padding-left:12px;">
+                          <div style="font-size:13px; font-weight:800; color:#be123c; margin-bottom:3px;">
+                            Strict Zero-Tolerance for Misbehavior &amp; Indiscipline
+                          </div>
+                          <div style="font-size:12px; color:#9f1239; line-height:1.5;">
+                            Any abusive language, indiscipline, damage to lab equipment or college infrastructure, harassment, or unauthorized exit from the campus is strictly forbidden. Any violation results in <strong>IMMEDIATE DISQUALIFICATION of the entire squad</strong> and escalation to campus security.
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Rule 4: Anti-Plagiarism & Authentic Code -->
+                <tr>
+                  <td style="padding:14px 16px; border-bottom:1px solid #f4f4f5; background:#fafafa;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td style="width:36px; vertical-align:top; font-size:22px; line-height:1;">🛡️</td>
+                        <td style="padding-left:12px;">
+                          <div style="font-size:13px; font-weight:800; color:#09090b; margin-bottom:3px;">
+                            Original Code Only &bull; Anti-Plagiarism Policy
+                          </div>
+                          <div style="font-size:12px; color:#52525b; line-height:1.5;">
+                            All source code must be developed strictly during the 24-hour sprint. Pre-built applications, cloned templates, or copy-pasted projects will be caught by automated Git commit inspections and will lead to instant disqualification.
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Rule 5: College ID Cards -->
+                <tr>
+                  <td style="padding:14px 16px; background:#fafafa;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td style="width:36px; vertical-align:top; font-size:22px; line-height:1;">🪪</td>
+                        <td style="padding-left:12px;">
+                          <div style="font-size:13px; font-weight:800; color:#09090b; margin-bottom:3px;">
+                            Mandatory Physical College ID Cards
+                          </div>
+                          <div style="font-size:12px; color:#52525b; line-height:1.5;">
+                            Every participant must carry their original college photo identity card. You must present your College ID and this Official Pass ID (<strong>${teamId}</strong>) at entrance security and coordinator check-in.
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+
+          <!-- Portal CTA Button -->
+          <tr>
+            <td style="padding:0 28px 32px 28px; text-align:center;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto;">
+                <tr>
+                  <td align="center" style="border-radius:6px; background:#09090b;">
+                    <a href="${cleanAppUrl}/leader?team=${teamId}" target="_blank" rel="noopener noreferrer" style="display:inline-block; padding:14px 38px; font-size:13px; font-weight:800; color:#ffffff; text-decoration:none; text-transform:uppercase; letter-spacing:0.08em;">
+                      ACCESS SQUAD PORTAL &amp; PASS &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <div style="margin-top:12px; font-size:11px; color:#71717a;">
+                Pass ID: <strong style="color:#09090b; font-family:monospace;">${teamId}</strong> &bull; Log in with your leader email &amp; squad password.
+              </div>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#f4f4f5; padding:20px 24px; text-align:center; border-top:1px solid #e4e4e7; font-size:11px; color:#71717a; line-height:1.6;">
+              <p style="margin:0 0 4px 0; color:#52525b; font-weight:600;">Infinity Hackathon 2026 &bull; Department of Computer Science &amp; Engineering</p>
+              <p style="margin:0;">Need assistance? Contact <a href="mailto:support@infinity.akao.in" style="color:#09090b; text-decoration:underline;">support@infinity.akao.in</a></p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  return await dispatchEmailTransport({
+    to: leaderEmail,
+    cc: memberEmails,
+    subject,
+    html: htmlContent,
+    env,
+    team,
+    debugLabel: 'Payment Verified Pass Email'
+  });
+}
 
 const fgtRateLimiter = new MemoryRateLimiter({
   windowMs: 15 * 60 * 1000,
@@ -1061,7 +1854,7 @@ export async function onRequest(context) {
 
   const clientIp = getClientIp(request);
 
-  // Global API Rate Limiting (120 req / min)
+  // Global API Rate Limiting (600 req / min)
   const globalCheck = apiRateLimiter.isLimited(`${clientIp}:api`);
   if (globalCheck.limited) {
     return jsonResponse({
@@ -1070,14 +1863,14 @@ export async function onRequest(context) {
       retryAfter: globalCheck.retryAfter
     }, 429, {
       'Retry-After': String(globalCheck.retryAfter),
-      'X-RateLimit-Limit': '120',
+      'X-RateLimit-Limit': '600',
       'X-RateLimit-Remaining': '0'
     });
   }
 
-  const ADMIN_SECRET = (env.ADMIN_SECRET && env.ADMIN_SECRET.trim()) || 'infinity-hackathon-2026-auth-salt';
-  const COORDINATOR_PASS = env.COORDINATOR_PASS || '';
-  const JUDGES_PASS = env.JUDGES_PASS || '';
+  const ADMIN_SECRET = env.ADMIN_SECRET || 'admin123';
+  const COORDINATOR_PASS = env.COORDINATOR_PASS || 'coord2026';
+  const JUDGES_PASS = env.JUDGES_PASS || 'judge2026';
   const PUBLIC_DOMAIN = env.CLOUDFLARE_R2_PUBLIC_DOMAIN || 'https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev';
 
   try {
@@ -1111,7 +1904,17 @@ export async function onRequest(context) {
     // -------------------------------------------------------------
     if (pathname === '/api/domains' && method === 'GET') {
       const db = await loadDb(env);
-      return jsonResponse({ success: true, domains: db.domains });
+      const registrationOpen = db.settings ? db.settings.registrationOpen !== false : true;
+      return jsonResponse({ success: true, domains: db.domains, registrationOpen });
+    }
+
+    // -------------------------------------------------------------
+    // Public Registration Status
+    // -------------------------------------------------------------
+    if (pathname === '/api/registration-status' && method === 'GET') {
+      const db = await loadDb(env);
+      const registrationOpen = db.settings ? db.settings.registrationOpen !== false : true;
+      return jsonResponse({ success: true, registrationOpen });
     }
 
     // -------------------------------------------------------------
@@ -1194,6 +1997,14 @@ export async function onRequest(context) {
         }, 429, {
           'Retry-After': String(regCheck.retryAfter)
         });
+      }
+
+      const dbCheck = await loadDb(env);
+      if (dbCheck.settings && dbCheck.settings.registrationOpen === false) {
+        return jsonResponse({
+          success: false,
+          error: 'Registrations for Infinity Hackathon 2026 are currently closed by the organizers.'
+        }, 403);
       }
 
       let teamName, college, preferredDomain, techStack, teamSize, teamPassword;
@@ -1418,9 +2229,7 @@ export async function onRequest(context) {
           r3: { attended: false, time: null, notes: '' },
         },
         food: {
-          highTea: { collected: false, time: null },
           dinner: { collected: false, time: null },
-          midnightFuel: { collected: false, time: null },
           breakfast: { collected: false, time: null },
           lunch: { collected: false, time: null },
         },
@@ -1473,19 +2282,60 @@ export async function onRequest(context) {
         }
         newTeam.id = assignedId;
 
+        const normDomain = normalizeDomainId(newTeam.preferredDomain);
+        const matchedDomain = db.domains.find(d => d.id === normDomain || d.stoneId === normDomain);
+        newTeam.roomAllocated = matchedDomain?.roomAllocated || 'TBA (Lab Block 3)';
+
         db.teams.push(newTeam);
         return { newTeam, calculatedAmount };
       });
 
+      // Automatically dispatch confirmation email with squad pass and verification details
+      let mailDispatched = false;
+      let mailError = null;
+      try {
+        const appUrl = (env.APP_URL || new URL(request.url).origin).replace(/\/$/, '');
+        await sendRegistrationPendingEmail({
+          team: result.newTeam,
+          appUrl,
+          env,
+          rawPassword: teamPassword ? teamPassword.trim() : null
+        });
+        mailDispatched = true;
+        // Mark registrationMailSent in database (official payment verification mail is NOT sent yet)
+        await updateDb(env, async (db) => {
+          const t = db.teams.find(x => x.id === result.newTeam.id);
+          if (t) {
+            t.registrationMailSent = true;
+            t.registrationMailSentAt = new Date().toISOString();
+            if (t.payment) {
+              t.payment.mailSent = false;
+            }
+          }
+        });
+      } catch (mErr) {
+        console.warn('Auto registration confirmation email warning:', mErr.message);
+        mailError = mErr.message;
+      }
+
+      const token = await generateTeamToken(result.newTeam.id, ADMIN_SECRET);
+
       return jsonResponse({
         success: true,
         message: `Registration successful for ${result.newTeam.teamName}! Total registration fee: ₹${result.calculatedAmount}.`,
+        mailSent: mailDispatched,
+        mailError: mailError,
+        token: token,
         team: {
           id: result.newTeam.id,
           teamName: result.newTeam.teamName,
+          college: result.newTeam.college,
           preferredDomain: result.newTeam.preferredDomain,
+          leader: result.newTeam.leader,
+          members: result.newTeam.members,
           leaderEmail: result.newTeam.leader.email,
           amount: result.calculatedAmount,
+          utr: result.newTeam.payment.utr,
         },
       });
     }
@@ -1862,7 +2712,7 @@ export async function onRequest(context) {
     // Coordinator Mark Food or Review
     // -------------------------------------------------------------
     if (pathname === '/api/coordinator/mark' && method === 'POST') {
-      const { teamId, type, key, value, notes } = await request.json();
+      const { teamId, type, key, value, memberIndex, notes } = await request.json();
       if (!teamId || !type || !key) {
         return jsonResponse({ success: false, error: 'Missing teamId, type, or key.' }, 400);
       }
@@ -1877,15 +2727,35 @@ export async function onRequest(context) {
 
         if (type === 'meal' || type === 'food') {
           if (!team.food) team.food = {};
-          // Prevent double redemption across different gates/coordinators
-          if (value === true && team.food[key]?.collected) {
-            const err = new Error(`Double Redemption Blocked: ${key.toUpperCase()} was ALREADY collected for ${team.teamName} (${team.id}) at ${new Date(team.food[key].time).toLocaleTimeString()}.`);
-            err.statusCode = 409;
-            throw err;
+          const teamSize = team.teamSize || (team.members ? team.members.length + 1 : 4);
+
+          let existingMembers = [];
+          if (Array.isArray(team.food[key]?.members)) {
+            existingMembers = [...team.food[key].members];
+          } else if (team.food[key]?.collected) {
+            existingMembers = Array(teamSize).fill(true);
+          } else {
+            existingMembers = Array(teamSize).fill(false);
           }
+
+          while (existingMembers.length < teamSize) existingMembers.push(false);
+          if (existingMembers.length > teamSize) existingMembers = existingMembers.slice(0, teamSize);
+
+          if (memberIndex !== undefined && memberIndex !== null) {
+            const idx = parseInt(memberIndex, 10);
+            if (idx >= 0 && idx < teamSize) {
+              existingMembers[idx] = Boolean(value);
+            }
+          } else {
+            existingMembers = Array(teamSize).fill(Boolean(value));
+          }
+
+          const count = existingMembers.filter(Boolean).length;
           team.food[key] = {
-            collected: Boolean(value),
-            time: value ? new Date().toISOString() : null,
+            collected: count > 0,
+            count: count,
+            members: existingMembers,
+            time: count > 0 ? (team.food[key]?.time || new Date().toISOString()) : null,
           };
         } else if (type === 'review') {
           if (!team.reviews) team.reviews = {};
@@ -2070,7 +2940,68 @@ export async function onRequest(context) {
         copy.hasPassword = Boolean(t.teamPassword);
         return copy;
       });
-      return jsonResponse({ success: true, teams: safeTeams });
+      return jsonResponse({
+        success: true,
+        teams: safeTeams,
+        settings: db.settings || { registrationOpen: true }
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Admin Settings Get & Toggle Registration
+    // -------------------------------------------------------------
+    if (pathname === '/api/admin/settings' && method === 'GET') {
+      const db = await loadDb(env);
+      return jsonResponse({
+        success: true,
+        settings: db.settings || { registrationOpen: true }
+      });
+    }
+
+    if (pathname === '/api/admin/toggle-registration' && method === 'POST') {
+      const body = (await request.json().catch(() => ({}))) || {};
+      const { registrationOpen } = body;
+      const { result } = await updateDb(env, async (db) => {
+        db.settings = db.settings || { registrationOpen: true };
+        if (typeof registrationOpen === 'boolean') {
+          db.settings.registrationOpen = registrationOpen;
+        } else {
+          db.settings.registrationOpen = !db.settings.registrationOpen;
+        }
+        return { registrationOpen: db.settings.registrationOpen };
+      });
+
+      return jsonResponse({
+        success: true,
+        registrationOpen: result.registrationOpen,
+        message: result.registrationOpen ? 'Public registrations are now OPEN.' : 'Public registrations are now CLOSED.'
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Admin Purge All Teams / User Data (Dangerous - strictly requires confirm: "ERASE")
+    // -------------------------------------------------------------
+    if (pathname === '/api/admin/purge-data' && method === 'POST') {
+      const body = (await request.json().catch(() => ({}))) || {};
+      const { confirm } = body;
+      if (!confirm || (confirm !== 'ERASE' && confirm !== 'DELETE')) {
+        return jsonResponse({
+          success: false,
+          error: 'Confirmation failed. You must provide confirm: "ERASE" to purge all user data.'
+        }, 400);
+      }
+
+      const { result } = await updateDb(env, async (db) => {
+        const count = Array.isArray(db.teams) ? db.teams.length : 0;
+        db.teams = [];
+        return { purgedCount: count };
+      });
+
+      return jsonResponse({
+        success: true,
+        purgedCount: result.purgedCount,
+        message: `All ${result.purgedCount} squad(s) and user data have been permanently erased.`
+      });
     }
 
     // -------------------------------------------------------------
@@ -2079,62 +3010,42 @@ export async function onRequest(context) {
     if (pathname.startsWith('/api/admin/teams/') && method === 'PUT') {
       const id = pathname.replace('/api/admin/teams/', '').trim();
       const updates = await request.json();
-      const db = await loadDb(env);
-      const idx = db.teams.findIndex((t) => t.id === id);
 
-      if (idx === -1) {
-        return jsonResponse({ success: false, error: `Team ${id} not found.` }, 404);
+      let finalScreenshotUrl = updates.payment?.screenshotUrl;
+      if (finalScreenshotUrl && typeof finalScreenshotUrl === 'string' && finalScreenshotUrl.startsWith('data:image/')) {
+        if (env && env.BUCKET) {
+          try {
+            const match = finalScreenshotUrl.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
+            if (match) {
+              const mime = match[1];
+              const base64Data = match[2];
+              const binaryStr = atob(base64Data);
+              const bytes = new Uint8Array(binaryStr.length);
+              for (let i = 0; i < binaryStr.length; i++) {
+                bytes[i] = binaryStr.charCodeAt(i);
+              }
+              const ext = mime.includes('jpeg') || mime.includes('jpg') ? '.jpg' : mime.includes('webp') ? '.webp' : '.png';
+              const key = `receipts/admin-${id}-${Date.now()}${ext}`;
+              await env.BUCKET.put(key, bytes, {
+                httpMetadata: { contentType: mime }
+              });
+              finalScreenshotUrl = `${PUBLIC_DOMAIN.replace(/\/$/, '')}/${key}`;
+            }
+          } catch (err) {
+            console.warn('Failed to upload admin receipt to R2:', err);
+          }
+        }
       }
 
-      const existing = db.teams[idx];
-      const updatedPayment = updates.payment ? {
-        ...existing.payment,
-        ...updates.payment,
-        screenshotUrl: updates.payment.screenshotUrl ? sanitizeUrl(updates.payment.screenshotUrl) : existing.payment?.screenshotUrl,
-        utr: updates.payment.utr ? stripHtmlTags(updates.payment.utr) : existing.payment?.utr,
-      } : existing.payment;
-
-      let updatedTeamPassword = existing.teamPassword;
+      let updatedTeamPassword = null;
       if (updates.teamPassword && typeof updates.teamPassword === 'string' && updates.teamPassword.trim()) {
         updatedTeamPassword = await hashPassword(updates.teamPassword.trim());
       }
 
-      db.teams[idx] = {
-        ...existing,
-        teamName: updates.teamName !== undefined ? stripHtmlTags(updates.teamName) : existing.teamName,
-        college: updates.college !== undefined ? stripHtmlTags(updates.college) : existing.college,
-        preferredDomain: updates.preferredDomain !== undefined ? stripHtmlTags(updates.preferredDomain) : existing.preferredDomain,
-        teamSize: updates.teamSize !== undefined ? updates.teamSize : existing.teamSize,
-        techStack: updates.techStack !== undefined ? (Array.isArray(updates.techStack) ? updates.techStack.map(s => stripHtmlTags(s)) : stripHtmlTags(updates.techStack)) : existing.techStack,
-        teamPassword: updatedTeamPassword,
-        roomAllocated: updates.roomAllocated !== undefined ? stripHtmlTags(updates.roomAllocated) : existing.roomAllocated,
-        selectedProblemStatement: updates.selectedProblemStatement !== undefined ? updates.selectedProblemStatement : existing.selectedProblemStatement,
-        leader: {
-          ...existing.leader,
-          ...(updates.leader || {}),
-          name: updates.leader?.name ? stripHtmlTags(updates.leader.name) : existing.leader?.name,
-        },
-        members: updates.members !== undefined ? (Array.isArray(updates.members) ? updates.members.map(m => ({ ...m, name: stripHtmlTags(m.name) })) : updates.members) : existing.members,
-        payment: updatedPayment,
-        reviews: {
-          ...existing.reviews,
-          ...(updates.reviews || {}),
-        },
-        food: {
-          ...existing.food,
-          ...(updates.food || {}),
-        },
-        scores: {
-          ...existing.scores,
-          ...(updates.scores || {}),
-          remarks: updates.scores?.remarks ? stripHtmlTags(updates.scores.remarks) : existing.scores?.remarks,
-        },
-      };
-
       const { result } = await updateDb(env, async (db) => {
         const idx = db.teams.findIndex((t) => t.id === id);
         if (idx === -1) {
-          const err = new Error('Team not found');
+          const err = new Error(`Team ${id} not found.`);
           err.statusCode = 404;
           throw err;
         }
@@ -2143,14 +3054,9 @@ export async function onRequest(context) {
         const updatedPayment = updates.payment ? {
           ...existing.payment,
           ...updates.payment,
-          screenshotUrl: updates.payment.screenshotUrl ? sanitizeUrl(updates.payment.screenshotUrl) : existing.payment?.screenshotUrl,
+          screenshotUrl: finalScreenshotUrl ? sanitizeUrl(finalScreenshotUrl) : existing.payment?.screenshotUrl,
           utr: updates.payment.utr ? stripHtmlTags(updates.payment.utr) : existing.payment?.utr,
         } : existing.payment;
-
-        let updatedTeamPassword = existing.teamPassword;
-        if (updates.teamPassword && typeof updates.teamPassword === 'string' && updates.teamPassword.trim()) {
-          updatedTeamPassword = await hashPassword(updates.teamPassword.trim());
-        }
 
         db.teams[idx] = {
           ...existing,
@@ -2159,7 +3065,7 @@ export async function onRequest(context) {
           preferredDomain: updates.preferredDomain !== undefined ? stripHtmlTags(updates.preferredDomain) : existing.preferredDomain,
           teamSize: updates.teamSize !== undefined ? updates.teamSize : existing.teamSize,
           techStack: updates.techStack !== undefined ? (Array.isArray(updates.techStack) ? updates.techStack.map(s => stripHtmlTags(s)) : stripHtmlTags(updates.techStack)) : existing.techStack,
-          teamPassword: updatedTeamPassword,
+          teamPassword: updatedTeamPassword || existing.teamPassword,
           roomAllocated: updates.roomAllocated !== undefined ? stripHtmlTags(updates.roomAllocated) : existing.roomAllocated,
           selectedProblemStatement: updates.selectedProblemStatement !== undefined ? updates.selectedProblemStatement : existing.selectedProblemStatement,
           leader: {
@@ -2167,7 +3073,12 @@ export async function onRequest(context) {
             ...(updates.leader || {}),
             name: updates.leader?.name ? stripHtmlTags(updates.leader.name) : existing.leader?.name,
           },
-          members: updates.members !== undefined ? (Array.isArray(updates.members) ? updates.members.map(m => ({ ...m, name: stripHtmlTags(m.name) })) : updates.members) : existing.members,
+          members: updates.members !== undefined ? (Array.isArray(updates.members) ? updates.members.map(m => ({
+            ...m,
+            name: stripHtmlTags(m.name),
+            email: stripHtmlTags(m.email).toLowerCase(),
+            phone: stripHtmlTags(m.phone)
+          })) : updates.members) : existing.members,
           payment: updatedPayment,
           reviews: {
             ...existing.reviews,
@@ -2219,16 +3130,71 @@ export async function onRequest(context) {
     if (pathname === '/api/admin/domains' && method === 'PUT') {
       const updatedDomain = await request.json();
       const { result } = await updateDb(env, async (db) => {
-        const idx = db.domains.findIndex((d) => d.id === updatedDomain.id || d.stoneId === updatedDomain.id);
+        const targetId = normalizeDomainId(updatedDomain.id || updatedDomain.stoneId);
+        const idx = db.domains.findIndex((d) => d.id === updatedDomain.id || d.stoneId === updatedDomain.id || d.id === targetId);
+        let updatedTeamsCount = 0;
+
         if (idx >= 0) {
           db.domains[idx] = { ...db.domains[idx], ...updatedDomain };
-          return { domain: db.domains[idx] };
+
+          // If roomAllocated was updated, optionally sync with teams
+          if (updatedDomain.roomAllocated !== undefined && updatedDomain.syncExistingTeams !== false) {
+            const cleanRoom = stripHtmlTags(String(updatedDomain.roomAllocated)).trim();
+            db.domains[idx].roomAllocated = cleanRoom;
+            db.teams.forEach(t => {
+              if (normalizeDomainId(t.preferredDomain) === targetId) {
+                t.roomAllocated = cleanRoom;
+                updatedTeamsCount++;
+              }
+            });
+          }
+          return { domain: db.domains[idx], updatedTeamsCount };
         }
+
         db.domains.push(updatedDomain);
-        return { domain: updatedDomain };
+        return { domain: updatedDomain, updatedTeamsCount };
       });
 
-      return jsonResponse({ success: true, domain: result.domain });
+      return jsonResponse({ success: true, domain: result.domain, updatedTeamsCount: result.updatedTeamsCount });
+    }
+
+    // -------------------------------------------------------------
+    // Admin Bulk Update Stone Areas / Rooms (Protected)
+    // -------------------------------------------------------------
+    if (pathname === '/api/admin/stone-areas' && method === 'PUT') {
+      const body = await request.json().catch(() => ({}));
+      const { stoneAreas, syncExistingTeams = true } = body;
+      if (!stoneAreas || typeof stoneAreas !== 'object') {
+        return jsonResponse({ success: false, error: 'stoneAreas object is required.' }, 400);
+      }
+
+      const { result } = await updateDb(env, async (db) => {
+        let updatedTeamsCount = 0;
+
+        // Update each domain in db.domains
+        Object.entries(stoneAreas).forEach(([domainKey, area]) => {
+          const cleanArea = stripHtmlTags(String(area || '')).trim();
+          const normId = normalizeDomainId(domainKey);
+          const dom = db.domains.find(d => d.id === normId || d.stoneId === normId || d.id === domainKey);
+          if (dom) {
+            dom.roomAllocated = cleanArea;
+          }
+
+          // If sync requested, update all squads registered under this stone
+          if (syncExistingTeams) {
+            db.teams.forEach(t => {
+              if (normalizeDomainId(t.preferredDomain) === normId) {
+                t.roomAllocated = cleanArea;
+                updatedTeamsCount++;
+              }
+            });
+          }
+        });
+
+        return { domains: db.domains, updatedTeamsCount };
+      });
+
+      return jsonResponse({ success: true, domains: result.domains, updatedTeamsCount: result.updatedTeamsCount });
     }
 
     // -------------------------------------------------------------
@@ -2318,6 +3284,101 @@ export async function onRequest(context) {
     }
 
     // -------------------------------------------------------------
+    // Admin Send Payment Verification Email to Single Squad
+    // -------------------------------------------------------------
+    if (pathname === '/api/admin/send-verification-mail' && method === 'POST') {
+      const { teamId } = await request.json().catch(() => ({}));
+      if (!teamId) {
+        return jsonResponse({ success: false, error: 'teamId is required' }, 400);
+      }
+
+      let mailResult = null;
+      const { result } = await updateDb(env, async (db) => {
+        const idx = db.teams.findIndex((t) => t.id === teamId);
+        if (idx === -1) {
+          const err = new Error(`Squad ${teamId} not found.`);
+          err.statusCode = 404;
+          throw err;
+        }
+
+        const team = db.teams[idx];
+        const appUrl = env.APP_URL || new URL(request.url).origin;
+
+        mailResult = await sendPaymentVerifiedEmail({ team, appUrl, env, domains: db.domains });
+
+        const now = new Date().toISOString();
+        db.teams[idx] = {
+          ...team,
+          payment: {
+            ...team.payment,
+            status: 'verified',
+            verifiedAt: team.payment?.verifiedAt || now,
+            mailSent: true,
+            mailSentAt: now,
+          },
+        };
+
+        const copy = { ...db.teams[idx] };
+        delete copy.teamPassword;
+        copy.hasPassword = Boolean(db.teams[idx].teamPassword);
+        return { team: copy };
+      });
+
+      return jsonResponse({
+        success: true,
+        message: mailResult?.simulated
+          ? 'Verification email simulated (configure RESEND_API_KEY for live delivery).'
+          : 'Payment verified email sent successfully!',
+        simulated: Boolean(mailResult?.simulated),
+        mailSentAt: result.team.payment?.mailSentAt,
+        team: result.team,
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Admin Send Payment Verification Emails to All Verified Squads
+    // -------------------------------------------------------------
+    if (pathname === '/api/admin/send-all-verification-mails' && method === 'POST') {
+      const { force } = await request.json().catch(() => ({}));
+      let sentCount = 0;
+      let failCount = 0;
+      let isSimulated = false;
+
+      await updateDb(env, async (db) => {
+        const appUrl = env.APP_URL || new URL(request.url).origin;
+        const verifiedTeams = db.teams.filter((t) => {
+          if (t.payment?.status !== 'verified') return false;
+          if (!force && t.payment?.mailSent) return false;
+          return true;
+        });
+
+        for (const t of verifiedTeams) {
+          try {
+            const mRes = await sendPaymentVerifiedEmail({ team: t, appUrl, env, domains: db.domains });
+            if (mRes.simulated) isSimulated = true;
+            const now = new Date().toISOString();
+            t.payment.mailSent = true;
+            t.payment.mailSentAt = now;
+            sentCount++;
+          } catch (mErr) {
+            console.error(`Failed to send mail to ${t.id}:`, mErr.message);
+            failCount++;
+          }
+        }
+
+        return { total: verifiedTeams.length, sentCount, failCount };
+      });
+
+      return jsonResponse({
+        success: true,
+        message: `Processed ${sentCount} squad emails (${failCount} failed).`,
+        sentCount,
+        failCount,
+        simulated: isSimulated,
+      });
+    }
+
+    // -------------------------------------------------------------
     // Admin Ephemeral Export Ticket Generator (Single-use, 60s ttl)
     // -------------------------------------------------------------
     if (pathname === '/api/admin/export-ticket' && method === 'POST') {
@@ -2346,6 +3407,8 @@ export async function onRequest(context) {
         'Team Size': t.teamSize || (t.members ? t.members.length + 1 : 4),
         'Fee Amount (₹)': t.payment?.amount || (349 * (t.teamSize || 4)),
         'Payment Status': sanitizeCsvFormula((t.payment?.status || 'pending').toUpperCase()),
+        'Confirmation Mail Sent': t.payment?.mailSent ? 'YES' : 'NO',
+        'Mail Sent At': t.payment?.mailSentAt ? new Date(t.payment.mailSentAt).toLocaleString() : 'N/A',
         'UTR / Transaction No': sanitizeCsvFormula(t.payment?.utr || 'N/A'),
         'Payer Phone': sanitizeCsvFormula(t.payment?.phone || 'N/A'),
         'Leader Email': sanitizeCsvFormula(t.leader?.email || ''),
@@ -2359,9 +3422,7 @@ export async function onRequest(context) {
         'Team ID': sanitizeCsvFormula(t.id),
         'Team Name': sanitizeCsvFormula(t.teamName),
         'College': sanitizeCsvFormula(t.college),
-        'High Tea': t.food?.highTea?.collected ? 'RECEIVED' : 'PENDING',
         'Dinner': t.food?.dinner?.collected ? 'RECEIVED' : 'PENDING',
-        'Midnight Fuel': t.food?.midnightFuel?.collected ? 'RECEIVED' : 'PENDING',
         'Breakfast': t.food?.breakfast?.collected ? 'RECEIVED' : 'PENDING',
         'Lunch': t.food?.lunch?.collected ? 'RECEIVED' : 'PENDING',
         'Review 1 (Ideation)': t.reviews?.r1?.attended ? 'ATTENDED' : 'PENDING',

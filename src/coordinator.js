@@ -1,6 +1,13 @@
 let allTeams = [];
     let activeFilter = 'all';
+    let activeMealFilter = 'all';
     let searchQuery = '';
+
+    const MEALS = [
+      { key: 'dinner', name: 'Dinner' },
+      { key: 'breakfast', name: 'Breakfast' },
+      { key: 'lunch', name: 'Lunch' },
+    ];
 
     const secLogin = document.getElementById('sec-login');
     const secDash = document.getElementById('sec-dashboard');
@@ -144,6 +151,14 @@ let allTeams = [];
       }
     }
 
+    function getShortMemberName(fullName, fallback) {
+      if (!fullName || typeof fullName !== 'string') return fallback;
+      const clean = fullName.trim();
+      if (!clean) return fallback;
+      const first = clean.split(' ')[0];
+      return first.length > 8 ? first.slice(0, 7) + '…' : first;
+    }
+
     function updateKPIs() {
       document.getElementById('kpi-total-teams').textContent = allTeams.length;
 
@@ -155,11 +170,15 @@ let allTeams = [];
         if (t.reviews?.r1?.attended) r1Count++;
         if (t.reviews?.r2?.attended) r2Count++;
         const food = t.food || {};
-        if (food.highTea?.collected) totalMeals++;
-        if (food.dinner?.collected) totalMeals++;
-        if (food.midnightFuel?.collected) totalMeals++;
-        if (food.breakfast?.collected) totalMeals++;
-        if (food.lunch?.collected) totalMeals++;
+        const teamSize = t.teamSize || (t.members ? t.members.length + 1 : 4);
+        MEALS.forEach(m => {
+          const f = food[m.key];
+          if (f?.count !== undefined) {
+            totalMeals += f.count;
+          } else if (f?.collected) {
+            totalMeals += teamSize;
+          }
+        });
       });
 
       document.getElementById('kpi-r1-attended').textContent = r1Count;
@@ -188,42 +207,102 @@ let allTeams = [];
       filtered.forEach(t => {
         const food = t.food || {};
         const rev = t.reviews || {};
+        const teamSize = t.teamSize || (t.members ? t.members.length + 1 : 4);
+
+        // Build member list: Leader (M1) + Squad Members (M2, M3, M4)
+        const squadMembers = [
+          {
+            role: 'L',
+            fullName: t.leader?.name || 'Leader',
+            shortName: getShortMemberName(t.leader?.name, 'Leader')
+          }
+        ];
+        const rawMembers = Array.isArray(t.members) ? t.members : [];
+        for (let i = 1; i < teamSize; i++) {
+          const m = rawMembers[i - 1] || {};
+          const fallbackRole = `M${i + 1}`;
+          squadMembers.push({
+            role: fallbackRole,
+            fullName: m.name || fallbackRole,
+            shortName: getShortMemberName(m.name, fallbackRole)
+          });
+        }
+
+        // Render Food Meals List
+        let mealsHtml = '<div class="food-meals-list">';
+        const visibleMeals = activeMealFilter === 'all'
+          ? MEALS
+          : MEALS.filter(m => m.key === activeMealFilter);
+
+        visibleMeals.forEach(mObj => {
+          const fEntry = food[mObj.key] || {};
+          let memberStates = [];
+          if (Array.isArray(fEntry.members)) {
+            memberStates = fEntry.members;
+          } else if (fEntry.collected) {
+            memberStates = Array(teamSize).fill(true);
+          } else {
+            memberStates = Array(teamSize).fill(false);
+          }
+
+          while (memberStates.length < teamSize) memberStates.push(false);
+
+          const checkedCount = memberStates.slice(0, teamSize).filter(Boolean).length;
+          const isAll = checkedCount === teamSize;
+          const hasSome = checkedCount > 0 && !isAll;
+          const badgeClass = isAll ? 'all-done' : (hasSome ? 'has-some' : '');
+
+          let chipsHtml = '';
+          squadMembers.forEach((mem, mIdx) => {
+            const isChecked = Boolean(memberStates[mIdx]);
+            chipsHtml += `
+              <button type="button" class="member-food-chip ${isChecked ? 'checked' : ''}"
+                data-team="${escapeHTML(t.id)}"
+                data-meal="${mObj.key}"
+                data-member="${mIdx}"
+                title="${escapeHTML(mem.role)}: ${escapeHTML(mem.fullName)} (Click to toggle)">
+                ${isChecked ? '✓ ' : ''}${escapeHTML(mem.role)}
+              </button>
+            `;
+          });
+
+          mealsHtml += `
+            <div class="meal-check-group ${isAll ? 'all-served' : ''}">
+              <div class="meal-header">
+                <span class="meal-name">${escapeHTML(mObj.name)}</span>
+                <button type="button" class="btn-meal-all"
+                  data-team="${escapeHTML(t.id)}"
+                  data-meal="${mObj.key}"
+                  data-action="${isAll ? 'unmark-all' : 'mark-all'}"
+                  title="Click to ${isAll ? 'unmark' : 'mark'} all ${teamSize} members">
+                  <span class="meal-count-badge ${badgeClass}">${checkedCount}/${teamSize}</span>
+                </button>
+              </div>
+              <div class="meal-members-chips">
+                ${chipsHtml}
+              </div>
+            </div>
+          `;
+        });
+        mealsHtml += '</div>';
 
         html += `
           <tr data-team-id="${escapeHTML(t.id)}">
-            <td>
-              <div class="team-cell-title">${escapeHTML(t.teamName)} <span class="font-mono" style="color:var(--cyan); font-size:0.7rem;">(${escapeHTML(t.id)})</span></div>
+            <td class="col-team">
+              <div class="team-cell-title">
+                <span>${escapeHTML(t.teamName)}</span>
+                <span class="font-mono team-id-badge" style="color:var(--cyan); font-size:0.7rem;">(${escapeHTML(t.id)})</span>
+              </div>
               <div class="team-cell-sub">${escapeHTML(t.college)} • Leader: ${escapeHTML(t.leader?.name || 'N/A')} (${escapeHTML(t.leader?.phone || '')})</div>
             </td>
-            <td>
+            <td class="col-domain">
               <span class="portal-badge">${escapeHTML((t.preferredDomain || 'MIND').toUpperCase())}</span>
-              <div class="team-cell-sub">${escapeHTML(t.roomAllocated || 'Lab Block 3')}</div>
+              <div class="team-cell-sub lab-location">📍 ${escapeHTML(t.roomAllocated || 'Lab Block 3')}</div>
             </td>
-            <td>
-              <div class="chip-group">
-                <label class="check-chip ${food.highTea?.collected ? 'checked' : ''}">
-                  <input type="checkbox" data-team="${escapeHTML(t.id)}" data-type="food" data-key="highTea" ${food.highTea?.collected ? 'checked' : ''}>
-                  High Tea
-                </label>
-                <label class="check-chip ${food.dinner?.collected ? 'checked' : ''}">
-                  <input type="checkbox" data-team="${escapeHTML(t.id)}" data-type="food" data-key="dinner" ${food.dinner?.collected ? 'checked' : ''}>
-                  Dinner
-                </label>
-                <label class="check-chip ${food.midnightFuel?.collected ? 'checked' : ''}">
-                  <input type="checkbox" data-team="${escapeHTML(t.id)}" data-type="food" data-key="midnightFuel" ${food.midnightFuel?.collected ? 'checked' : ''}>
-                  Midnight
-                </label>
-                <label class="check-chip ${food.breakfast?.collected ? 'checked' : ''}">
-                  <input type="checkbox" data-team="${escapeHTML(t.id)}" data-type="food" data-key="breakfast" ${food.breakfast?.collected ? 'checked' : ''}>
-                  Breakfast
-                </label>
-                <label class="check-chip ${food.lunch?.collected ? 'checked' : ''}">
-                  <input type="checkbox" data-team="${escapeHTML(t.id)}" data-type="food" data-key="lunch" ${food.lunch?.collected ? 'checked' : ''}>
-                  Lunch
-                </label>
-              </div>
+            <td class="col-food">
+              ${mealsHtml}
             </td>
-            <td>
+            <td class="col-reviews">
               <div class="chip-group">
                 <label class="check-chip ${rev.r1?.attended ? 'checked' : ''}">
                   <input type="checkbox" data-team="${escapeHTML(t.id)}" data-type="review" data-key="r1" ${rev.r1?.attended ? 'checked' : ''}>
@@ -244,11 +323,106 @@ let allTeams = [];
       });
       tbody.innerHTML = html;
 
-      // Bind dynamic chip clicks
-      tbody.querySelectorAll('input[type="checkbox"]').forEach(input => {
-        input.addEventListener('change', async (e) => {
+      // 1. Bind Individual Member Food Chips
+      tbody.querySelectorAll('.member-food-chip').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const teamId = btn.getAttribute('data-team');
+          const mealKey = btn.getAttribute('data-meal');
+          const memberIdx = parseInt(btn.getAttribute('data-member'), 10);
+          const isCurrentlyChecked = btn.classList.contains('checked');
+          const newValue = !isCurrentlyChecked;
+
+          btn.disabled = true;
+          try {
+            const res = await fetch('/api/coordinator/mark', {
+              method: 'POST',
+              headers: authHeaders({ 'Content-Type': 'application/json' }),
+              body: JSON.stringify({
+                teamId,
+                type: 'food',
+                key: mealKey,
+                memberIndex: memberIdx,
+                value: newValue,
+              }),
+            });
+
+            if (res.status === 401) {
+              alert('Coordinator session expired. Please log in again.');
+              window.location.reload();
+              return;
+            }
+
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+              throw new Error(data.error || 'Failed to update member food status.');
+            }
+
+            const target = allTeams.find(t => t.id === teamId);
+            if (target && data.team) {
+              Object.assign(target, data.team);
+            }
+            renderTable();
+            updateKPIs();
+          } catch (err) {
+            console.error('Error saving member food checkmark:', err);
+            alert(err.message || 'Error updating status');
+            btn.disabled = false;
+          }
+        });
+      });
+
+      // 2. Bind Meal Mark All / Unmark All Badges
+      tbody.querySelectorAll('.btn-meal-all').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const teamId = btn.getAttribute('data-team');
+          const mealKey = btn.getAttribute('data-meal');
+          const action = btn.getAttribute('data-action');
+          const newValue = action === 'mark-all';
+
+          btn.disabled = true;
+          try {
+            const res = await fetch('/api/coordinator/mark', {
+              method: 'POST',
+              headers: authHeaders({ 'Content-Type': 'application/json' }),
+              body: JSON.stringify({
+                teamId,
+                type: 'food',
+                key: mealKey,
+                value: newValue,
+              }),
+            });
+
+            if (res.status === 401) {
+              alert('Coordinator session expired. Please log in again.');
+              window.location.reload();
+              return;
+            }
+
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+              throw new Error(data.error || 'Failed to update squad food status.');
+            }
+
+            const target = allTeams.find(t => t.id === teamId);
+            if (target && data.team) {
+              Object.assign(target, data.team);
+            }
+            renderTable();
+            updateKPIs();
+          } catch (err) {
+            console.error('Error updating all food checkmarks:', err);
+            alert(err.message || 'Error updating status');
+            btn.disabled = false;
+          }
+        });
+      });
+
+      // 3. Bind Review Checkboxes
+      tbody.querySelectorAll('input[data-type="review"]').forEach(input => {
+        input.addEventListener('change', async () => {
           const teamId = input.getAttribute('data-team');
-          const type = input.getAttribute('data-type');
           const key = input.getAttribute('data-key');
           const value = input.checked;
 
@@ -259,7 +433,7 @@ let allTeams = [];
             const res = await fetch('/api/coordinator/mark', {
               method: 'POST',
               headers: authHeaders({ 'Content-Type': 'application/json' }),
-              body: JSON.stringify({ teamId, type, key, value }),
+              body: JSON.stringify({ teamId, type: 'review', key, value }),
             });
             if (res.status === 401) {
               alert('Coordinator session expired. Please log in again.');
@@ -268,22 +442,16 @@ let allTeams = [];
             }
             const data = await res.json();
             if (!res.ok || !data.success) {
-              throw new Error(data.error || 'Failed to update status.');
+              throw new Error(data.error || 'Failed to update review status.');
             }
-            // Update local state
             const target = allTeams.find(t => t.id === teamId);
             if (target) {
-              if (type === 'food') {
-                if (!target.food) target.food = {};
-                target.food[key] = { collected: value };
-              } else if (type === 'review') {
-                if (!target.reviews) target.reviews = {};
-                target.reviews[key] = { attended: value };
-              }
+              if (!target.reviews) target.reviews = {};
+              target.reviews[key] = { attended: value };
             }
             updateKPIs();
           } catch (err) {
-            console.error('Error saving checkmark:', err);
+            console.error('Error saving review checkmark:', err);
             input.checked = !value;
             label.classList.toggle('checked', !value);
             alert(err.message || 'Error updating status');
@@ -302,6 +470,15 @@ let allTeams = [];
         document.querySelectorAll('#domain-filters .f-pill').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         activeFilter = btn.getAttribute('data-domain');
+        renderTable();
+      });
+    });
+
+    document.querySelectorAll('#meal-filters .f-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#meal-filters .f-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeMealFilter = btn.getAttribute('data-meal');
         renderTable();
       });
     });
