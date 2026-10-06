@@ -1416,7 +1416,7 @@ export async function sendRegistrationPendingEmail({ team, appUrl = 'https://inf
   });
 }
 
-export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinity.akao.in', env = {}, rawPassword = null }) {
+export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinity.akao.in', env = {}, rawPassword = null, domains = null }) {
   const leader = team.leader || {};
   const leaderEmail = (leader.email || '').trim().toLowerCase();
   if (!leaderEmail || !leaderEmail.includes('@')) {
@@ -1433,25 +1433,52 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
   const college = escapeEmailHtml(team.college || 'N/A');
   const domain = escapeEmailHtml((team.preferredDomain || 'intelligence').toUpperCase());
 
-  // Domain-specific lab / arena mappings if roomAllocated is missing or TBA
-  const domainRooms = {
-    intelligence: 'Lab Block 3 (CS-301) — AI & Machine Learning Arena',
-    connectivity: 'Lab Block 3 (CS-302) — Cloud & Networks Wing',
-    space: 'Lab Block 3 (CS-302) — Cloud & Networks Wing',
-    digital: 'Lab Block 3 (CS-303) — Cyber Security & Systems Lab',
-    reality: 'Lab Block 3 (CS-303) — Cyber Security & Systems Lab',
-    power: 'Lab Block 2 (EC-201) — Hardware & IoT Innovation Deck',
-    automation: 'Lab Block 2 (EC-201) — Hardware & IoT Innovation Deck',
-    time: 'Lab Block 2 (EC-202) — Robotics & Automation Hall',
-    analytics: 'Lab Block 2 (EC-202) — Robotics & Automation Hall',
-    soul: 'Main Campus Innovation Arena — Open Track Hub',
-    impact: 'Main Campus Innovation Arena — Open Track Hub'
+  // Dynamically load active domains from database if not passed directly to ensure latest admin venue changes
+  let activeDomains = domains;
+  if (!activeDomains || !Array.isArray(activeDomains)) {
+    try {
+      const db = await loadDb(env);
+      activeDomains = db.domains;
+    } catch (e) {
+      activeDomains = null;
+    }
+  }
+
+  // Find live room allocated for this domain from activeDomains (updated by admin)
+  const normTeamDomain = normalizeDomainId(team.preferredDomain);
+  const matchedDomain = Array.isArray(activeDomains) ? activeDomains.find(d => {
+    const dNorm = normalizeDomainId(d.id || d.stoneId);
+    return dNorm === normTeamDomain || d.id === team.preferredDomain || d.stoneId === team.preferredDomain;
+  }) : null;
+
+  // Domain fallback mappings if database has not set a custom room
+  const fallbackRooms = {
+    transportation: 'Lab Block 3 (CS-301) — Transportation & Logistics Hub',
+    cybersecurity: 'Lab Block 2 (IoT-204) — Cybersecurity & Digital Trust Wing',
+    infrastructure: 'Innovation Wing (IW-102) — Digital Public Infrastructure Arena',
+    cleantech: 'Hardware & IoT Arena (HA-01) — Clean & Green Tech Lab',
+    education: 'CS Block (DataLab-401) — Smart Education Lab',
+    healthcare: 'Seminar Hall 2 — MedTech & Healthcare Deck'
   };
 
-  const prefDomainKey = (team.preferredDomain || '').trim().toLowerCase();
-  const defaultRoom = domainRooms[prefDomainKey] || 'Main Campus Innovation Arena (Lab Block 3)';
-  const rawRoom = (team.roomAllocated || '').trim();
-  const room = rawRoom && !rawRoom.startsWith('TBA') ? rawRoom : defaultRoom;
+  // Live room resolution:
+  // 1. If admin updated the domain's room in db.domains, use that live venue!
+  // 2. If the squad has a specific desk/table assigned (e.g. Table A-12), incorporate it.
+  // 3. Fallback to fallbackRooms[normTeamDomain]
+  let room = '';
+  if (matchedDomain && matchedDomain.roomAllocated && String(matchedDomain.roomAllocated).trim() && !String(matchedDomain.roomAllocated).trim().startsWith('TBA')) {
+    const liveRoom = String(matchedDomain.roomAllocated).trim();
+    if (team.roomAllocated && (team.roomAllocated.startsWith('Table') || team.roomAllocated.startsWith('Desk'))) {
+      room = `${team.roomAllocated} (${liveRoom})`;
+    } else {
+      room = liveRoom;
+    }
+  } else if (team.roomAllocated && !team.roomAllocated.startsWith('TBA')) {
+    room = team.roomAllocated.trim();
+  } else {
+    room = fallbackRooms[normTeamDomain] || 'Main Campus Innovation Arena (Lab Block 3)';
+  }
+
   const roomEscaped = escapeEmailHtml(room);
 
   const utr = escapeEmailHtml(team.payment?.utr || 'VERIFIED');
@@ -3321,7 +3348,7 @@ export async function onRequest(context) {
         const team = db.teams[idx];
         const appUrl = env.APP_URL || new URL(request.url).origin;
 
-        mailResult = await sendPaymentVerifiedEmail({ team, appUrl, env });
+        mailResult = await sendPaymentVerifiedEmail({ team, appUrl, env, domains: db.domains });
 
         const now = new Date().toISOString();
         db.teams[idx] = {
@@ -3371,7 +3398,7 @@ export async function onRequest(context) {
 
         for (const t of verifiedTeams) {
           try {
-            const mRes = await sendPaymentVerifiedEmail({ team: t, appUrl, env });
+            const mRes = await sendPaymentVerifiedEmail({ team: t, appUrl, env, domains: db.domains });
             if (mRes.simulated) isSimulated = true;
             const now = new Date().toISOString();
             t.payment.mailSent = true;
