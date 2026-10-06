@@ -8,22 +8,29 @@ let editingTeam = null;
 let uploadedReceiptData = null;
 
 const STONE_DOMAIN_MAP = {
-  mind: 'intelligence',
-  intelligence: 'intelligence',
-  space: 'connectivity',
-  connectivity: 'connectivity',
-  reality: 'digital',
-  digital: 'digital',
-  power: 'automation',
-  automation: 'automation',
-  time: 'analytics',
-  analytics: 'analytics',
-  soul: 'impact',
-  impact: 'impact'
+  mind: 'transportation',
+  transportation: 'transportation',
+  space: 'cybersecurity',
+  cybersecurity: 'cybersecurity',
+  reality: 'infrastructure',
+  infrastructure: 'infrastructure',
+  power: 'cleantech',
+  cleantech: 'cleantech',
+  time: 'education',
+  education: 'education',
+  soul: 'healthcare',
+  healthcare: 'healthcare',
+  // Backward compatibility
+  intelligence: 'transportation',
+  connectivity: 'cybersecurity',
+  digital: 'infrastructure',
+  automation: 'cleantech',
+  analytics: 'education',
+  impact: 'healthcare'
 };
 
 function normalizeDomainId(val) {
-  if (!val) return 'intelligence';
+  if (!val) return 'transportation';
   const clean = String(val).toLowerCase().replace(/ stone$/i, '').trim();
   return STONE_DOMAIN_MAP[clean] || clean;
 }
@@ -838,22 +845,28 @@ function authHeaders(extra = {}) {
       document.getElementById('edt-team-name').value = editingTeam.teamName || '';
       document.getElementById('edt-college').value = editingTeam.college || '';
       document.getElementById('edt-room').value = editingTeam.roomAllocated || '';
-      const rawDomain = (editingTeam.preferredDomain || 'intelligence').toLowerCase();
+      const rawDomain = (editingTeam.preferredDomain || 'transportation').toLowerCase();
       const domainMap = {
-        mind: 'intelligence',
-        space: 'connectivity',
-        reality: 'digital',
-        power: 'automation',
-        time: 'analytics',
-        soul: 'impact',
-        intelligence: 'intelligence',
-        connectivity: 'connectivity',
-        digital: 'digital',
-        automation: 'automation',
-        analytics: 'analytics',
-        impact: 'impact'
+        mind: 'transportation',
+        space: 'cybersecurity',
+        reality: 'infrastructure',
+        power: 'cleantech',
+        time: 'education',
+        soul: 'healthcare',
+        transportation: 'transportation',
+        cybersecurity: 'cybersecurity',
+        infrastructure: 'infrastructure',
+        cleantech: 'cleantech',
+        education: 'education',
+        healthcare: 'healthcare',
+        intelligence: 'transportation',
+        connectivity: 'cybersecurity',
+        digital: 'infrastructure',
+        automation: 'cleantech',
+        analytics: 'education',
+        impact: 'healthcare'
       };
-      document.getElementById('edt-domain').value = domainMap[rawDomain] || 'intelligence';
+      document.getElementById('edt-domain').value = domainMap[rawDomain] || 'transportation';
       document.getElementById('edt-size').value = editingTeam.teamSize || 4;
       const pwdInput = document.getElementById('edt-password');
       if (pwdInput) {
@@ -1310,18 +1323,24 @@ function authHeaders(extra = {}) {
 
     function renderPsManager() {
       const prefixMap = {
-        intelligence: 'INTEL',
-        connectivity: 'CONN',
-        digital: 'DIG',
-        automation: 'AUTO',
-        analytics: 'ANA',
-        impact: 'IMP',
-        mind: 'INTEL',
-        space: 'CONN',
-        reality: 'DIG',
-        power: 'AUTO',
-        time: 'ANA',
-        soul: 'IMP'
+        transportation: 'TRANS',
+        cybersecurity: 'CYBER',
+        infrastructure: 'INFRA',
+        cleantech: 'CLEAN',
+        education: 'EDU',
+        healthcare: 'HEALTH',
+        mind: 'TRANS',
+        space: 'CYBER',
+        reality: 'INFRA',
+        power: 'CLEAN',
+        time: 'EDU',
+        soul: 'HEALTH',
+        intelligence: 'TRANS',
+        connectivity: 'CYBER',
+        digital: 'INFRA',
+        automation: 'CLEAN',
+        analytics: 'EDU',
+        impact: 'HEALTH'
       };
 
       let html = '';

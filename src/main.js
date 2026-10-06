@@ -73,7 +73,7 @@ class InfinityScrollShowcase {
     // Initial state: locked to 6-stone showcase until all 6 stones are scrolled or nav clicked
     document.body.classList.remove('timeline-unlocked');
 
-    // Initial Presentation of Specimen 1 (Mind Stone // Intelligence)
+    // Initial Presentation of Specimen 1 (Mind Stone // Transportation & Logistics)
     this.displayStone(0, false);
 
     // Initialize Site Video Loader (loading.mp4)

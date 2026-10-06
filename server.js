@@ -250,279 +250,184 @@ const R2_DB_KEY = 'state/database.json';
 
 // Stone & Domain Normalization Map
 export const STONE_DOMAIN_MAP = {
-  mind: 'intelligence',
-  intelligence: 'intelligence',
-  space: 'connectivity',
-  connectivity: 'connectivity',
-  reality: 'digital',
-  digital: 'digital',
-  power: 'automation',
-  automation: 'automation',
-  time: 'analytics',
-  analytics: 'analytics',
-  soul: 'impact',
-  impact: 'impact'
+  mind: 'transportation',
+  transportation: 'transportation',
+  space: 'cybersecurity',
+  cybersecurity: 'cybersecurity',
+  reality: 'infrastructure',
+  infrastructure: 'infrastructure',
+  power: 'cleantech',
+  cleantech: 'cleantech',
+  time: 'education',
+  education: 'education',
+  soul: 'healthcare',
+  healthcare: 'healthcare',
+  // Backward compatibility with previous keys
+  intelligence: 'transportation',
+  connectivity: 'cybersecurity',
+  digital: 'infrastructure',
+  automation: 'cleantech',
+  analytics: 'education',
+  impact: 'healthcare'
 };
 
 export function normalizeDomainId(val) {
-  if (!val) return 'intelligence';
+  if (!val) return 'transportation';
   const clean = String(val).toLowerCase().replace(/ stone$/i, '').trim();
   return STONE_DOMAIN_MAP[clean] || clean;
 }
 
-// Initial Domains & Problem Statements — Marvel Infinity Stones
+// Initial Domains — Marvel Infinity Stones
 const INITIAL_DOMAINS = [
   {
-    id: 'intelligence',
-    stoneId: 'mind',
-    stoneName: 'Mind Stone',
-    domainName: 'INTELLIGENCE',
-    tagline: 'AI • ML • Decision Systems',
-    marvelTheme: 'Vision Neural Gold',
-    accentHex: '#ffd000',
-    roomAllocated: 'Lab Block 3 (CS-301)',
-    techStackSuggestions: ['Python', 'PyTorch', 'LangChain', 'FastAPI', 'Gemini API', 'TensorFlow'],
-    isPsReleased: false,
-    psReleaseDate: '2026-10-10T09:00:00Z',
-    description: 'Architect autonomous multi-agent networks, neural cognition models, self-refining LLM pipelines, and intelligent decision systems capable of enterprise-scale problem-solving.',
-    problemStatements: [
-      {
-        id: 'ps-intel-01',
-        code: 'PS-INTEL-01',
-        title: 'Autonomous Multi-Agent Synthesis & Dynamic Self-Correction Engine',
-        category: 'AI & Decision Systems',
-        description: 'Build an autonomous team of specialized AI agents (Architect, Auditor, Coder, Verifier) that debate trade-offs, execute verification loops, and generate verified artifact packages.',
-        difficulty: 'Advanced',
-        deliverables: [
-          'Interactive agent trace visualizer UI',
-          'Self-correcting verification testbench',
-          'Multi-modal decision engine integration'
-        ]
-      },
-      {
-        id: 'ps-intel-02',
-        code: 'PS-INTEL-02',
-        title: 'Neuro-Symbolic Automated Theorem Prover & Code Certifier',
-        category: 'Formal AI Verification',
-        description: 'Construct a neural-guided symbolic solver that produces formally verified correctness certificates for distributed protocols and cryptographic smart contracts.',
-        difficulty: 'Hardcore',
-        deliverables: [
-          'Automated proof trace generation visualizer',
-          'CLI benchmark suite verifying real-world protocols',
-          'Exportable formal verification certificate'
-        ]
-      }
-    ]
+    "id": "transportation",
+    "stoneId": "mind",
+    "stoneName": "Mind Stone",
+    "domainName": "TRANSPORTATION & LOGISTICS",
+    "tagline": "Mobility • Supply Chain • Routing",
+    "marvelTheme": "Vision Neural Gold",
+    "accentHex": "#ffd000",
+    "accentRgb": "255, 208, 0",
+    "iconName": "Navigation",
+    "stoneSymbol": "The Vision Core",
+    "roomAllocated": "Lab Block 3 (CS-301)",
+    "techStackSuggestions": [
+      "Python",
+      "FastAPI",
+      "Mapbox / GIS",
+      "Kafka",
+      "React",
+      "OR-Tools"
+    ],
+    "isPsReleased": false,
+    "psReleaseDate": "2026-10-10T09:00:00Z",
+    "description": "Smart Traffic Management — Develop a software solution to analyze traffic patterns and reduce congestion through intelligent routing.\n\nEmergency Vehicle Route Optimization — Build a system that identifies the fastest route for ambulances, fire services, or other emergency vehicles.\n\nPublic Transport Tracking — Create a real-time platform for tracking buses or other public transportation and estimating arrival times.\n\nSmart Logistics & Delivery Optimization — Develop a solution to optimize delivery routes, schedules, vehicle utilization, and operational costs.\n\nSupply Chain Visibility — Build a platform that improves tracking and transparency of goods across the supply chain.\n\nSmart Parking Management — Create a system that helps users discover, reserve, and efficiently manage available parking spaces.",
+    "problemStatements": []
   },
   {
-    id: 'connectivity',
-    stoneId: 'space',
-    stoneName: 'Space Stone',
-    domainName: 'CONNECTIVITY',
-    tagline: 'Cybersecurity • Cloud • Networks',
-    marvelTheme: 'Tesseract Cyan',
-    accentHex: '#00d2ff',
-    roomAllocated: 'Lab Block 2 (IoT-204)',
-    techStackSuggestions: ['Rust', 'Go', 'Kubernetes', 'eBPF', 'Cloudflare Workers', 'WireGuard'],
-    isPsReleased: false,
-    psReleaseDate: '2026-10-10T09:00:00Z',
-    description: 'Forge zero-trust defense architectures, planet-scale cloud networks, high-throughput distributed protocols, and resilient cybersecurity fabrics.',
-    problemStatements: [
-      {
-        id: 'ps-conn-01',
-        code: 'PS-CONN-01',
-        title: 'Zero-Trust Multi-Cloud Mesh Failover & Network Threat Shield',
-        category: 'Cybersecurity & Cloud',
-        description: 'Design a self-healing reverse proxy and global routing daemon that dynamically migrates stateful traffic across multiple cloud providers and edge nodes during regional outages or active DDoS attacks.',
-        difficulty: 'Hardcore',
-        deliverables: [
-          'Working distributed controller and lightweight edge proxy agent',
-          'Zero-loss connection migration benchmark demonstration',
-          'Real-time threat detection & firewall isolation rules'
-        ]
-      },
-      {
-        id: 'ps-conn-02',
-        code: 'PS-CONN-02',
-        title: 'Post-Quantum Encrypted Peer-to-Peer Mesh Fabric',
-        category: 'Quantum Cryptography',
-        description: 'Engineer a lightweight decentralized P2P transport layer implementing Kyber/Dilithium lattice-based key exchanges with zero external central coordinator dependency.',
-        difficulty: 'Hardcore',
-        deliverables: [
-          'Working multi-node mesh simulator daemon',
-          'Quantum-resistant handshake latency benchmark',
-          'Live packet telemetry visualizer'
-        ]
-      }
-    ]
+    "id": "cybersecurity",
+    "stoneId": "space",
+    "stoneName": "Space Stone",
+    "domainName": "CYBERSECURITY & DIGITAL TRUST",
+    "tagline": "Cybersecurity • Privacy • Cryptography",
+    "marvelTheme": "Tesseract Cyan",
+    "accentHex": "#00d2ff",
+    "accentRgb": "0, 210, 255",
+    "iconName": "Shield",
+    "stoneSymbol": "The Tesseract",
+    "roomAllocated": "Lab Block 2 (IoT-204)",
+    "techStackSuggestions": [
+      "Rust",
+      "Go",
+      "Python",
+      "eBPF",
+      "Cryptography",
+      "SIEM / ELK"
+    ],
+    "isPsReleased": false,
+    "psReleaseDate": "2026-10-10T09:00:00Z",
+    "description": "Phishing & Scam Detection — Develop an intelligent system capable of identifying suspicious emails, messages, URLs, or websites.\n\nDigital Fraud Detection — Build a solution that identifies potentially fraudulent digital transactions or suspicious user behaviour.\n\nSecure Digital Identity — Create a secure identity-verification and authentication solution while protecting user privacy.\n\nDeepfake & Manipulated Content Detection — Develop a platform for identifying potentially manipulated images, videos, or digital content.\n\nPrivacy-Preserving Data Sharing — Build a system that enables organizations or users to share information securely while protecting sensitive data.\n\nCyber Threat Monitoring — Develop a dashboard that identifies, analyzes, and alerts users about suspicious security activities.",
+    "problemStatements": []
   },
   {
-    id: 'digital',
-    stoneId: 'reality',
-    stoneName: 'Reality Stone',
-    domainName: 'DIGITAL',
-    tagline: 'Web • Mobile • Digital Platforms',
-    marvelTheme: 'Aether Crimson',
-    accentHex: '#ff2a4b',
-    roomAllocated: 'Lab Block 1 (AI-102)',
-    techStackSuggestions: ['TypeScript', 'React', 'Flutter', 'Next.js', 'Node.js', 'WebGL'],
-    isPsReleased: false,
-    psReleaseDate: '2026-10-10T09:00:00Z',
-    description: 'Bend digital reality. Build hyper-responsive web applications, cross-platform mobile architectures, immersive real-time canvases, and scalable modern platforms.',
-    problemStatements: [
-      {
-        id: 'ps-dig-01',
-        code: 'PS-DIG-01',
-        title: 'Sub-30ms Collaborative Digital Canvas & Universal Component Mesh',
-        category: 'Web & Mobile Platforms',
-        description: 'Construct a browser-based and mobile-first real-time workspace enabling multi-user manipulation of high-fidelity state with cryptographic attribution and instant offline synchronization.',
-        difficulty: 'Advanced',
-        deliverables: [
-          'Interactive cross-platform collaboration UI',
-          'Sub-30ms CRDT state synchronization pipeline',
-          'Offline-first progressive synchronization'
-        ]
-      },
-      {
-        id: 'ps-dig-02',
-        code: 'PS-DIG-02',
-        title: 'Generative Spatial Reality Studio for WebXR & Mobile AR',
-        category: 'Spatial Realities',
-        description: 'Build an in-browser 3D WebXR workspace enabling instantaneous procedural generation of reactive 3D worlds controllable across VR headsets, desktops, and mobile devices.',
-        difficulty: 'Advanced',
-        deliverables: [
-          'Fully functional Three.js/WebXR interactive world',
-          'Procedural asset generator with real-time lighting',
-          'Cross-device responsive controls'
-        ]
-      }
-    ]
+    "id": "infrastructure",
+    "stoneId": "reality",
+    "stoneName": "Reality Stone",
+    "domainName": "DIGITAL PUBLIC INFRASTRUCTURE",
+    "tagline": "Digital Platforms • Services • E-Governance",
+    "marvelTheme": "Aether Crimson",
+    "accentHex": "#ff2a4b",
+    "accentRgb": "255, 42, 75",
+    "iconName": "Globe",
+    "stoneSymbol": "The Aether Prism",
+    "roomAllocated": "Innovation Wing (IW-102)",
+    "techStackSuggestions": [
+      "TypeScript",
+      "React",
+      "Next.js",
+      "Node.js",
+      "PostgreSQL",
+      "Flutter"
+    ],
+    "isPsReleased": false,
+    "psReleaseDate": "2026-10-10T09:00:00Z",
+    "description": "Smart Public Grievance System — Build a platform where citizens can report civic problems and track their resolution.\n\nGovernment Scheme Discovery — Develop a system that helps citizens discover public schemes and services for which they may be eligible.\n\nUnified Citizen Service Platform — Create a single digital platform for accessing multiple public services.\n\nSmart Civic Issue Reporting — Develop a location-based platform for reporting issues such as damaged roads, waste, streetlights, or water problems.\n\nPublic Service Transparency Dashboard — Build a platform for tracking service requests, progress, response times, and public-service performance.\n\nDigital Document Verification — Develop a secure system for verifying certificates, documents, or other public records.",
+    "problemStatements": []
   },
   {
-    id: 'automation',
-    stoneId: 'power',
-    stoneName: 'Power Stone',
-    domainName: 'AUTOMATION',
-    tagline: 'IoT • Robotics • Embedded Systems',
-    marvelTheme: 'Thanos Void Purple',
-    accentHex: '#b026ff',
-    roomAllocated: 'Mechanical Block (Robo-01)',
-    techStackSuggestions: ['C++', 'Rust', 'ESP32 / Arduino', 'ROS2', 'MQTT', 'FreeRTOS'],
-    isPsReleased: false,
-    psReleaseDate: '2026-10-10T09:00:00Z',
-    description: 'Unleash physical and digital kinetic power. Develop autonomous robotics, smart hardware controllers, industrial IoT pipelines, and embedded real-time systems.',
-    problemStatements: [
-      {
-        id: 'ps-auto-01',
-        code: 'PS-AUTO-01',
-        title: 'Autonomous Edge Robotics Fleet Controller & Sensor Telemetry Hub',
-        category: 'Robotics & Embedded Systems',
-        description: 'Develop a microsecond telemetry agent and swarm control hub that continuously coordinates robotic actuators and IoT sensors, isolating hardware faults automatically.',
-        difficulty: 'Hardcore',
-        deliverables: [
-          'Hardware-in-the-loop or simulation telemetry interface',
-          'Autonomous failover daemon for robotic actuators',
-          'Real-time metrics visualizer with latency histograms'
-        ]
-      },
-      {
-        id: 'ps-auto-02',
-        code: 'PS-AUTO-02',
-        title: 'Industrial Energy Grid Balancer & Automated Micro-Inverter Mesh',
-        category: 'Embedded IoT & Power Systems',
-        description: 'Design an ultra-low-power embedded firmware orchestrator that coordinates distributed renewable energy sources, balancing load across power nodes in real time.',
-        difficulty: 'Advanced',
-        deliverables: [
-          'Embedded firmware code compatible with ESP32/ARM Cortex',
-          'Hardware simulation testbench with load surges',
-          'Interactive telemetry dashboard'
-        ]
-      }
-    ]
+    "id": "cleantech",
+    "stoneId": "power",
+    "stoneName": "Power Stone",
+    "domainName": "CLEAN & GREEN TECHNOLOGY",
+    "tagline": "Environment • Waste • Sustainability",
+    "marvelTheme": "Thanos Void Purple",
+    "accentHex": "#b026ff",
+    "accentRgb": "176, 38, 255",
+    "iconName": "Zap",
+    "stoneSymbol": "The Orb of Morag",
+    "roomAllocated": "Hardware & IoT Arena (HA-01)",
+    "techStackSuggestions": [
+      "Python",
+      "IoT / ESP32",
+      "React",
+      "MQTT",
+      "TensorFlow",
+      "FastAPI"
+    ],
+    "isPsReleased": false,
+    "psReleaseDate": "2026-10-10T09:00:00Z",
+    "description": "Smart Waste Management — Develop a platform for improving waste collection, segregation, recycling, or disposal.\n\nCarbon Footprint Tracker — Build an application that estimates environmental impact and recommends ways to reduce carbon emissions.\n\nEnergy Consumption Optimization — Develop a software system that analyzes energy usage and provides recommendations for reducing consumption.\n\nWater Conservation Platform — Build a solution that monitors water usage, identifies wastage, and encourages conservation.\n\nSmart Recycling Platform — Create a system connecting households, institutions, recyclers, and waste-collection services.\n\nEnvironmental Monitoring Dashboard — Develop a platform that analyzes environmental data such as pollution, water quality, temperature, or waste generation.",
+    "problemStatements": []
   },
   {
-    id: 'analytics',
-    stoneId: 'time',
-    stoneName: 'Time Stone',
-    domainName: 'ANALYTICS',
-    tagline: 'Data • Prediction • Optimization',
-    marvelTheme: 'Doctor Strange Emerald',
-    accentHex: '#00ff88',
-    roomAllocated: 'CS Block (DataLab-401)',
-    techStackSuggestions: ['Python', 'Kafka', 'ClickHouse', 'Pandas', 'DuckDB', 'Scikit-Learn'],
-    isPsReleased: false,
-    psReleaseDate: '2026-10-10T09:00:00Z',
-    description: 'Control temporal velocity. Engineer real-time streaming pipelines, high-throughput predictive time-series models, algorithmic optimization engines, and big data intelligence.',
-    problemStatements: [
-      {
-        id: 'ps-ana-01',
-        code: 'PS-ANA-01',
-        title: 'Sub-Millisecond Streaming Prediction & Algorithmic Optimization Pipeline',
-        category: 'Data & Prediction',
-        description: 'Engineer an event-driven analytical router that processes high-throughput telemetry streams, predicts impending anomaly spikes using micro-statistical models, and dynamically optimizes execution paths.',
-        difficulty: 'Hardcore',
-        deliverables: [
-          'Real-time streaming pipeline processing benchmarks',
-          'Live statistical prediction vs naive forecast models',
-          'Visual telemetry interface with latency histograms'
-        ]
-      },
-      {
-        id: 'ps-ana-02',
-        code: 'PS-ANA-02',
-        title: 'Temporal Graph Analytics & Supply Chain Bottleneck Oracle',
-        category: 'Graph Analytics',
-        description: 'Build a temporal graph processing engine capable of querying millions of dynamic shipment nodes and calculating optimal routing adjustments seconds before cascading delays occur.',
-        difficulty: 'Advanced',
-        deliverables: [
-          'Interactive graph visualization canvas with time-slider',
-          'Predictive bottleneck alert daemon',
-          'Benchmarking report showing speedup vs standard algorithms'
-        ]
-      }
-    ]
+    "id": "education",
+    "stoneId": "time",
+    "stoneName": "Time Stone",
+    "domainName": "SMART EDUCATION",
+    "tagline": "EdTech • Learning • Assessment",
+    "marvelTheme": "Doctor Strange Emerald",
+    "accentHex": "#00ff88",
+    "accentRgb": "0, 255, 136",
+    "iconName": "BookOpen",
+    "stoneSymbol": "Eye of Agamotto",
+    "roomAllocated": "CS Block (DataLab-401)",
+    "techStackSuggestions": [
+      "Python",
+      "LangChain",
+      "React",
+      "FastAPI",
+      "Node.js",
+      "PostgreSQL"
+    ],
+    "isPsReleased": false,
+    "psReleaseDate": "2026-10-10T09:00:00Z",
+    "description": "Personalized Learning Platform — Build a system that adapts learning content according to individual student performance and progress.\n\nAI Learning Assistant — Develop an intelligent assistant that helps students understand concepts, find resources, and resolve academic doubts.\n\nSmart Assessment System — Create a platform for conducting assessments and providing meaningful performance feedback.\n\nStudent Performance Analytics — Develop a system that identifies learning gaps and students who may require additional academic support.\n\nSkill Gap & Career Recommendation — Build a platform that analyzes student skills and recommends learning paths or career opportunities.\n\nAccessible Education Platform — Develop software that makes digital learning more accessible for students with different learning or accessibility needs.",
+    "problemStatements": []
   },
   {
-    id: 'impact',
-    stoneId: 'soul',
-    stoneName: 'Soul Stone',
-    domainName: 'IMPACT',
-    tagline: 'Healthcare • Agriculture • Education • Social Good',
-    marvelTheme: 'Vormir Sunset Orange',
-    accentHex: '#ff7700',
-    roomAllocated: 'Seminar Hall 2',
-    techStackSuggestions: ['Python', 'Flutter', 'PostgreSQL', 'FastAPI', 'Edge AI', 'OpenCV'],
-    isPsReleased: false,
-    psReleaseDate: '2026-10-10T09:00:00Z',
-    description: 'Channel technology to transform lives. Pioneer accessible healthcare diagnostics, precision agricultural sensors, adaptive educational tools, and sustainable social impact networks.',
-    problemStatements: [
-      {
-        id: 'ps-imp-01',
-        code: 'PS-IMP-01',
-        title: 'Decentralized Community Healthcare Triage & Precision Agriculture Telemetry',
-        category: 'HealthTech & Social Impact',
-        description: 'Construct a privacy-preserving triage engine and sensor aggregation hub for underserved rural communities that pairs offline-first inference with automated resource distribution.',
-        difficulty: 'Advanced',
-        deliverables: [
-          'Offline-first progressive web and mobile application',
-          'Differential-privacy epidemiological & soil telemetry dashboard',
-          'SMS/WhatsApp fallback alerting pipeline'
-        ]
-      },
-      {
-        id: 'ps-imp-02',
-        code: 'PS-IMP-02',
-        title: 'Adaptive Multi-Lingual AI Tutor for Low-Resource Classrooms',
-        category: 'EdTech & Inclusivity',
-        description: 'Develop a localized voice and text pedagogical assistant that adapts curriculum lessons into indigenous languages without requiring high-speed cloud internet connectivity.',
-        difficulty: 'Advanced',
-        deliverables: [
-          'Accessible PWA optimized for low-end mobile devices',
-          'Local offline speech-to-text / text-to-speech fallback engine',
-          'Student mastery & gamified progress tracker'
-        ]
-      }
-    ]
+    "id": "healthcare",
+    "stoneId": "soul",
+    "stoneName": "Soul Stone",
+    "domainName": "MEDTECH / BIOTECH / HEALTHCARE",
+    "tagline": "Healthcare • Medical AI • Assistive Technology",
+    "marvelTheme": "Vormir Sunset Orange",
+    "accentHex": "#ff7700",
+    "accentRgb": "255, 119, 0",
+    "iconName": "Heart",
+    "stoneSymbol": "Vormir Altar",
+    "roomAllocated": "Seminar Hall 2",
+    "techStackSuggestions": [
+      "Python",
+      "Flutter",
+      "FastAPI",
+      "OpenCV",
+      "PyTorch",
+      "PostgreSQL"
+    ],
+    "isPsReleased": false,
+    "psReleaseDate": "2026-10-10T09:00:00Z",
+    "description": "Smart Healthcare Assistance — Develop a platform that helps patients access appropriate healthcare information and services.\n\nRemote Patient Monitoring — Build a software solution for recording, visualizing, and communicating patient health information to authorized caregivers.\n\nEmergency Healthcare Platform — Create a system connecting patients with nearby hospitals, emergency services, blood banks, or other critical resources.\n\nMedication Management — Develop an application for medication schedules, reminders, adherence tracking, and caregiver notifications.\n\nHealthcare Accessibility — Build an assistive technology solution that improves access to healthcare for elderly people or people with disabilities.\n\nHospital Resource Management — Develop software for efficiently managing appointments, beds, queues, staff, or other hospital resources.",
+    "problemStatements": []
   }
 ];
 

@@ -1155,6 +1155,7 @@ body.timeline-unlocked .showcase-layout {
   color: rgba(235, 235, 245, 0.85);
   letter-spacing: 0.01em;
   margin-bottom: 24px;
+  white-space: pre-line;
 }
 
 /* Power Section Energy Conduit */
