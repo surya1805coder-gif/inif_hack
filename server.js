@@ -2406,13 +2406,13 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
 
   let rosterRows = `
     <tr>
-      <td style="padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.05); width:80px;">
-        <span style="display:inline-block; padding:2px 7px; border-radius:4px; background:rgba(0,255,136,0.08); border:1px solid rgba(0,255,136,0.25); color:#00ff88; font-size:10px; font-weight:600; font-family:monospace;">CAPTAIN</span>
+      <td style="padding:10px 14px; border-bottom:1px solid #1a1a1a; width:80px;">
+        <span style="display:inline-block; padding:2px 7px; border-radius:3px; background:#ffffff; color:#000000; font-size:9px; font-weight:800; letter-spacing:0.06em; font-family:monospace;">CAPTAIN</span>
       </td>
-      <td style="padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.05); color:#ffffff; font-weight:500; font-size:13px;">
+      <td style="padding:10px 14px; border-bottom:1px solid #1a1a1a; color:#ffffff; font-weight:600; font-size:13px;">
         ${escapeEmailHtml(leader.name || 'Captain')}
       </td>
-      <td style="padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.05); color:#71717a; font-size:12px; font-family:monospace;">
+      <td style="padding:10px 14px; border-bottom:1px solid #1a1a1a; color:#737373; font-size:12px; font-family:monospace;">
         ${escapeEmailHtml(leader.email || '')}
       </td>
     </tr>
@@ -2420,23 +2420,23 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
 
   teamMembers.forEach((m, idx) => {
     const isLast = idx === teamMembers.length - 1;
-    const borderStyle = isLast ? '' : 'border-bottom:1px solid rgba(255,255,255,0.05);';
+    const borderStyle = isLast ? '' : 'border-bottom:1px solid #1a1a1a;';
     rosterRows += `
       <tr>
         <td style="padding:10px 14px; ${borderStyle} width:80px;">
-          <span style="display:inline-block; padding:2px 7px; border-radius:4px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); color:#a1a1aa; font-size:10px; font-weight:600; font-family:monospace;">MEMBER</span>
+          <span style="display:inline-block; padding:2px 7px; border-radius:3px; background:#141414; border:1px solid #2e2e2e; color:#a3a3a3; font-size:9px; font-weight:600; letter-spacing:0.06em; font-family:monospace;">MEMBER</span>
         </td>
         <td style="padding:10px 14px; ${borderStyle} color:#e4e4e7; font-weight:500; font-size:13px;">
           ${escapeEmailHtml(m.name || 'Squad Member')}
         </td>
-        <td style="padding:10px 14px; ${borderStyle} color:#71717a; font-size:12px; font-family:monospace;">
+        <td style="padding:10px 14px; ${borderStyle} color:#737373; font-size:12px; font-family:monospace;">
           ${escapeEmailHtml(m.email || '')}
         </td>
       </tr>
     `;
   });
 
-  const subject = `⚡ Pass — Infinity Hackathon 2026 | Squad ${team.teamName} [${team.id}]`;
+  const subject = `Pass — Infinity Hackathon 2026 | Squad ${team.teamName} [${team.id}]`;
   const cleanAppUrl = (appUrl || 'https://infinity.akao.in').replace(/\/$/, '');
 
   const htmlContent = `<!DOCTYPE html>
@@ -2446,36 +2446,31 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${subject}</title>
 </head>
-<body style="margin:0; padding:0; background-color:#08090d; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#ffffff; -webkit-font-smoothing:antialiased;">
+<body style="margin:0; padding:0; background-color:#050505; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#ffffff; -webkit-font-smoothing:antialiased;">
   <!-- Outer Wrapper Table -->
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#08090d; min-height:100vh; padding:32px 12px;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#050505; min-height:100vh; padding:36px 12px;">
     <tr>
       <td align="center">
         <!-- Main Minimal Container -->
-        <table role="presentation" width="100%" style="max-width:560px; background-color:#111219; border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden; box-shadow:0 12px 36px rgba(0,0,0,0.5); margin:0 auto;" cellspacing="0" cellpadding="0" border="0">
+        <table role="presentation" width="100%" style="max-width:560px; background-color:#0d0d0d; border:1px solid #222222; border-radius:8px; overflow:hidden; margin:0 auto;" cellspacing="0" cellpadding="0" border="0">
           
-          <!-- Subtle Top Accent Line -->
-          <tr>
-            <td style="height:2px; background:linear-gradient(90deg, #ffd000 0%, #00d2ff 50%, #00ff88 100%); line-height:2px; font-size:1px;">&nbsp;</td>
-          </tr>
-
           <!-- Header Section -->
           <tr>
-            <td style="padding:28px 24px 20px 24px; text-align:center; border-bottom:1px solid rgba(255,255,255,0.06);">
-              <div style="font-size:10px; font-weight:700; letter-spacing:0.2em; color:#7d8294; text-transform:uppercase; margin-bottom:6px;">DEPARTMENT OF CSE &bull; CHENNAI</div>
-              <div style="font-size:18px; font-weight:800; letter-spacing:0.06em; color:#ffffff; text-transform:uppercase; margin-bottom:14px;">INFINITY HACKATHON 2026</div>
+            <td style="padding:32px 28px 24px 28px; text-align:center; border-bottom:1px solid #1a1a1a;">
+              <div style="font-size:10px; font-weight:700; letter-spacing:0.22em; color:#737373; text-transform:uppercase; margin-bottom:8px;">DEPARTMENT OF COMPUTER SCIENCE &amp; ENGINEERING</div>
+              <div style="font-size:18px; font-weight:800; letter-spacing:0.1em; color:#ffffff; text-transform:uppercase; margin-bottom:16px;">INFINITY HACKATHON 2026</div>
               
               <!-- Minimalist Pass Badge -->
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto 12px auto;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto 16px auto;">
                 <tr>
-                  <td style="padding:4px 14px; border-radius:9999px; background:rgba(0,255,136,0.06); border:1px solid rgba(0,255,136,0.25); color:#00ff88; font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,sans-serif;">
+                  <td style="padding:5px 14px; border-radius:9999px; background:#141414; border:1px solid #333333; color:#ffffff; font-size:10px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase;">
                     ✓ PASS &bull; VERIFIED
                   </td>
                 </tr>
               </table>
 
-              <h1 style="margin:0 0 6px 0; font-size:22px; font-weight:700; color:#ffffff; letter-spacing:-0.01em;">Squad ${teamName}</h1>
-              <p style="margin:0 auto; font-size:13px; color:#8e94a8; line-height:1.6; max-width:440px;">
+              <h1 style="margin:0 0 8px 0; font-size:22px; font-weight:700; color:#ffffff; letter-spacing:-0.01em;">Squad ${teamName}</h1>
+              <p style="margin:0 auto; font-size:13px; color:#888888; line-height:1.6; max-width:440px;">
                 Registration payment is verified. Your official squad pass is ready for hackathon check-in.
               </p>
             </td>
@@ -2483,20 +2478,20 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
 
           <!-- Ticket Pass Section -->
           <tr>
-            <td style="padding:20px 24px;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#14151e; border:1px solid rgba(255,255,255,0.07); border-radius:10px; overflow:hidden;">
+            <td style="padding:24px 28px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#000000; border:1px solid #222222; border-radius:6px; overflow:hidden;">
                 
                 <!-- Ticket Header -->
                 <tr>
-                  <td style="padding:14px 18px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                  <td style="padding:14px 18px; border-bottom:1px solid #1a1a1a;">
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                       <tr>
                         <td align="left">
-                          <span style="font-size:10px; font-weight:600; color:#6b7280; letter-spacing:0.12em; text-transform:uppercase;">PASS ID</span>
-                          <div style="font-size:18px; font-weight:800; color:#ffd000; font-family:monospace; margin-top:2px;">${teamId}</div>
+                          <span style="font-size:10px; font-weight:600; color:#666666; letter-spacing:0.14em; text-transform:uppercase;">PASS ID</span>
+                          <div style="font-size:18px; font-weight:800; color:#ffffff; font-family:monospace; margin-top:2px;">${teamId}</div>
                         </td>
                         <td align="right">
-                          <span style="display:inline-block; padding:4px 10px; border-radius:4px; background:rgba(0,210,255,0.08); border:1px solid rgba(0,210,255,0.2); color:#00d2ff; font-size:11px; font-weight:600; font-family:monospace;">${size} MEMBERS</span>
+                          <span style="display:inline-block; padding:4px 10px; border-radius:4px; background:#141414; border:1px solid #2e2e2e; color:#ffffff; font-size:11px; font-weight:600; font-family:monospace;">${size} MEMBERS</span>
                         </td>
                       </tr>
                     </table>
@@ -2505,27 +2500,27 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
 
                 <!-- Specs -->
                 <tr>
-                  <td style="padding:12px 18px;">
+                  <td style="padding:14px 18px;">
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="6" border="0" style="font-size:12px;">
                       <tr>
-                        <td style="color:#6b7280; font-weight:500; width:34%;">Institution</td>
+                        <td style="color:#666666; font-weight:500; width:34%;">Institution</td>
                         <td style="color:#ffffff; font-weight:500;">${college}</td>
                       </tr>
                       <tr>
-                        <td style="color:#6b7280; font-weight:500;">Track</td>
-                        <td style="color:#00d2ff; font-weight:600;">${domain}</td>
+                        <td style="color:#666666; font-weight:500;">Track</td>
+                        <td style="color:#ffffff; font-weight:700;">${domain}</td>
                       </tr>
                       <tr>
-                        <td style="color:#6b7280; font-weight:500;">Venue</td>
+                        <td style="color:#666666; font-weight:500;">Venue</td>
                         <td style="color:#ffffff; font-weight:500;">${room}</td>
                       </tr>
                       <tr>
-                        <td style="color:#6b7280; font-weight:500;">Bank UTR</td>
-                        <td style="color:#a1a1aa; font-family:monospace;">${utr}</td>
+                        <td style="color:#666666; font-weight:500;">Bank UTR</td>
+                        <td style="color:#a3a3a3; font-family:monospace;">${utr}</td>
                       </tr>
                       <tr>
-                        <td style="color:#6b7280; font-weight:500;">Verified Fee</td>
-                        <td style="color:#00ff88; font-weight:600;">₹${amount}</td>
+                        <td style="color:#666666; font-weight:500;">Verified Fee</td>
+                        <td style="color:#ffffff; font-weight:700;">₹${amount}</td>
                       </tr>
                     </table>
                   </td>
@@ -2536,11 +2531,11 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
 
           <!-- Roster Section -->
           <tr>
-            <td style="padding:0 24px 20px 24px;">
-              <div style="font-size:11px; font-weight:600; letter-spacing:0.1em; color:#7d8294; text-transform:uppercase; margin-bottom:8px;">
-                Squad Members
+            <td style="padding:0 28px 24px 28px;">
+              <div style="font-size:10px; font-weight:700; letter-spacing:0.14em; color:#666666; text-transform:uppercase; margin-bottom:8px;">
+                SQUAD MEMBERS
               </div>
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#14151e; border:1px solid rgba(255,255,255,0.07); border-radius:10px; overflow:hidden;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#000000; border:1px solid #222222; border-radius:6px; overflow:hidden;">
                 ${rosterRows}
               </table>
             </td>
@@ -2548,14 +2543,14 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
 
           <!-- Check-In Guidelines Note -->
           <tr>
-            <td style="padding:0 24px 22px 24px;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#14151e; border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:14px 16px;">
+            <td style="padding:0 28px 24px 28px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#000000; border:1px solid #222222; border-radius:6px; padding:14px 16px;">
                 <tr>
                   <td>
-                    <div style="font-size:11px; font-weight:600; color:#cbd5e1; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:6px;">
+                    <div style="font-size:10px; font-weight:700; color:#888888; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:8px;">
                       Check-in Guidelines
                     </div>
-                    <ul style="margin:0; padding-left:16px; color:#8e94a8; font-size:12px; line-height:1.6;">
+                    <ul style="margin:0; padding-left:16px; color:#888888; font-size:12px; line-height:1.6;">
                       <li>Reporting time: <strong style="color:#ffffff;">08:30 AM</strong> at the Main Campus Innovation Arena.</li>
                       <li>Bring original college ID cards, personal laptops, and chargers.</li>
                       <li>Problem statements will unlock on your Leader Portal on hackathon morning.</li>
@@ -2568,27 +2563,27 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
 
           <!-- Portal CTA Button -->
           <tr>
-            <td style="padding:0 24px 28px 24px; text-align:center;">
+            <td style="padding:0 28px 32px 28px; text-align:center;">
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto;">
                 <tr>
-                  <td align="center" style="border-radius:6px; background:#ffd000;">
-                    <a href="${cleanAppUrl}/leader" target="_blank" rel="noopener noreferrer" style="display:inline-block; padding:12px 28px; font-size:12px; font-weight:700; color:#0a0a0f; text-decoration:none; text-transform:uppercase; letter-spacing:0.06em;">
+                  <td align="center" style="border-radius:4px; background:#ffffff;">
+                    <a href="${cleanAppUrl}/leader" target="_blank" rel="noopener noreferrer" style="display:inline-block; padding:12px 30px; font-size:12px; font-weight:800; color:#000000; text-decoration:none; text-transform:uppercase; letter-spacing:0.08em;">
                       Access Squad Portal &rarr;
                     </a>
                   </td>
                 </tr>
               </table>
-              <div style="margin-top:10px; font-size:11px; color:#6b7280;">
-                Pass ID: <strong style="color:#ffd000; font-family:monospace;">${teamId}</strong> &bull; Log in with your squad password.
+              <div style="margin-top:12px; font-size:11px; color:#666666;">
+                Pass ID: <strong style="color:#ffffff; font-family:monospace;">${teamId}</strong> &bull; Log in with your squad password.
               </div>
             </td>
           </tr>
 
           <!-- Footer -->
           <tr>
-            <td style="background-color:#0d0e14; padding:20px 24px; text-align:center; border-top:1px solid rgba(255,255,255,0.06); font-size:11px; color:#52525b; line-height:1.6;">
-              <p style="margin:0 0 4px 0; color:#71717a; font-weight:500;">Infinity Hackathon 2026 &bull; Department of Computer Science &amp; Engineering</p>
-              <p style="margin:0;">Need assistance? Contact <a href="mailto:support@infinity.akao.in" style="color:#8e94a8; text-decoration:underline;">support@infinity.akao.in</a></p>
+            <td style="background-color:#050505; padding:20px 24px; text-align:center; border-top:1px solid #1a1a1a; font-size:11px; color:#555555; line-height:1.6;">
+              <p style="margin:0 0 4px 0; color:#666666; font-weight:500;">Infinity Hackathon 2026 &bull; Department of Computer Science &amp; Engineering</p>
+              <p style="margin:0;">Need assistance? Contact <a href="mailto:support@infinity.akao.in" style="color:#888888; text-decoration:underline;">support@infinity.akao.in</a></p>
             </td>
           </tr>
         </table>
