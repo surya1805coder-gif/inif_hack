@@ -33,22 +33,10 @@
             "Self-correcting verification testbench",
             "Multi-modal decision engine integration"
           ]
-        },
-        {
-          "id": "ps-intel-02",
-          "code": "PS-INTEL-02",
-          "title": "aaasd",
-          "category": "INTELLIGENCE & Systems",
-          "difficulty": "Advanced",
-          "description": "asdf",
-          "deliverables": [
-            "asd"
-          ]
         }
       ],
-      "roomAllocated": "Lab Block 3 1234",
-      "stoneId": "mind",
-      "syncExistingTeams": true
+      "roomAllocated": "Lab Block 3 (CS-301)",
+      "stoneId": "mind"
     },
     {
       "id": "cybersecurity",
