@@ -1093,7 +1093,7 @@ async function dispatchEmailTransport({ to, cc = [], subject, html, env = {}, te
       from: emailFrom,
       to: [to],
       ...(cc.length > 0 ? { cc } : {}),
-      reply_to: 'support@infinity.akao.in',
+      reply_to: 'infinity.hackathon@gvpcdpgc.edu.in',
       subject,
       html,
     };
@@ -1114,7 +1114,7 @@ async function dispatchEmailTransport({ to, cc = [], subject, html, env = {}, te
       const fallbackPayload = {
         from: emailFrom,
         to: [to],
-        reply_to: 'support@infinity.akao.in',
+        reply_to: 'infinity.hackathon@gvpcdpgc.edu.in',
         subject,
         html,
       };
@@ -1401,7 +1401,7 @@ export async function sendRegistrationPendingEmail({ team, appUrl = 'https://inf
           <tr>
             <td style="background-color:#f4f4f5; padding:20px 24px; text-align:center; border-top:1px solid #e4e4e7; font-size:11px; color:#71717a; line-height:1.6;">
               <p style="margin:0 0 4px 0; color:#52525b; font-weight:500;">Infinity Hackathon 2026 &bull; Department of Computer Science &amp; Engineering</p>
-              <p style="margin:0;">Need assistance? Contact <a href="mailto:support@infinity.akao.in" style="color:#09090b; text-decoration:underline;">support@infinity.akao.in</a></p>
+              <p style="margin:0;">Need assistance? Contact <a href="mailto:infinity.hackathon@gvpcdpgc.edu.in" style="color:#09090b; text-decoration:underline;">infinity.hackathon@gvpcdpgc.edu.in</a></p>
             </td>
           </tr>
         </table>
@@ -1795,7 +1795,7 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
           <tr>
             <td style="background-color:#f4f4f5; padding:20px 24px; text-align:center; border-top:1px solid #e4e4e7; font-size:11px; color:#71717a; line-height:1.6;">
               <p style="margin:0 0 4px 0; color:#52525b; font-weight:600;">Infinity Hackathon 2026 &bull; Department of Computer Science &amp; Engineering</p>
-              <p style="margin:0;">Need assistance? Contact <a href="mailto:support@infinity.akao.in" style="color:#09090b; text-decoration:underline;">support@infinity.akao.in</a></p>
+              <p style="margin:0;">Need assistance? Contact <a href="mailto:infinity.hackathon@gvpcdpgc.edu.in" style="color:#09090b; text-decoration:underline;">infinity.hackathon@gvpcdpgc.edu.in</a></p>
             </td>
           </tr>
         </table>
