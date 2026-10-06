@@ -1,6 +1,16 @@
 import { audioEngine } from './audio.js';
 import { STONES } from './stonesData.js';
 
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export function initRegistrationModule() {
   const modalRegister = document.getElementById('modal-register');
   const modalSuccess = document.getElementById('modal-success');
@@ -1353,113 +1363,120 @@ export function initRegistrationModule() {
         // Successful registration!
         closeConfirmModal();
         closeModal();
-        audioEngine.playConvergenceChord();
+        try { audioEngine.playConvergenceChord(); } catch (_) {}
 
-        // Populate Success Modal with full squad details and member roster
-        const sucTeamId = document.getElementById('suc-team-id');
-        const sucTeamName = document.getElementById('suc-team-name');
-        const sucCollege = document.getElementById('suc-college');
-        const sucDomain = document.getElementById('suc-domain');
-        const sucEmail = document.getElementById('suc-email');
-        const sucAmount = document.getElementById('suc-amount');
-        const sucUtr = document.getElementById('suc-utr');
-        const sucRosterList = document.getElementById('suc-roster-list');
-
-        const submittedCollege = resData.team.college || pendingFormData?.get('college') || '-';
-        const submittedUtr = resData.team.utr || pendingFormData?.get('paymentUtr') || '-';
-        const leaderNameVal = resData.team.leader?.name || pendingFormData?.get('leaderName') || 'Team Captain';
-        const leaderEmailVal = resData.team.leader?.email || resData.team.leaderEmail || pendingFormData?.get('leaderEmail') || '-';
-        const leaderPhoneVal = resData.team.leader?.phone || pendingFormData?.get('leaderPhone') || '';
-
-        let membersList = [];
-        try {
-          if (Array.isArray(resData.team.members) && resData.team.members.length > 0) {
-            membersList = resData.team.members;
-          } else {
-            const raw = pendingFormData?.get('members');
-            membersList = raw ? JSON.parse(raw) : [];
-          }
-        } catch (_) {
-          membersList = [];
-        }
-
-        const stoneObj = STONES.find(s => s.id === resData.team.preferredDomain) || STONES[0];
-
-        if (sucTeamId) sucTeamId.textContent = resData.team.id;
-        if (sucTeamName) sucTeamName.textContent = resData.team.teamName;
-        if (sucCollege) sucCollege.textContent = submittedCollege;
-        if (sucDomain) {
-          sucDomain.textContent = `${stoneObj.name} // ${stoneObj.domain}`;
-          sucDomain.style.color = stoneObj.colorHex || '#00d2ff';
-        }
-        if (sucEmail) sucEmail.textContent = leaderEmailVal;
-        if (sucAmount) sucAmount.textContent = `₹${resData.team.amount.toLocaleString('en-IN')}`;
-        if (sucUtr) sucUtr.textContent = submittedUtr;
-
-        const sucMailRecipient = document.getElementById('suc-mail-recipient');
-        if (sucMailRecipient) sucMailRecipient.textContent = leaderEmailVal;
-
-        // Auto-login session preparation
-        if (resData.token) {
-          try {
-            sessionStorage.setItem('infinity_leader_auth', JSON.stringify({ token: resData.token }));
-            localStorage.setItem('infinity_leader_auth', JSON.stringify({ token: resData.token }));
-          } catch (_) {}
-        }
-
-        const btnGoLeader = document.getElementById('btn-go-leader');
-        if (btnGoLeader) {
-          const autoLoginUrl = resData.token
-            ? `/leader.html?autologin=1#token=${encodeURIComponent(resData.token)}`
-            : `/leader.html?team=${encodeURIComponent(resData.team.id)}&email=${encodeURIComponent(leaderEmailVal)}`;
-
-          btnGoLeader.href = autoLoginUrl;
-          btnGoLeader.innerHTML = `<span>⚡ AUTO-LOGIN TO LEADER PAGE</span> &rarr;`;
-
-          btnGoLeader.onclick = () => {
-            if (resData.token) {
-              try {
-                sessionStorage.setItem('infinity_leader_auth', JSON.stringify({ token: resData.token }));
-                localStorage.setItem('infinity_leader_auth', JSON.stringify({ token: resData.token }));
-              } catch (_) {}
-            }
-          };
-        }
-
-        // Populate Member Roster in Success Modal
-        if (sucRosterList) {
-          sucRosterList.innerHTML = '';
-
-          const fullRoster = [
-            { role: 'LEADER / CAPTAIN', name: leaderNameVal, email: leaderEmailVal, phone: leaderPhoneVal, isLeader: true },
-            ...membersList.map((m, idx) => ({
-              role: `MEMBER 0${idx + 2}`,
-              name: m.name,
-              email: m.email,
-              phone: m.phone,
-              isLeader: false
-            }))
-          ];
-
-          fullRoster.forEach(m => {
-            const row = document.createElement('div');
-            row.className = 'suc-member-row';
-            row.innerHTML = `
-              <div class="suc-member-info">
-                <div class="suc-member-name">
-                  <span>${escapeHtml(m.name)}</span>
-                  <span class="suc-member-badge ${m.isLeader ? '' : 'member'}">${m.role}</span>
-                </div>
-                <div class="suc-member-meta">${escapeHtml(m.email)} • ${escapeHtml(m.phone)}</div>
-              </div>
-            `;
-            sucRosterList.appendChild(row);
-          });
-        }
-
+        // Ensure Success Modal opens immediately
         if (modalSuccess) {
           modalSuccess.classList.add('is-open');
           modalSuccess.setAttribute('aria-hidden', 'false');
+        }
+
+        // Populate Success Modal safely
+        try {
+          const sucTeamId = document.getElementById('suc-team-id');
+          const sucTeamName = document.getElementById('suc-team-name');
+          const sucCollege = document.getElementById('suc-college');
+          const sucDomain = document.getElementById('suc-domain');
+          const sucEmail = document.getElementById('suc-email');
+          const sucAmount = document.getElementById('suc-amount');
+          const sucUtr = document.getElementById('suc-utr');
+          const sucRosterList = document.getElementById('suc-roster-list');
+
+          const submittedCollege = resData.team?.college || pendingFormData?.get('college') || '-';
+          const submittedUtr = resData.team?.utr || pendingFormData?.get('paymentUtr') || '-';
+          const leaderNameVal = resData.team?.leader?.name || pendingFormData?.get('leaderName') || 'Team Captain';
+          const leaderEmailVal = resData.team?.leader?.email || resData.team?.leaderEmail || pendingFormData?.get('leaderEmail') || '-';
+          const leaderPhoneVal = resData.team?.leader?.phone || pendingFormData?.get('leaderPhone') || '';
+          const teamAmountVal = resData.team?.amount != null ? Number(resData.team.amount) : 1047;
+
+          let membersList = [];
+          try {
+            if (Array.isArray(resData.team?.members) && resData.team.members.length > 0) {
+              membersList = resData.team.members;
+            } else {
+              const raw = pendingFormData?.get('members');
+              membersList = raw ? JSON.parse(raw) : [];
+            }
+          } catch (_) {
+            membersList = [];
+          }
+
+          const preferredDom = resData.team?.preferredDomain || pendingFormData?.get('preferredDomain');
+          const stoneObj = STONES.find(s => s.id === preferredDom || s.domainKey === preferredDom) || STONES[0];
+
+          if (sucTeamId) sucTeamId.textContent = resData.team?.id || 'INF-OK';
+          if (sucTeamName) sucTeamName.textContent = resData.team?.teamName || 'Your Squad';
+          if (sucCollege) sucCollege.textContent = submittedCollege;
+          if (sucDomain) {
+            sucDomain.textContent = `${stoneObj.name} // ${stoneObj.domain}`;
+            sucDomain.style.color = stoneObj.colorHex || '#00d2ff';
+          }
+          if (sucEmail) sucEmail.textContent = leaderEmailVal;
+          if (sucAmount) sucAmount.textContent = `₹${teamAmountVal.toLocaleString('en-IN')}`;
+          if (sucUtr) sucUtr.textContent = submittedUtr;
+
+          const sucMailRecipient = document.getElementById('suc-mail-recipient');
+          if (sucMailRecipient) sucMailRecipient.textContent = leaderEmailVal;
+
+          // Auto-login session preparation
+          if (resData.token) {
+            try {
+              sessionStorage.setItem('infinity_leader_auth', JSON.stringify({ token: resData.token }));
+              localStorage.setItem('infinity_leader_auth', JSON.stringify({ token: resData.token }));
+            } catch (_) {}
+          }
+
+          const btnGoLeader = document.getElementById('btn-go-leader');
+          if (btnGoLeader) {
+            const autoLoginUrl = resData.token
+              ? `/leader.html?autologin=1#token=${encodeURIComponent(resData.token)}`
+              : `/leader.html?team=${encodeURIComponent(resData.team?.id || '')}&email=${encodeURIComponent(leaderEmailVal)}`;
+
+            btnGoLeader.href = autoLoginUrl;
+            btnGoLeader.innerHTML = `<span>⚡ AUTO-LOGIN TO LEADER PAGE</span> &rarr;`;
+
+            btnGoLeader.onclick = () => {
+              if (resData.token) {
+                try {
+                  sessionStorage.setItem('infinity_leader_auth', JSON.stringify({ token: resData.token }));
+                  localStorage.setItem('infinity_leader_auth', JSON.stringify({ token: resData.token }));
+                } catch (_) {}
+              }
+            };
+          }
+
+          // Populate Member Roster in Success Modal
+          if (sucRosterList) {
+            sucRosterList.innerHTML = '';
+
+            const fullRoster = [
+              { role: 'LEADER / CAPTAIN', name: leaderNameVal, email: leaderEmailVal, phone: leaderPhoneVal, isLeader: true },
+              ...membersList.map((m, idx) => ({
+                role: `MEMBER 0${idx + 2}`,
+                name: m?.name || `Member ${idx + 2}`,
+                email: m?.email || '',
+                phone: m?.phone || '',
+                isLeader: false
+              }))
+            ];
+
+            fullRoster.forEach(m => {
+              const row = document.createElement('div');
+              row.className = 'suc-member-row';
+              row.innerHTML = `
+                <div class="suc-member-info">
+                  <div class="suc-member-name">
+                    <span>${escapeHtml(m.name)}</span>
+                    <span class="suc-member-badge ${m.isLeader ? '' : 'member'}">${m.role}</span>
+                  </div>
+                  <div class="suc-member-meta">${escapeHtml(m.email)} • ${escapeHtml(m.phone)}</div>
+                </div>
+              `;
+              sucRosterList.appendChild(row);
+            });
+          }
+        } catch (renderErr) {
+          console.warn('Success modal rendering fallback notice:', renderErr);
         }
 
         if (formReg) formReg.reset();
@@ -1479,12 +1496,40 @@ export function initRegistrationModule() {
         });
 
       } catch (err) {
-        closeConfirmModal();
-        showError(err.message);
+        console.error('Registration submission failed:', err);
+        if (modalConfirm && modalConfirm.classList.contains('is-open')) {
+          const confSubTitle = document.getElementById('confirm-modal-title');
+          if (confSubTitle) {
+            confSubTitle.textContent = `FAILED: ${err.message}`;
+            confSubTitle.style.color = '#ff2a4b';
+          }
+          if (confSubmitText) {
+            confSubmitText.textContent = 'VERIFY DETAILS & RETRY';
+          }
+          safePlayChime(220);
+          setTimeout(() => {
+            if (confSubTitle) {
+              confSubTitle.textContent = 'REVIEW SQUAD REGISTRATION';
+              confSubTitle.style.color = '#ffffff';
+            }
+            if (confSubmitText) {
+              confSubmitText.textContent = 'CONFIRM & LOCK SQUAD ✦';
+            }
+          }, 4500);
+        } else {
+          closeConfirmModal();
+          if (modalRegister) {
+            modalRegister.classList.add('is-open');
+            modalRegister.setAttribute('aria-hidden', 'false');
+          }
+          showError(err.message || 'Registration failed. Please check your details.');
+        }
       } finally {
         if (btnConfirmFinal) btnConfirmFinal.disabled = false;
         if (confSubmitSpinner) confSubmitSpinner.style.display = 'none';
-        if (confSubmitText) confSubmitText.textContent = 'CONFIRM & LOCK SQUAD ✦';
+        if (confSubmitText && !confSubmitText.textContent.includes('FAILED') && !confSubmitText.textContent.includes('RETRY')) {
+          confSubmitText.textContent = 'CONFIRM & LOCK SQUAD ✦';
+        }
         if (btnBackEdit) btnBackEdit.disabled = false;
         if (btnSubmit) btnSubmit.disabled = false;
         if (regSpinner) regSpinner.style.display = 'none';
