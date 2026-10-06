@@ -1270,14 +1270,24 @@
         </div>
       </div>
 
-      <p class="success-note">
-        Use your leader email and chosen password to access the Team Leader Dashboard to monitor your payment
-        verification, food meal tokens, review milestones, and select your Problem Statement when unlocked.
-      </p>
+      <!-- Auto-Login Readiness Notice -->
+      <div class="suc-autologin-callout" style="margin: 14px 0 16px 0; padding: 12px 14px; border-radius: 8px; background: rgba(255, 208, 0, 0.08); border: 1px solid rgba(255, 208, 0, 0.32); text-align: left; display: flex; align-items: center; gap: 10px;">
+        <span style="color: #ffd000; font-size: 1.25rem;">⚡</span>
+        <div style="flex: 1;">
+          <div style="font-family: var(--font-mono); font-size: 0.74rem; font-weight: 700; color: #ffd000; letter-spacing: 0.06em; text-transform: uppercase;">
+            INSTANT LEADER ACCESS READY
+          </div>
+          <p style="margin: 2px 0 0 0; font-size: 0.78rem; color: rgba(255, 255, 255, 0.85); line-height: 1.4;">
+            Your session is securely unlocked. Jump directly into your Leader Dashboard without re-entering credentials.
+          </p>
+        </div>
+      </div>
 
-      <div class="modal-actions-row">
-        <a href="/leader.html" class="btn-modal-primary" id="btn-go-leader">VIEW SQUAD PASS &amp; VERIFICATION &rarr;</a>
-        <button class="btn-modal-secondary" id="btn-close-success">CLOSE</button>
+      <div class="modal-actions-row" style="display: flex; gap: 10px; align-items: center;">
+        <a href="/leader.html" class="btn-modal-primary" id="btn-go-leader" style="flex: 1.5; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; background: linear-gradient(135deg, #ffd000 0%, #ffaa00 100%); color: #000; box-shadow: 0 0 20px rgba(255, 208, 0, 0.35); text-decoration: none;">
+          <span>⚡ AUTO-LOGIN TO LEADER PAGE</span> &rarr;
+        </a>
+        <button class="btn-modal-secondary" id="btn-close-success" style="flex: 0.8;">CLOSE</button>
       </div>
     </div>
   </div>

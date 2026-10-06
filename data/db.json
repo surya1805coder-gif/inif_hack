@@ -6,22 +6,49 @@
       "domainName": "TRANSPORTATION & LOGISTICS",
       "tagline": "Mobility • Supply Chain • Routing",
       "description": "Pioneer intelligent traffic management, emergency route optimization, real-time public transit tracking, and dynamic supply chain logistics to eliminate urban congestion.",
-      "iconName": "Navigation",
+      "iconName": "Cpu",
       "stoneSymbol": "The Vision Core",
       "accentHex": "#ffd000",
       "accentRgb": "255, 208, 0",
       "techStackSuggestions": [
         "Python",
+        "PyTorch",
+        "LangChain",
         "FastAPI",
-        "Mapbox / GIS",
-        "Kafka",
-        "React",
-        "OR-Tools"
+        "Gemini API",
+        "TensorFlow"
       ],
       "isPsReleased": false,
       "psReleaseDate": "2026-10-10T09:00:00Z",
-      "problemStatements": [],
-      "roomAllocated": "Lab Block 3 (CS-301)"
+      "problemStatements": [
+        {
+          "id": "ps-intel-01",
+          "code": "PS-INTEL-01",
+          "title": "Quantum-Resistant Telemetry Fabric [RELEASED]",
+          "category": "AI & Decision Systems",
+          "description": "Build an autonomous team of specialized AI agents (Architect, Auditor, Coder, Verifier) that debate trade-offs, execute verification loops, and generate verified artifact packages.",
+          "difficulty": "Advanced",
+          "deliverables": [
+            "Interactive agent trace visualizer UI",
+            "Self-correcting verification testbench",
+            "Multi-modal decision engine integration"
+          ]
+        },
+        {
+          "id": "ps-intel-02",
+          "code": "PS-INTEL-02",
+          "title": "aaasd",
+          "category": "INTELLIGENCE & Systems",
+          "difficulty": "Advanced",
+          "description": "asdf",
+          "deliverables": [
+            "asd"
+          ]
+        }
+      ],
+      "roomAllocated": "Lab Block 3 1234",
+      "stoneId": "mind",
+      "syncExistingTeams": true
     },
     {
       "id": "cybersecurity",
@@ -29,22 +56,38 @@
       "domainName": "CYBERSECURITY & DIGITAL TRUST",
       "tagline": "Cybersecurity • Privacy • Cryptography",
       "description": "Engineer resilient digital trust architectures, intelligent phishing and fraud detection, secure digital identity verification, and proactive cyber threat defense.",
-      "iconName": "Shield",
+      "iconName": "Globe",
       "stoneSymbol": "The Tesseract",
       "accentHex": "#00d2ff",
       "accentRgb": "0, 210, 255",
       "techStackSuggestions": [
         "Rust",
         "Go",
-        "Python",
+        "Kubernetes",
         "eBPF",
-        "Cryptography",
-        "SIEM / ELK"
+        "Cloudflare Workers",
+        "WireGuard"
       ],
       "isPsReleased": false,
       "psReleaseDate": "2026-10-10T09:00:00Z",
-      "problemStatements": [],
-      "roomAllocated": "Lab Block 2 (IoT-204)"
+      "problemStatements": [
+        {
+          "id": "ps-conn-01",
+          "code": "PS-CONN-01",
+          "title": "Zero-Trust Multi-Cloud Mesh Failover & Network Threat Shield",
+          "category": "Cybersecurity & Cloud",
+          "description": "Design a self-healing reverse proxy and global routing daemon that dynamically migrates stateful traffic across multiple cloud providers and edge nodes during regional outages or active DDoS attacks.",
+          "difficulty": "Hardcore",
+          "deliverables": [
+            "Working distributed controller and lightweight edge proxy agent",
+            "Zero-loss connection migration benchmark demonstration",
+            "Real-time threat detection & firewall isolation rules"
+          ]
+        }
+      ],
+      "roomAllocated": "Lab Block 2 (IoT-204)",
+      "syncExistingTeams": true,
+      "stoneId": "space"
     },
     {
       "id": "infrastructure",
@@ -52,22 +95,37 @@
       "domainName": "DIGITAL PUBLIC INFRASTRUCTURE",
       "tagline": "Digital Platforms • Services • E-Governance",
       "description": "Construct unified digital public infrastructure, smart civic grievance platforms, transparent governance dashboards, and verified digital citizen services.",
-      "iconName": "Globe",
+      "iconName": "Sparkles",
       "stoneSymbol": "The Aether Prism",
       "accentHex": "#ff2a4b",
       "accentRgb": "255, 42, 75",
       "techStackSuggestions": [
         "TypeScript",
         "React",
+        "Flutter",
         "Next.js",
         "Node.js",
-        "PostgreSQL",
-        "Flutter"
+        "WebGL"
       ],
       "isPsReleased": false,
       "psReleaseDate": "2026-10-10T09:00:00Z",
-      "problemStatements": [],
-      "roomAllocated": "Innovation Wing (IW-102)"
+      "problemStatements": [
+        {
+          "id": "ps-dig-01",
+          "code": "PS-DIG-01",
+          "title": "Sub-30ms Collaborative Digital Canvas & Universal Component Mesh",
+          "category": "Web & Mobile Platforms",
+          "description": "Construct a browser-based and mobile-first real-time workspace enabling multi-user manipulation of high-fidelity state with cryptographic attribution and instant offline synchronization.",
+          "difficulty": "Advanced",
+          "deliverables": [
+            "Interactive cross-platform collaboration UI",
+            "Sub-30ms CRDT state synchronization pipeline",
+            "Offline-first progressive synchronization"
+          ]
+        }
+      ],
+      "roomAllocated": "Lab Block 1 (AI-102)",
+      "stoneId": "reality"
     },
     {
       "id": "cleantech",
@@ -75,22 +133,37 @@
       "domainName": "CLEAN & GREEN TECHNOLOGY",
       "tagline": "Environment • Waste • Sustainability",
       "description": "Develop sustainable clean technologies, intelligent waste and recycling systems, smart water conservation platforms, and real-time carbon footprint optimization.",
-      "iconName": "Zap",
-      "stoneSymbol": "The Orb of Morag",
+      "iconName": "Shield",
+      "stoneSymbol": "The Kinetic Orb",
       "accentHex": "#b026ff",
       "accentRgb": "176, 38, 255",
       "techStackSuggestions": [
-        "Python",
-        "IoT / ESP32",
-        "React",
+        "C++",
+        "Rust",
+        "ESP32 / Arduino",
+        "ROS2",
         "MQTT",
-        "TensorFlow",
-        "FastAPI"
+        "FreeRTOS"
       ],
       "isPsReleased": false,
       "psReleaseDate": "2026-10-10T09:00:00Z",
-      "problemStatements": [],
-      "roomAllocated": "Hardware & IoT Arena (HA-01)"
+      "problemStatements": [
+        {
+          "id": "ps-auto-01",
+          "code": "PS-AUTO-01",
+          "title": "Autonomous Edge Robotics Fleet Controller & Sensor Telemetry Hub",
+          "category": "Robotics & Embedded Systems",
+          "description": "Develop a microsecond telemetry agent and swarm control hub that continuously coordinates robotic actuators and IoT sensors, isolating hardware faults automatically.",
+          "difficulty": "Hardcore",
+          "deliverables": [
+            "Hardware-in-the-loop or simulation telemetry interface",
+            "Autonomous failover daemon for robotic actuators",
+            "Real-time metrics visualizer with latency histograms"
+          ]
+        }
+      ],
+      "roomAllocated": "Mechanical Block (Robo-01)",
+      "stoneId": "power"
     },
     {
       "id": "education",
@@ -98,22 +171,37 @@
       "domainName": "SMART EDUCATION",
       "tagline": "EdTech • Learning • Assessment",
       "description": "Architect personalized AI learning platforms, intelligent academic mentors, student performance analytics, and accessible assistive education tools.",
-      "iconName": "BookOpen",
-      "stoneSymbol": "Eye of Agamotto",
+      "iconName": "Clock",
+      "stoneSymbol": "The Eye of Agamotto",
       "accentHex": "#00ff88",
       "accentRgb": "0, 255, 136",
       "techStackSuggestions": [
         "Python",
-        "LangChain",
-        "React",
-        "FastAPI",
-        "Node.js",
-        "PostgreSQL"
+        "Kafka",
+        "ClickHouse",
+        "Pandas",
+        "DuckDB",
+        "Scikit-Learn"
       ],
       "isPsReleased": false,
       "psReleaseDate": "2026-10-10T09:00:00Z",
-      "problemStatements": [],
-      "roomAllocated": "CS Block (DataLab-401)"
+      "problemStatements": [
+        {
+          "id": "ps-ana-01",
+          "code": "PS-ANA-01",
+          "title": "Sub-Millisecond Streaming Prediction & Algorithmic Optimization Pipeline",
+          "category": "Data & Prediction",
+          "description": "Engineer an event-driven analytical router that processes high-throughput telemetry streams, predicts impending anomaly spikes using micro-statistical models, and dynamically optimizes execution paths.",
+          "difficulty": "Hardcore",
+          "deliverables": [
+            "Real-time streaming pipeline processing benchmarks",
+            "Live statistical prediction vs naive forecast models",
+            "Visual telemetry interface with latency histograms"
+          ]
+        }
+      ],
+      "roomAllocated": "CS Block (DataLab-401)",
+      "stoneId": "time"
     },
     {
       "id": "healthcare",
@@ -122,27 +210,47 @@
       "tagline": "Healthcare • Medical AI • Assistive Technology",
       "description": "Advance transformative medical AI, remote patient diagnostic networks, emergency healthcare coordination, and accessible assistive health technologies.",
       "iconName": "Heart",
-      "stoneSymbol": "Vormir Altar",
+      "stoneSymbol": "The Cosmic Singularity",
       "accentHex": "#ff7700",
       "accentRgb": "255, 119, 0",
       "techStackSuggestions": [
         "Python",
         "Flutter",
+        "PostgreSQL",
         "FastAPI",
-        "OpenCV",
-        "PyTorch",
-        "PostgreSQL"
+        "Edge AI",
+        "OpenCV"
       ],
       "isPsReleased": false,
       "psReleaseDate": "2026-10-10T09:00:00Z",
-      "problemStatements": [],
-      "roomAllocated": "Seminar Hall 2"
+      "problemStatements": [
+        {
+          "id": "ps-imp-01",
+          "code": "PS-IMP-01",
+          "title": "Decentralized Community Healthcare Triage & Precision Agriculture Telemetry",
+          "category": "HealthTech & Social Impact",
+          "description": "Construct a privacy-preserving triage engine and sensor aggregation hub for underserved rural communities that pairs offline-first inference with automated resource distribution.",
+          "difficulty": "Advanced",
+          "deliverables": [
+            "Offline-first progressive web and mobile application",
+            "Differential-privacy epidemiological & soil telemetry dashboard",
+            "SMS/WhatsApp fallback alerting pipeline"
+          ]
+        }
+      ],
+      "roomAllocated": "Seminar Hall 2",
+      "stoneId": "soul"
     }
   ],
   "teams": [],
-  "_version": 80,
-  "_lastModified": "2026-10-06T08:20:58.208Z",
+  "_version": 234,
+  "_lastModified": "2026-10-06T14:35:12.737Z",
   "settings": {
     "registrationOpen": true
+  },
+  "paymentQrs": {
+    "member3": "/3mem.png",
+    "member4": "/4mem.png",
+    "updatedAt": "2026-10-06T06:24:45.763Z"
   }
 }

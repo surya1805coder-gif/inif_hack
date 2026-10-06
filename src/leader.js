@@ -21,12 +21,51 @@ let currentTeam = null;
 
     function getSavedToken() {
       try {
-        // Purge legacy storage to ensure no plaintext passwords linger in localStorage
-        localStorage.removeItem('infinity_leader_auth');
-        const raw = sessionStorage.getItem('infinity_leader_auth');
-        if (!raw) return '';
-        const parsed = JSON.parse(raw);
-        return parsed.token || (typeof parsed === 'string' ? parsed : '');
+        // 1. Check URL hash (e.g., #token=... or #autologin=1&token=...)
+        let urlToken = '';
+        if (window.location.hash) {
+          const hashString = window.location.hash.replace(/^#/, '');
+          const hashParams = new URLSearchParams(hashString);
+          urlToken = hashParams.get('token') || (hashString.startsWith('token=') ? hashString.split('=')[1] : '');
+        }
+
+        // 2. Check query parameters (e.g., ?token=...)
+        if (!urlToken && window.location.search) {
+          const queryParams = new URLSearchParams(window.location.search);
+          urlToken = queryParams.get('token') || '';
+        }
+
+        // If token arrived via URL, store it and sanitize URL cleanly without reloading
+        if (urlToken) {
+          try {
+            sessionStorage.setItem('infinity_leader_auth', JSON.stringify({ token: urlToken }));
+            localStorage.setItem('infinity_leader_auth', JSON.stringify({ token: urlToken }));
+            const cleanUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+          } catch (_) {}
+          return urlToken;
+        }
+
+        // 3. Check sessionStorage
+        const rawSession = sessionStorage.getItem('infinity_leader_auth');
+        if (rawSession) {
+          const parsed = JSON.parse(rawSession);
+          const t = parsed.token || (typeof parsed === 'string' ? parsed : '');
+          if (t) return t;
+        }
+
+        // 4. Check localStorage fallback (for cross-tab navigation from registration)
+        const rawLocal = localStorage.getItem('infinity_leader_auth');
+        if (rawLocal) {
+          const parsed = JSON.parse(rawLocal);
+          const t = parsed.token || (typeof parsed === 'string' ? parsed : '');
+          if (t) {
+            sessionStorage.setItem('infinity_leader_auth', JSON.stringify({ token: t }));
+            return t;
+          }
+        }
+
+        return '';
       } catch (e) {
         return '';
       }
@@ -46,6 +85,7 @@ let currentTeam = null;
         const data = await res.json();
         if (!res.ok || !data.success) {
           sessionStorage.removeItem('infinity_leader_auth');
+          localStorage.removeItem('infinity_leader_auth');
           secLogin.style.display = 'block';
           return;
         }

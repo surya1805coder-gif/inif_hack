@@ -1399,9 +1399,31 @@ export function initRegistrationModule() {
         const sucMailRecipient = document.getElementById('suc-mail-recipient');
         if (sucMailRecipient) sucMailRecipient.textContent = leaderEmailVal;
 
+        // Auto-login session preparation
+        if (resData.token) {
+          try {
+            sessionStorage.setItem('infinity_leader_auth', JSON.stringify({ token: resData.token }));
+            localStorage.setItem('infinity_leader_auth', JSON.stringify({ token: resData.token }));
+          } catch (_) {}
+        }
+
         const btnGoLeader = document.getElementById('btn-go-leader');
         if (btnGoLeader) {
-          btnGoLeader.href = `/leader.html?team=${encodeURIComponent(resData.team.id)}&email=${encodeURIComponent(leaderEmailVal)}`;
+          const autoLoginUrl = resData.token
+            ? `/leader.html?autologin=1#token=${encodeURIComponent(resData.token)}`
+            : `/leader.html?team=${encodeURIComponent(resData.team.id)}&email=${encodeURIComponent(leaderEmailVal)}`;
+
+          btnGoLeader.href = autoLoginUrl;
+          btnGoLeader.innerHTML = `<span>⚡ AUTO-LOGIN TO LEADER PAGE</span> &rarr;`;
+
+          btnGoLeader.onclick = () => {
+            if (resData.token) {
+              try {
+                sessionStorage.setItem('infinity_leader_auth', JSON.stringify({ token: resData.token }));
+                localStorage.setItem('infinity_leader_auth', JSON.stringify({ token: resData.token }));
+              } catch (_) {}
+            }
+          };
         }
 
         // Populate Member Roster in Success Modal

@@ -1406,11 +1406,15 @@ app.post('/api/register', upload.single('paymentScreenshot'), async (req, res) =
       mailError = mErr.message;
     }
 
+    const secret = process.env.ADMIN_SECRET || 'infinity-secret-2026-stellar';
+    const token = generateTeamToken(result.newTeam.id, secret);
+
     res.json({
       success: true,
       message: `Registration successful for ${result.newTeam.teamName}! Total registration fee: ₹${result.calculatedAmount}.`,
       mailSent: mailDispatched,
       mailError: mailError,
+      token: token,
       team: {
         id: result.newTeam.id,
         teamName: result.newTeam.teamName,

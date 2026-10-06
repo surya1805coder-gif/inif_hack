@@ -2312,11 +2312,14 @@ export async function onRequest(context) {
         mailError = mErr.message;
       }
 
+      const token = await generateTeamToken(result.newTeam.id, ADMIN_SECRET);
+
       return jsonResponse({
         success: true,
         message: `Registration successful for ${result.newTeam.teamName}! Total registration fee: ₹${result.calculatedAmount}.`,
         mailSent: mailDispatched,
         mailError: mailError,
+        token: token,
         team: {
           id: result.newTeam.id,
           teamName: result.newTeam.teamName,
