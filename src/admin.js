@@ -29,6 +29,27 @@ const STONE_DOMAIN_MAP = {
   impact: 'healthcare'
 };
 
+const CANONICAL_DOMAINS_MAP = {
+  mind: { id: 'transportation', domainName: 'TRANSPORTATION & LOGISTICS', tagline: 'Mobility • Supply Chain • Routing' },
+  space: { id: 'cybersecurity', domainName: 'CYBERSECURITY & DIGITAL TRUST', tagline: 'Cybersecurity • Privacy • Cryptography' },
+  reality: { id: 'infrastructure', domainName: 'DIGITAL PUBLIC INFRASTRUCTURE', tagline: 'Digital Platforms • Services • E-Governance' },
+  power: { id: 'cleantech', domainName: 'CLEAN & GREEN TECHNOLOGY', tagline: 'Environment • Waste • Sustainability' },
+  time: { id: 'education', domainName: 'SMART EDUCATION', tagline: 'EdTech • Learning • Assessment' },
+  soul: { id: 'healthcare', domainName: 'MEDTECH / BIOTECH / HEALTHCARE', tagline: 'Healthcare • Medical AI • Assistive Technology' },
+  transportation: { id: 'transportation', domainName: 'TRANSPORTATION & LOGISTICS', tagline: 'Mobility • Supply Chain • Routing' },
+  cybersecurity: { id: 'cybersecurity', domainName: 'CYBERSECURITY & DIGITAL TRUST', tagline: 'Cybersecurity • Privacy • Cryptography' },
+  infrastructure: { id: 'infrastructure', domainName: 'DIGITAL PUBLIC INFRASTRUCTURE', tagline: 'Digital Platforms • Services • E-Governance' },
+  cleantech: { id: 'cleantech', domainName: 'CLEAN & GREEN TECHNOLOGY', tagline: 'Environment • Waste • Sustainability' },
+  education: { id: 'education', domainName: 'SMART EDUCATION', tagline: 'EdTech • Learning • Assessment' },
+  healthcare: { id: 'healthcare', domainName: 'MEDTECH / BIOTECH / HEALTHCARE', tagline: 'Healthcare • Medical AI • Assistive Technology' },
+  intelligence: { id: 'transportation', domainName: 'TRANSPORTATION & LOGISTICS', tagline: 'Mobility • Supply Chain • Routing' },
+  connectivity: { id: 'cybersecurity', domainName: 'CYBERSECURITY & DIGITAL TRUST', tagline: 'Cybersecurity • Privacy • Cryptography' },
+  digital: { id: 'infrastructure', domainName: 'DIGITAL PUBLIC INFRASTRUCTURE', tagline: 'Digital Platforms • Services • E-Governance' },
+  automation: { id: 'cleantech', domainName: 'CLEAN & GREEN TECHNOLOGY', tagline: 'Environment • Waste • Sustainability' },
+  analytics: { id: 'education', domainName: 'SMART EDUCATION', tagline: 'EdTech • Learning • Assessment' },
+  impact: { id: 'healthcare', domainName: 'MEDTECH / BIOTECH / HEALTHCARE', tagline: 'Healthcare • Medical AI • Assistive Technology' }
+};
+
 function normalizeDomainId(val) {
   if (!val) return 'transportation';
   const clean = String(val).toLowerCase().replace(/ stone$/i, '').trim();
@@ -300,7 +321,19 @@ function authHeaders(extra = {}) {
         const domainsData = await domainsRes.json();
 
         allTeams = teamsData.teams || [];
-        allDomains = domainsData.domains || [];
+        allDomains = (domainsData.domains || []).map(dom => {
+          const normKey = (dom.stoneId || '').toLowerCase() || (dom.stoneName ? dom.stoneName.toLowerCase().replace(/ stone/i, '').trim() : '') || dom.id;
+          const canonical = CANONICAL_DOMAINS_MAP[normKey] || CANONICAL_DOMAINS_MAP[dom.id];
+          if (canonical) {
+            return {
+              ...dom,
+              id: canonical.id,
+              domainName: canonical.domainName,
+              tagline: canonical.tagline
+            };
+          }
+          return dom;
+        });
 
         if (teamsData.settings && typeof teamsData.settings.registrationOpen === 'boolean') {
           updateRegistrationUI(teamsData.settings.registrationOpen);
@@ -1347,7 +1380,12 @@ function authHeaders(extra = {}) {
       allDomains.forEach(dom => {
         const isReleased = Boolean(dom.isPsReleased);
         const psList = dom.problemStatements || [];
-        const pfx = prefixMap[dom.id] || dom.id.substring(0, 4).toUpperCase();
+        const normKey = (dom.stoneId || '').toLowerCase() || (dom.stoneName ? dom.stoneName.toLowerCase().replace(/ stone/i, '').trim() : '') || dom.id;
+        const canonical = CANONICAL_DOMAINS_MAP[normKey] || CANONICAL_DOMAINS_MAP[dom.id];
+        const displayDomainName = canonical ? canonical.domainName : dom.domainName;
+        const displayTagline = canonical ? canonical.tagline : (dom.tagline || '');
+        const targetId = canonical ? canonical.id : dom.id;
+        const pfx = prefixMap[targetId] || prefixMap[dom.id] || targetId.substring(0, 4).toUpperCase();
         const nextCode = `PS-${pfx}-${String(psList.length + 1).padStart(2, '0')}`;
         const accent = dom.accentHex || '#ffd000';
 
@@ -1356,10 +1394,10 @@ function authHeaders(extra = {}) {
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:12px;">
               <div>
                 <h4 style="font-size:1.15rem; color:#fff; display:flex; align-items:center; gap:8px;">
-                  <span>${escapeHTML(dom.domainName)}</span>
+                  <span>${escapeHTML(displayDomainName)}</span>
                   <span style="font-family:'JetBrains Mono'; font-size:0.75rem; color:${accent}; font-weight:700;">(${escapeHTML(dom.stoneName)})</span>
                 </h4>
-                <div style="font-size:0.75rem; color:var(--text-muted);">${escapeHTML(dom.tagline || '')}</div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">${escapeHTML(displayTagline)}</div>
               </div>
 
               <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
@@ -1389,7 +1427,7 @@ function authHeaders(extra = {}) {
             <!-- Expandable Add Problem Statement Panel -->
             <div id="add-panel-${escapeHTML(dom.id)}" style="display:none; margin: 12px 0 16px 0; padding:16px; border-radius:10px; background:rgba(6,6,12,0.95); border:1px solid ${accent}60; box-shadow:0 8px 25px rgba(0,0,0,0.6);">
               <div style="font-family:'Syne',sans-serif; font-size:0.86rem; font-weight:700; color:${accent}; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
-                <span>✦</span> NEW PROBLEM STATEMENT // ${escapeHTML(dom.stoneName.toUpperCase())} (${escapeHTML(dom.domainName)})
+                <span>✦</span> NEW PROBLEM STATEMENT // ${escapeHTML(dom.stoneName.toUpperCase())} (${escapeHTML(displayDomainName)})
               </div>
 
               <div class="edit-grid-3" style="margin-bottom:10px;">
@@ -1414,7 +1452,7 @@ function authHeaders(extra = {}) {
               <div class="edit-grid-2" style="margin-bottom:10px;">
                 <div class="form-group" style="margin:0;">
                   <label class="form-label">CATEGORY / TRACK</label>
-                  <input type="text" id="new-cat-${escapeHTML(dom.id)}" class="form-input" value="${escapeHTML(dom.domainName)} & Systems" style="padding:8px 10px; font-size:0.82rem;">
+                  <input type="text" id="new-cat-${escapeHTML(dom.id)}" class="form-input" value="${escapeHTML(displayDomainName)}" style="padding:8px 10px; font-size:0.82rem;">
                 </div>
                 <div class="form-group" style="margin:0;">
                   <label class="form-label">DELIVERABLES (COMMA-SEPARATED)</label>

@@ -431,6 +431,115 @@ const INITIAL_DOMAINS = [
   }
 ];
 
+export function syncCanonicalDomains(db) {
+  if (!db || !Array.isArray(db.domains)) return false;
+  let changed = false;
+
+  const stoneOrder = ['mind', 'space', 'reality', 'power', 'time', 'soul'];
+  const canonicalMap = {
+    mind: {
+      id: "transportation",
+      stoneId: "mind",
+      stoneName: "Mind Stone",
+      domainName: "TRANSPORTATION & LOGISTICS",
+      tagline: "Mobility • Supply Chain • Routing",
+      description: "Pioneer intelligent traffic management, emergency route optimization, real-time public transit tracking, and dynamic supply chain logistics to eliminate urban congestion.",
+      accentHex: "#ffd000",
+      accentRgb: "255, 208, 0"
+    },
+    space: {
+      id: "cybersecurity",
+      stoneId: "space",
+      stoneName: "Space Stone",
+      domainName: "CYBERSECURITY & DIGITAL TRUST",
+      tagline: "Cybersecurity • Privacy • Cryptography",
+      description: "Engineer resilient digital trust architectures, intelligent phishing and fraud detection, secure digital identity verification, and proactive cyber threat defense.",
+      accentHex: "#00d2ff",
+      accentRgb: "0, 210, 255"
+    },
+    reality: {
+      id: "infrastructure",
+      stoneId: "reality",
+      stoneName: "Reality Stone",
+      domainName: "DIGITAL PUBLIC INFRASTRUCTURE",
+      tagline: "Digital Platforms • Services • E-Governance",
+      description: "Construct unified digital public infrastructure, smart civic grievance platforms, transparent governance dashboards, and verified digital citizen services.",
+      accentHex: "#ff2a4b",
+      accentRgb: "255, 42, 75"
+    },
+    power: {
+      id: "cleantech",
+      stoneId: "power",
+      stoneName: "Power Stone",
+      domainName: "CLEAN & GREEN TECHNOLOGY",
+      tagline: "Environment • Waste • Sustainability",
+      description: "Develop sustainable clean technologies, intelligent waste and recycling systems, smart water conservation platforms, and real-time carbon footprint optimization.",
+      accentHex: "#b026ff",
+      accentRgb: "176, 38, 255"
+    },
+    time: {
+      id: "education",
+      stoneId: "time",
+      stoneName: "Time Stone",
+      domainName: "SMART EDUCATION",
+      tagline: "EdTech • Learning • Assessment",
+      description: "Architect personalized AI learning platforms, intelligent academic mentors, student performance analytics, and accessible assistive education tools.",
+      accentHex: "#00ff88",
+      accentRgb: "0, 255, 136"
+    },
+    soul: {
+      id: "healthcare",
+      stoneId: "soul",
+      stoneName: "Soul Stone",
+      domainName: "MEDTECH / BIOTECH / HEALTHCARE",
+      tagline: "Healthcare • Medical AI • Assistive Technology",
+      description: "Advance transformative medical AI, remote patient diagnostic networks, emergency healthcare coordination, and accessible assistive health technologies.",
+      accentHex: "#ff7700",
+      accentRgb: "255, 119, 0"
+    }
+  };
+
+  stoneOrder.forEach((stoneKey, idx) => {
+    const canonical = canonicalMap[stoneKey];
+    let dom = db.domains.find(d => 
+      (d.stoneId && d.stoneId.toLowerCase() === stoneKey) ||
+      (d.stoneName && d.stoneName.toLowerCase().includes(stoneKey)) ||
+      (STONE_DOMAIN_MAP[d.id] === canonical.id)
+    );
+
+    if (!dom && db.domains[idx]) {
+      dom = db.domains[idx];
+    }
+
+    if (dom) {
+      if (
+        dom.domainName !== canonical.domainName ||
+        dom.tagline !== canonical.tagline ||
+        dom.id !== canonical.id ||
+        dom.stoneId !== canonical.stoneId
+      ) {
+        dom.id = canonical.id;
+        dom.stoneId = canonical.stoneId;
+        dom.stoneName = canonical.stoneName;
+        dom.domainName = canonical.domainName;
+        dom.tagline = canonical.tagline;
+        dom.description = canonical.description;
+        dom.accentHex = canonical.accentHex;
+        dom.accentRgb = canonical.accentRgb;
+        changed = true;
+      }
+    } else {
+      const initial = INITIAL_DOMAINS.find(d => d.id === canonical.id);
+      if (initial) {
+        db.domains.push(JSON.parse(JSON.stringify(initial)));
+        changed = true;
+      }
+    }
+  });
+
+  return changed;
+}
+
 // Helper: Ensure Data Directory
 function ensureDataDir() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -455,6 +564,10 @@ export async function loadDb(forceFresh = false) {
         const parsed = JSON.parse(text);
         if (parsed.domains && parsed.teams) {
           if (!parsed.settings) parsed.settings = { registrationOpen: true };
+          const migrated = syncCanonicalDomains(parsed);
+          if (migrated) {
+            saveDb(parsed).catch(err => console.warn('Failed to save migrated domains:', err));
+          }
           dbMemoryCache = parsed;
           dbMemoryCacheTimestamp = Date.now();
           return parsed;
@@ -471,6 +584,10 @@ export async function loadDb(forceFresh = false) {
       const raw = fs.readFileSync(DB_FILE, 'utf-8');
       const parsed = JSON.parse(raw);
       if (!parsed.settings) parsed.settings = { registrationOpen: true };
+      const migratedLocal = syncCanonicalDomains(parsed);
+      if (migratedLocal) {
+        saveDb(parsed).catch(err => console.warn('Failed to save migrated domains:', err));
+      }
       dbMemoryCache = parsed;
       dbMemoryCacheTimestamp = Date.now();
       return parsed;
