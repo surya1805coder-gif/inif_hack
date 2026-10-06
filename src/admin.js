@@ -1303,7 +1303,7 @@ function authHeaders(extra = {}) {
         let force = false;
         let targetCount = unmailedTeams.length;
 
-        const mailDetails = `The email includes:\n• Assigned Track Domain & Lab Room Allocation\n• Official Pass ID & Team Name\n• Hackathon Schedule & Round Timings (08:30 AM arrival)\n• Mandatory Rules: Own Laptops & Chargers, Electric Spikes (Multi-Plug Boards), Zero Tolerance for Misbehavior, and Original College IDs.`;
+        const mailDetails = `The email includes:\n• Assigned Track Domain & Lab Room Allocation\n• Official Pass ID & Team Name\n• Mandatory Rules: Own Laptops & Chargers, Electric Spikes (Multi-Plug Boards), Zero Tolerance for Misbehavior, and Original College IDs.`;
 
         if (targetCount === 0) {
           if (confirm(`All ${verifiedTeams.length} verified squad(s) have already received confirmation passes.\n\nDo you want to FORCE re-send to ALL ${verifiedTeams.length} verified squads?\n\n${mailDetails}`)) {

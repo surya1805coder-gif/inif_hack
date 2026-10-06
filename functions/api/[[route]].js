@@ -1659,65 +1659,6 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
             </td>
           </tr>
 
-          <!-- Event Timing & Schedule Table -->
-          <tr>
-            <td style="padding:0 28px 20px 28px;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; overflow:hidden;">
-                <tr>
-                  <td style="padding:14px 18px; background:#f1f5f9; border-bottom:1px solid #cbd5e1;">
-                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                      <tr>
-                        <td style="width:24px; vertical-align:middle; font-size:18px;">⏰</td>
-                        <td style="padding-left:8px; vertical-align:middle;">
-                          <span style="font-size:11px; font-weight:800; color:#334155; letter-spacing:0.12em; text-transform:uppercase;">
-                            EVENT TIMINGS &amp; HACKATHON SCHEDULE
-                          </span>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding:14px 18px;">
-                    <table role="presentation" width="100%" cellspacing="0" cellpadding="6" border="0" style="font-size:12px;">
-                      <tr>
-                        <td style="color:#475569; font-weight:700; width:34%; font-family:monospace;">08:30 AM – 09:15 AM</td>
-                        <td style="color:#0f172a; font-weight:600;">Campus Arrival, Security Pass Check &amp; Desk Allocation</td>
-                      </tr>
-                      <tr>
-                        <td style="color:#475569; font-weight:700; font-family:monospace;">09:15 AM – 09:30 AM</td>
-                        <td style="color:#0f172a; font-weight:600;">Desk Setup at Allocated Room: <strong>${roomEscaped}</strong></td>
-                      </tr>
-                      <tr>
-                        <td style="color:#475569; font-weight:700; font-family:monospace;">09:30 AM – 10:00 AM</td>
-                        <td style="color:#0f172a; font-weight:600;">Inauguration Ceremony &amp; Problem Statements Release</td>
-                      </tr>
-                      <tr>
-                        <td style="color:#475569; font-weight:700; font-family:monospace;">10:00 AM (Day 1)</td>
-                        <td style="color:#047857; font-weight:800;">🚀 24-Hour Hackathon Development Sprint Begins</td>
-                      </tr>
-                      <tr>
-                        <td style="color:#475569; font-weight:700; font-family:monospace;">03:00 PM (Day 1)</td>
-                        <td style="color:#0f172a; font-weight:600;">Review Round 01 — System Architecture &amp; Feasibility Check</td>
-                      </tr>
-                      <tr>
-                        <td style="color:#475569; font-weight:700; font-family:monospace;">10:00 PM (Day 1)</td>
-                        <td style="color:#0f172a; font-weight:600;">Review Round 02 — Working Prototype &amp; Core APIs Mentoring</td>
-                      </tr>
-                      <tr>
-                        <td style="color:#475569; font-weight:700; font-family:monospace;">07:30 AM (Day 2)</td>
-                        <td style="color:#0f172a; font-weight:600;">Review Round 03 — Feature Freeze &amp; Code Polish</td>
-                      </tr>
-                      <tr>
-                        <td style="color:#475569; font-weight:700; font-family:monospace;">10:00 AM (Day 2)</td>
-                        <td style="color:#0f172a; font-weight:800;">🏆 Final Jury Pitches, Rubric Evaluation &amp; Grand Valedictory</td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
 
           <!-- Mandatory Rules & Guidelines Highlighted with Icons -->
           <tr>
