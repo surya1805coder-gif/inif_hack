@@ -1599,7 +1599,7 @@ body.timeline-unlocked .showcase-layout {
     display: none !important;
   }
 
-  /* Direct Register CTA on mobile positioned directly under Leader & Hamburger */
+  /* Direct Register CTA on mobile positioned directly under Leader & Hamburger - Unified dark glass style */
   .hud-btn-register {
     display: inline-flex !important;
     align-items: center !important;
@@ -1610,23 +1610,29 @@ body.timeline-unlocked .showcase-layout {
     padding: 0 8px !important;
     font-family: var(--font-mono) !important;
     font-size: 0.60rem !important;
-    font-weight: 800 !important;
+    font-weight: 700 !important;
     letter-spacing: 0.08em !important;
     border-radius: 6px !important;
-    background: linear-gradient(135deg, #ffd000, #ff8800) !important;
-    color: #000000 !important;
-    box-shadow: 0 0 12px rgba(255, 208, 0, 0.4) !important;
-    border: none !important;
+    background: rgba(18, 18, 26, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
     cursor: pointer !important;
     width: 100% !important;
     box-sizing: border-box !important;
     white-space: nowrap !important;
     text-transform: uppercase !important;
-    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+    transition: all 0.2s ease !important;
   }
 
+  .hud-btn-register:hover,
   .hud-btn-register:active {
-    transform: scale(0.97) !important;
+    background: rgba(255, 255, 255, 0.14) !important;
+    border-color: rgba(255, 255, 255, 0.45) !important;
+    color: #ffffff !important;
+    transform: scale(0.98) !important;
   }
 
   /* Ultra-compact and sleek Leader button and Hamburger on mobile: EXACT SAME HEIGHT & RADIUS (30px) */
@@ -1998,6 +2004,11 @@ body.timeline-unlocked .showcase-layout {
     padding: 0 12px !important;
     gap: 8px !important;
     width: 100% !important;
+    border-radius: 8px !important;
+    background: rgba(14, 14, 22, 0.92) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
   }
 
   .btn-wield-stone .wield-title {
@@ -3605,16 +3616,23 @@ body.timeline-unlocked #sponsors-section {
 }
 
 .hud-btn-register {
-  background: linear-gradient(135deg, rgba(255, 208, 0, 0.25) 0%, rgba(255, 208, 0, 0.08) 100%) !important;
-  border-color: rgba(255, 208, 0, 0.5) !important;
-  color: #ffd000 !important;
+  background: rgba(14, 14, 20, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 8px !important;
+  color: #ffffff !important;
   font-weight: 700 !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  transition: all 0.25s var(--transition-smooth) !important;
 }
 
 .hud-btn-register:hover {
-  background: #ffd000 !important;
-  color: #050508 !important;
-  box-shadow: 0 0 24px rgba(255, 208, 0, 0.6) !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+  transform: translateY(-1px) !important;
 }
 
 /* Portals Dropdown */
@@ -3714,23 +3732,23 @@ body.timeline-unlocked #sponsors-section {
 
 .btn-wield-stone {
   width: 100%;
-  height: 48px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 0 24px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0 20px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-top: 1px solid rgba(255, 255, 255, 0.22);
   color: #ffffff;
   cursor: pointer;
   position: relative;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
   outline: none;
 }
 
@@ -3754,36 +3772,36 @@ body.timeline-unlocked #sponsors-section {
   width: 14px;
   height: 14px;
   stroke-width: 2.2;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.75);
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), color 0.28s ease, opacity 0.28s ease;
   margin-left: 2px;
 }
 
 .btn-wield-stone:hover {
-  background: #ffffff;
-  border-color: #ffffff;
-  color: #030305;
-  transform: translateY(-2px);
-  box-shadow: 0 0 28px rgba(255, 255, 255, 0.35), 0 10px 25px rgba(0, 0, 0, 0.6);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--active-stone-color, #ffffff);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 18px var(--active-stone-glow, rgba(255, 208, 0, 0.35));
 }
 
 .btn-wield-stone:hover .wield-title {
-  color: #030305 !important;
+  color: #ffffff !important;
 }
 
 .btn-wield-stone:hover .wield-icon {
-  color: #030305 !important;
+  color: var(--active-stone-color, #ffd000) !important;
   transform: rotate(20deg) scale(1.15);
 }
 
 .btn-wield-stone:hover .wield-arrow {
-  color: #030305 !important;
+  color: #ffffff !important;
   transform: translateX(4px);
   opacity: 1;
 }
 
 .btn-wield-stone:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.98);
 }
 
 /* Tech Stack Badges in Card */
@@ -6055,18 +6073,26 @@ body.timeline-unlocked #sponsors-section {
 .btn-modal-primary {
   padding: 12px 20px;
   border-radius: 8px;
-  background: #ffd000;
-  color: #000000;
+  background: rgba(18, 18, 26, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.82rem;
   text-decoration: none;
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
   transition: all 0.2s ease;
 }
 
 .btn-modal-primary:hover {
-  background: #ffffff;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.45);
+  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transform: translateY(-1px);
 }
 
 .btn-modal-secondary {

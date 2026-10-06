@@ -76,11 +76,11 @@ export function initRegistrationModule() {
       if (formReg) formReg.style.display = 'block';
       if (regClosedNotice) regClosedNotice.style.display = 'none';
       if (btnNavRegister) {
-        btnNavRegister.innerHTML = '<span>REGISTER SQUAD</span>';
+        btnNavRegister.innerHTML = '<span class="btn-text"><span class="txt-desktop">✦ REGISTER SQUAD</span><span class="txt-mobile">✦ REGISTER</span></span>';
         btnNavRegister.classList.remove('reg-nav-closed');
       }
       if (btnWieldStone) {
-        btnWieldStone.innerHTML = '<span>WIELD THIS STONE</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+        btnWieldStone.innerHTML = '<span class="wield-icon">✦</span><span class="wield-title">WIELD THIS STONE</span><svg class="wield-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
       }
     }
   }

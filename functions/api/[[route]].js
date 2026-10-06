@@ -1076,6 +1076,346 @@ export function escapeEmailHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+async function dispatchEmailTransport({ to, cc = [], subject, html, env = {}, team = {}, debugLabel = 'Email' }) {
+  const resendApiKey = (env.RESEND_API_KEY || (typeof process !== 'undefined' ? process.env?.RESEND_API_KEY : '') || '').trim();
+  const brevoApiKey = (env.BREVO_API_KEY || (typeof process !== 'undefined' ? process.env?.BREVO_API_KEY : '') || '').trim();
+  const emailFrom = (env.EMAIL_FROM || (typeof process !== 'undefined' ? process.env?.EMAIL_FROM : '') || 'Infinity Hackathon 2026 <hackathon@infinity.akao.in>').trim();
+
+  // 1. Resend API (Recommended)
+  if (resendApiKey) {
+    const payload = {
+      from: emailFrom,
+      to: [to],
+      ...(cc.length > 0 ? { cc } : {}),
+      reply_to: 'support@infinity.akao.in',
+      subject,
+      html,
+    };
+
+    let res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    let resData = await res.json().catch(() => ({}));
+
+    // If CC failed due to invalid teammate addresses, retry strictly with leaderEmail
+    if (!res.ok && payload.cc) {
+      const fallbackPayload = {
+        from: emailFrom,
+        to: [to],
+        reply_to: 'support@infinity.akao.in',
+        subject,
+        html,
+      };
+      res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${resendApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(fallbackPayload)
+      });
+      resData = await res.json().catch(() => ({}));
+    }
+
+    if (!res.ok) {
+      let errMsg = resData.message || resData.error || `HTTP ${res.status}`;
+      if (errMsg.includes('only send testing emails to your own email address')) {
+        errMsg = `Resend Free Sandbox restriction: To send emails to all student addresses, please verify your domain at resend.com/domains. (For testing now, you can send to your registered email: white018899@gmail.com).`;
+      }
+      throw new Error(`Resend email dispatch: ${errMsg}`);
+    }
+    return { success: true, provider: 'resend', id: resData.id };
+  }
+
+  // 2. Brevo API (Fallback)
+  if (brevoApiKey) {
+    const senderParts = emailFrom.match(/^(.*)<(.*)>$/) || [null, 'Infinity Hackathon 2026', emailFrom];
+    const senderName = (senderParts[1] || 'Infinity Hackathon 2026').trim();
+    const senderEmail = (senderParts[2] || emailFrom).trim();
+
+    const payload = {
+      sender: { name: senderName, email: senderEmail },
+      to: [{ email: to, name: team?.leader?.name || 'Captain' }],
+      subject,
+      htmlContent: html
+    };
+    if (cc.length > 0) {
+      payload.cc = cc.map(email => ({ email }));
+    }
+
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'api-key': brevoApiKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const resData = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const errMsg = resData.message || `HTTP ${res.status}`;
+      throw new Error(`Brevo email dispatch error: ${errMsg}`);
+    }
+    return { success: true, provider: 'brevo', id: resData.messageId };
+  }
+
+  // 3. Simulated Dev Mode
+  console.log(`\n======================================================`);
+  console.log(`[EMAIL SIMULATION] ${debugLabel} Dispatched`);
+  console.log(`Squad:       ${team?.id} (${team?.teamName})`);
+  console.log(`To:          ${to}`);
+  console.log(`CC Members:  ${cc.join(', ') || 'None'}`);
+  console.log(`Subject:     ${subject}`);
+  console.log(`UTR:         ${team?.payment?.utr || 'N/A'}`);
+  console.log(`======================================================\n`);
+
+  return {
+    success: true,
+    simulated: true,
+    message: 'Simulated email sent! Configure RESEND_API_KEY in .env.local for live delivery.'
+  };
+}
+
+export async function sendRegistrationPendingEmail({ team, appUrl = 'https://infinity.akao.in', env = {}, rawPassword = null }) {
+  const leader = team.leader || {};
+  const leaderEmail = (leader.email || '').trim().toLowerCase();
+  if (!leaderEmail || !leaderEmail.includes('@')) {
+    throw new Error(`Squad ${team.id} (${team.teamName}) has no valid leader email address.`);
+  }
+
+  const teamMembers = Array.isArray(team.members) ? team.members : [];
+  const memberEmails = teamMembers
+    .map(m => (m.email || '').trim().toLowerCase())
+    .filter(e => e && e.includes('@') && e !== leaderEmail);
+
+  const teamId = escapeEmailHtml(team.id);
+  const teamName = escapeEmailHtml(team.teamName);
+  const college = escapeEmailHtml(team.college || 'N/A');
+  const domain = escapeEmailHtml((team.preferredDomain || 'intelligence').toUpperCase());
+  const utr = escapeEmailHtml(team.payment?.utr || 'PENDING');
+  const amount = escapeEmailHtml(team.payment?.amount || (team.teamSize || 4) * 349);
+  const size = escapeEmailHtml(team.teamSize || (teamMembers.length + 1));
+
+  let rosterRows = `
+    <tr>
+      <td style="padding:10px 14px; border-bottom:1px solid #e4e4e7; width:80px;">
+        <span style="display:inline-block; padding:3px 8px; border-radius:4px; background:#09090b; color:#ffffff; font-size:9px; font-weight:800; letter-spacing:0.06em; font-family:monospace;">CAPTAIN</span>
+      </td>
+      <td style="padding:10px 14px; border-bottom:1px solid #e4e4e7; color:#09090b; font-weight:600; font-size:13px;">
+        ${escapeEmailHtml(leader.name || 'Captain')}
+      </td>
+      <td style="padding:10px 14px; border-bottom:1px solid #e4e4e7; color:#71717a; font-size:12px; font-family:monospace;">
+        ${escapeEmailHtml(leader.email || '')} ${leader.phone ? `&bull; ${escapeEmailHtml(leader.phone)}` : ''}
+      </td>
+    </tr>
+  `;
+
+  teamMembers.forEach((m, idx) => {
+    const isLast = idx === teamMembers.length - 1;
+    const borderStyle = isLast ? '' : 'border-bottom:1px solid #e4e4e7;';
+    rosterRows += `
+      <tr>
+        <td style="padding:10px 14px; ${borderStyle} width:80px;">
+          <span style="display:inline-block; padding:3px 8px; border-radius:4px; background:#f4f4f5; border:1px solid #e4e4e7; color:#52525b; font-size:9px; font-weight:700; letter-spacing:0.06em; font-family:monospace;">MEMBER</span>
+        </td>
+        <td style="padding:10px 14px; ${borderStyle} color:#18181b; font-weight:500; font-size:13px;">
+          ${escapeEmailHtml(m.name || 'Squad Member')}
+        </td>
+        <td style="padding:10px 14px; ${borderStyle} color:#71717a; font-size:12px; font-family:monospace;">
+          ${escapeEmailHtml(m.email || '')} ${m.phone ? `&bull; ${escapeEmailHtml(m.phone)}` : ''}
+        </td>
+      </tr>
+    `;
+  });
+
+  const subject = `Registration Received — Pending Review | Squad ${team.teamName} [${team.id}]`;
+  const cleanAppUrl = (appUrl || 'https://infinity.akao.in').replace(/\/$/, '');
+
+  const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="margin:0; padding:0; background-color:#ffffff; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#09090b; -webkit-font-smoothing:antialiased;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f4f4f5; min-height:100vh; padding:36px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" style="max-width:580px; background-color:#ffffff; border:1px solid #e4e4e7; border-radius:10px; overflow:hidden; margin:0 auto; box-shadow:0 4px 16px rgba(0,0,0,0.04);" cellspacing="0" cellpadding="0" border="0">
+          
+          <!-- Header Section -->
+          <tr>
+            <td style="padding:36px 28px 24px 28px; text-align:center; border-bottom:1px solid #f4f4f5;">
+              <div style="font-size:10px; font-weight:700; letter-spacing:0.22em; color:#71717a; text-transform:uppercase; margin-bottom:8px;">DEPARTMENT OF COMPUTER SCIENCE &amp; ENGINEERING</div>
+              <div style="font-size:18px; font-weight:800; letter-spacing:0.1em; color:#09090b; text-transform:uppercase; margin-bottom:16px;">INFINITY HACKATHON 2026</div>
+              
+              <!-- Pending Status Badge -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto 16px auto;">
+                <tr>
+                  <td style="padding:6px 14px; border-radius:9999px; background:#fffbeb; border:1px solid #fde68a; color:#b45309; font-size:10px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase;">
+                    ⏳ REGISTRATION RECEIVED &bull; VERIFICATION PENDING
+                  </td>
+                </tr>
+              </table>
+
+              <h1 style="margin:0 0 8px 0; font-size:24px; font-weight:800; color:#09090b; letter-spacing:-0.02em;">Squad ${teamName}</h1>
+              <p style="margin:0 auto; font-size:13px; color:#71717a; line-height:1.6; max-width:460px;">
+                Your registration has been successfully received and is currently under administrative review. Once your payment is verified, you will receive an official Confirmed Squad Pass.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Summary Section -->
+          <tr>
+            <td style="padding:24px 28px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fafafa; border:1px solid #e4e4e7; border-radius:8px; overflow:hidden;">
+                <tr>
+                  <td style="padding:14px 18px; border-bottom:1px solid #e4e4e7; background:#f4f4f5;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td align="left">
+                          <span style="font-size:10px; font-weight:600; color:#71717a; letter-spacing:0.14em; text-transform:uppercase;">REGISTRATION REFERENCE ID</span>
+                          <div style="font-size:19px; font-weight:800; color:#09090b; font-family:monospace; margin-top:2px;">${teamId}</div>
+                        </td>
+                        <td align="right">
+                          <span style="display:inline-block; padding:4px 10px; border-radius:4px; background:#ffffff; border:1px solid #e4e4e7; color:#09090b; font-size:11px; font-weight:700; font-family:monospace;">${size} MEMBERS</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:16px 18px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="6" border="0" style="font-size:12px;">
+                      <tr>
+                        <td style="color:#71717a; font-weight:500; width:34%;">Payment Status</td>
+                        <td style="color:#b45309; font-weight:700;">
+                          <span style="display:inline-block; padding:3px 8px; border-radius:4px; background:#fffbeb; border:1px solid #fde68a;">⏳ PENDING ADMIN VERIFICATION</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Institution</td>
+                        <td style="color:#09090b; font-weight:600;">${college}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Track / Domain</td>
+                        <td style="color:#09090b; font-weight:700;">${domain}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Bank UTR / Ref</td>
+                        <td style="color:#18181b; font-family:monospace;">${utr}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Total Fee Submitted</td>
+                        <td style="color:#09090b; font-weight:700;">₹${amount}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Leader Username</td>
+                        <td style="color:#09090b; font-family:monospace; font-weight:700;">${leaderEmail}</td>
+                      </tr>
+                      ${rawPassword ? `
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Team Password</td>
+                        <td style="color:#09090b; font-family:monospace; font-weight:700;">${escapeEmailHtml(rawPassword)}</td>
+                      </tr>
+                      ` : ''}
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Status Check Link</td>
+                        <td style="color:#09090b; font-family:monospace; font-size:11px;">
+                          <a href="${cleanAppUrl}/leader?team=${teamId}" target="_blank" style="color:#09090b; text-decoration:underline;">${cleanAppUrl}/leader?team=${teamId}</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Roster Section -->
+          <tr>
+            <td style="padding:0 28px 24px 28px;">
+              <div style="font-size:10px; font-weight:700; letter-spacing:0.14em; color:#71717a; text-transform:uppercase; margin-bottom:8px;">
+                REGISTERED SQUAD ROSTER
+              </div>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fafafa; border:1px solid #e4e4e7; border-radius:8px; overflow:hidden;">
+                ${rosterRows}
+              </table>
+            </td>
+          </tr>
+
+          <!-- What Happens Next Note -->
+          <tr>
+            <td style="padding:0 28px 24px 28px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fafafa; border:1px solid #e4e4e7; border-radius:8px; padding:16px 18px;">
+                <tr>
+                  <td>
+                    <div style="font-size:10px; font-weight:700; color:#71717a; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:8px;">
+                      What Happens Next?
+                    </div>
+                    <ul style="margin:0; padding-left:16px; color:#52525b; font-size:12px; line-height:1.6;">
+                      <li>Our administrative desk is verifying your payment UTR (<strong style="color:#09090b;">${utr}</strong>) against the banking statement.</li>
+                      <li>Once verified, you will receive an official <strong style="color:#09090b;">Payment Verified &bull; Official Pass Issued</strong> email.</li>
+                      <li>You can log into your Leader Portal anytime to check live verification status and track event announcements.</li>
+                    </ul>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Portal CTA Button -->
+          <tr>
+            <td style="padding:0 28px 32px 28px; text-align:center;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto;">
+                <tr>
+                  <td align="center" style="border-radius:6px; background:#09090b;">
+                    <a href="${cleanAppUrl}/leader?team=${teamId}" target="_blank" rel="noopener noreferrer" style="display:inline-block; padding:13px 34px; font-size:12px; font-weight:700; color:#ffffff; text-decoration:none; text-transform:uppercase; letter-spacing:0.08em;">
+                      ACCESS SQUAD PORTAL &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <div style="margin-top:12px; font-size:11px; color:#71717a;">
+                Reference ID: <strong style="color:#09090b; font-family:monospace;">${teamId}</strong> &bull; Log in with your leader email &amp; squad password.
+              </div>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#f4f4f5; padding:20px 24px; text-align:center; border-top:1px solid #e4e4e7; font-size:11px; color:#71717a; line-height:1.6;">
+              <p style="margin:0 0 4px 0; color:#52525b; font-weight:500;">Infinity Hackathon 2026 &bull; Department of Computer Science &amp; Engineering</p>
+              <p style="margin:0;">Need assistance? Contact <a href="mailto:support@infinity.akao.in" style="color:#09090b; text-decoration:underline;">support@infinity.akao.in</a></p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  return await dispatchEmailTransport({
+    to: leaderEmail,
+    cc: memberEmails,
+    subject,
+    html: htmlContent,
+    env,
+    team,
+    debugLabel: 'Registration Pending Email'
+  });
+}
+
 export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinity.akao.in', env = {}, rawPassword = null }) {
   const leader = team.leader || {};
   const leaderEmail = (leader.email || '').trim().toLowerCase();
@@ -1129,7 +1469,7 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
     `;
   });
 
-  const subject = `Confirmed Squad Pass — Infinity Hackathon 2026 | Squad ${team.teamName} [${team.id}]`;
+  const subject = `✓ Official Squad Pass Issued — Infinity Hackathon 2026 | Squad ${team.teamName} [${team.id}]`;
   const cleanAppUrl = (appUrl || 'https://infinity.akao.in').replace(/\/$/, '');
 
   const htmlContent = `<!DOCTYPE html>
@@ -1140,11 +1480,9 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
   <title>${subject}</title>
 </head>
 <body style="margin:0; padding:0; background-color:#ffffff; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#09090b; -webkit-font-smoothing:antialiased;">
-  <!-- Outer Wrapper Table -->
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f4f4f5; min-height:100vh; padding:36px 12px;">
     <tr>
       <td align="center">
-        <!-- Main Minimal Container -->
         <table role="presentation" width="100%" style="max-width:580px; background-color:#ffffff; border:1px solid #e4e4e7; border-radius:10px; overflow:hidden; margin:0 auto; box-shadow:0 4px 16px rgba(0,0,0,0.04);" cellspacing="0" cellpadding="0" border="0">
           
           <!-- Header Section -->
@@ -1153,18 +1491,18 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
               <div style="font-size:10px; font-weight:700; letter-spacing:0.22em; color:#71717a; text-transform:uppercase; margin-bottom:8px;">DEPARTMENT OF COMPUTER SCIENCE &amp; ENGINEERING</div>
               <div style="font-size:18px; font-weight:800; letter-spacing:0.1em; color:#09090b; text-transform:uppercase; margin-bottom:16px;">INFINITY HACKATHON 2026</div>
               
-              <!-- Minimalist Pass Badge -->
+              <!-- Verified Pass Badge -->
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto 16px auto;">
                 <tr>
-                  <td style="padding:5px 14px; border-radius:9999px; background:#09090b; border:1px solid #09090b; color:#ffffff; font-size:10px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase;">
-                    ✓ REGISTRATION CONFIRMED &bull; PASS ISSUED
+                  <td style="padding:6px 14px; border-radius:9999px; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; font-size:10px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase;">
+                    ✓ PAYMENT VERIFIED &bull; OFFICIAL PASS ISSUED
                   </td>
                 </tr>
               </table>
 
               <h1 style="margin:0 0 8px 0; font-size:24px; font-weight:800; color:#09090b; letter-spacing:-0.02em;">Squad ${teamName}</h1>
               <p style="margin:0 auto; font-size:13px; color:#71717a; line-height:1.6; max-width:460px;">
-                Your squad is confirmed for <strong>Infinity Hackathon 2026</strong>. Keep this email safe for coordinator entrance verification and online portal access.
+                Great news! Your payment has been verified. Squad <strong>${teamName}</strong> is officially confirmed for <strong>Infinity Hackathon 2026</strong>. Keep this email safe for coordinator entrance verification and hackathon check-in.
               </p>
             </td>
           </tr>
@@ -1173,8 +1511,6 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
           <tr>
             <td style="padding:24px 28px;">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fafafa; border:1px solid #e4e4e7; border-radius:8px; overflow:hidden;">
-                
-                <!-- Ticket Header -->
                 <tr>
                   <td style="padding:14px 18px; border-bottom:1px solid #e4e4e7; background:#f4f4f5;">
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
@@ -1191,12 +1527,17 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
                   </td>
                 </tr>
 
-                <!-- Specs -->
                 <tr>
                   <td style="padding:16px 18px;">
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="6" border="0" style="font-size:12px;">
                       <tr>
-                        <td style="color:#71717a; font-weight:500; width:34%;">Institution</td>
+                        <td style="color:#71717a; font-weight:500; width:34%;">Payment Status</td>
+                        <td style="color:#047857; font-weight:700;">
+                          <span style="display:inline-block; padding:3px 8px; border-radius:4px; background:#ecfdf5; border:1px solid #a7f3d0;">✓ VERIFIED & APPROVED</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:500;">Institution</td>
                         <td style="color:#09090b; font-weight:600;">${college}</td>
                       </tr>
                       <tr>
@@ -1303,102 +1644,15 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
 </body>
 </html>`;
 
-  const resendApiKey = (env.RESEND_API_KEY || '').trim();
-  const brevoApiKey = (env.BREVO_API_KEY || '').trim();
-  const emailFrom = (env.EMAIL_FROM || 'Infinity Hackathon 2026 <hackathon@infinity.akao.in>').trim();
-
-  // 1. Resend API (Recommended: 3,000 free/mo, native REST fetch)
-  if (resendApiKey && resendApiKey.trim()) {
-    const payload = {
-      from: emailFrom,
-      to: [leaderEmail],
-      ...(memberEmails.length > 0 ? { cc: memberEmails } : {}),
-      reply_to: 'support@infinity.akao.in',
-      subject,
-      html: htmlContent,
-    };
-
-    let res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendApiKey.trim()}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    let resData = await res.json().catch(() => ({}));
-
-    // If CC failed due to invalid teammate addresses, retry strictly with leaderEmail
-    if (!res.ok && payload.cc) {
-      const fallbackPayload = {
-        from: emailFrom,
-        to: [leaderEmail],
-        reply_to: 'support@infinity.akao.in',
-        subject,
-        html: htmlContent,
-      };
-      res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${resendApiKey.trim()}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(fallbackPayload)
-      });
-      resData = await res.json().catch(() => ({}));
-    }
-
-    if (!res.ok) {
-      let errMsg = resData.message || resData.error || `HTTP ${res.status}`;
-      if (errMsg.includes('only send testing emails to your own email address')) {
-        errMsg = `Resend Free Sandbox restriction: To send confirmation emails to all student addresses, please verify your domain at resend.com/domains. (For testing now, you can send to your registered email: white018899@gmail.com).`;
-      }
-      throw new Error(`Resend email dispatch: ${errMsg}`);
-    }
-    return { success: true, provider: 'resend', id: resData.id };
-  }
-
-  // 2. Brevo API (Fallback: 300 free/day)
-  if (brevoApiKey && brevoApiKey.trim()) {
-    const senderParts = emailFrom.match(/^(.*)<(.*)>$/) || [null, 'Infinity Hackathon 2026', emailFrom];
-    const senderName = (senderParts[1] || 'Infinity Hackathon 2026').trim();
-    const senderEmail = (senderParts[2] || emailFrom).trim();
-
-    const payload = {
-      sender: { name: senderName, email: senderEmail },
-      to: [{ email: leaderEmail, name: leader.name || 'Captain' }],
-      subject,
-      htmlContent
-    };
-    if (memberEmails.length > 0) {
-      payload.cc = memberEmails.map(email => ({ email }));
-    }
-
-    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
-      headers: {
-        'api-key': brevoApiKey.trim(),
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    const resData = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      const errMsg = resData.message || `HTTP ${res.status}`;
-      throw new Error(`Brevo email dispatch error: ${errMsg}`);
-    }
-    return { success: true, provider: 'brevo', id: resData.messageId };
-  }
-
-  // 3. Simulated Dev Mode
-  console.log(`[EMAIL SIMULATION] Verification Email Dispatched to ${leaderEmail} for Squad ${team.id} (${team.teamName})`);
-  return {
-    success: true,
-    simulated: true,
-    message: 'Simulated email logged. Configure RESEND_API_KEY for live delivery (3,000 free/mo).'
-  };
+  return await dispatchEmailTransport({
+    to: leaderEmail,
+    cc: memberEmails,
+    subject,
+    html: htmlContent,
+    env,
+    team,
+    debugLabel: 'Payment Verified Pass Email'
+  });
 }
 
 const fgtRateLimiter = new MemoryRateLimiter({
@@ -1880,19 +2134,22 @@ export async function onRequest(context) {
       let mailError = null;
       try {
         const appUrl = (env.APP_URL || new URL(request.url).origin).replace(/\/$/, '');
-        await sendPaymentVerifiedEmail({
+        await sendRegistrationPendingEmail({
           team: result.newTeam,
           appUrl,
           env,
           rawPassword: teamPassword ? teamPassword.trim() : null
         });
         mailDispatched = true;
-        // Mark mailSent in database
+        // Mark registrationMailSent in database (official payment verification mail is NOT sent yet)
         await updateDb(env, async (db) => {
           const t = db.teams.find(x => x.id === result.newTeam.id);
-          if (t && t.payment) {
-            t.payment.mailSent = true;
-            t.payment.mailSentAt = new Date().toISOString();
+          if (t) {
+            t.registrationMailSent = true;
+            t.registrationMailSentAt = new Date().toISOString();
+            if (t.payment) {
+              t.payment.mailSent = false;
+            }
           }
         });
       } catch (mErr) {
