@@ -218,9 +218,104 @@ export function initRegistrationModule() {
     });
   }
 
+  // Focus Areas Matrix Modal Elements
+  const modalFocus = document.getElementById('modal-focus-areas');
+  const btnCloseFocus = document.getElementById('btn-close-focus');
+  const btnCloseFocusAlt = document.getElementById('btn-focus-close-alt');
+  const btnViewFocusAreas = document.getElementById('btn-view-focus-areas');
+  const btnFocusWieldNow = document.getElementById('btn-focus-wield-now');
+  const focusGrid = document.getElementById('focus-matrix-grid');
+  const focusTitle = document.getElementById('focus-modal-title');
+  const focusTagline = document.getElementById('focus-modal-tagline');
+  const focusOverview = document.getElementById('focus-modal-overview');
+  const focusBadge = document.getElementById('focus-modal-badge');
+  const focusDot = document.getElementById('focus-modal-dot');
+
+  function openFocusAreasModal(stoneId) {
+    if (!modalFocus) return;
+    const stone = STONES.find(s => s.id === stoneId) || STONES[0];
+
+    if (focusTitle) focusTitle.textContent = stone.domain;
+    if (focusTagline) focusTagline.textContent = stone.domainTagline || '';
+    if (focusOverview) focusOverview.textContent = stone.description;
+    if (focusBadge) {
+      focusBadge.textContent = `${stone.name} // SPECIMEN ${stone.index}`;
+      focusBadge.style.color = stone.colorHex;
+    }
+    if (focusDot) {
+      focusDot.style.background = stone.colorHex;
+      focusDot.style.boxShadow = `0 0 10px ${stone.colorHex}`;
+    }
+
+    if (focusGrid) {
+      const areas = stone.focusAreas || [];
+      focusGrid.innerHTML = areas.map((item, idx) => `
+        <div class="focus-area-card" style="--card-accent: ${stone.colorHex}">
+          <div class="focus-area-header">
+            <span class="focus-area-num">${String(idx + 1).padStart(2, '0')}</span>
+            <h4 class="focus-area-title">${item.title}</h4>
+          </div>
+          <p class="focus-area-desc">${item.desc}</p>
+        </div>
+      `).join('');
+    }
+
+    if (btnFocusWieldNow) {
+      btnFocusWieldNow.setAttribute('data-stone-id', stone.id);
+    }
+
+    modalFocus.classList.add('is-open');
+    modalFocus.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    safePlayChime(640);
+  }
+
+  function closeFocusAreasModal() {
+    if (!modalFocus) return;
+    modalFocus.classList.remove('is-open');
+    modalFocus.setAttribute('aria-hidden', 'true');
+    if (document.body.classList.contains('timeline-unlocked')) {
+      document.body.style.overflowY = 'auto';
+    } else {
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  if (btnViewFocusAreas) {
+    btnViewFocusAreas.addEventListener('click', () => {
+      const activeId = btnWieldStone?.getAttribute('data-stone-id') || 'mind';
+      audioEngine.playClick();
+      openFocusAreasModal(activeId);
+    });
+  }
+
+  if (btnCloseFocus) {
+    btnCloseFocus.addEventListener('click', () => {
+      audioEngine.playClick();
+      closeFocusAreasModal();
+    });
+  }
+
+  if (btnCloseFocusAlt) {
+    btnCloseFocusAlt.addEventListener('click', () => {
+      audioEngine.playClick();
+      closeFocusAreasModal();
+    });
+  }
+
+  if (btnFocusWieldNow) {
+    btnFocusWieldNow.addEventListener('click', () => {
+      const activeId = btnFocusWieldNow.getAttribute('data-stone-id') || 'mind';
+      closeFocusAreasModal();
+      audioEngine.playClick();
+      openModal(activeId);
+    });
+  }
+
   // Close on backdrop click
   window.addEventListener('click', (e) => {
     if (e.target === modalRegister) closeModal();
+    if (e.target === modalFocus) closeFocusAreasModal();
     if (e.target === modalSuccess) {
       modalSuccess.classList.remove('is-open');
       modalSuccess.setAttribute('aria-hidden', 'true');
@@ -232,6 +327,9 @@ export function initRegistrationModule() {
     if (e.key === 'Escape' || e.key === 'Esc') {
       if (modalRegister && modalRegister.classList.contains('is-open')) {
         closeModal();
+      }
+      if (modalFocus && modalFocus.classList.contains('is-open')) {
+        closeFocusAreasModal();
       }
       if (modalSuccess && modalSuccess.classList.contains('is-open')) {
         modalSuccess.classList.remove('is-open');

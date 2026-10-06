@@ -21,17 +21,15 @@ export const STONES = [
     particleCount: 180,
     techStack: ['Python', 'FastAPI', 'Mapbox / GIS', 'Kafka', 'React', 'OR-Tools'],
     quote: 'It contains an intellect of supreme cosmic density.',
-    description: `Smart Traffic Management — Develop a software solution to analyze traffic patterns and reduce congestion through intelligent routing.
-
-Emergency Vehicle Route Optimization — Build a system that identifies the fastest route for ambulances, fire services, or other emergency vehicles.
-
-Public Transport Tracking — Create a real-time platform for tracking buses or other public transportation and estimating arrival times.
-
-Smart Logistics & Delivery Optimization — Develop a solution to optimize delivery routes, schedules, vehicle utilization, and operational costs.
-
-Supply Chain Visibility — Build a platform that improves tracking and transparency of goods across the supply chain.
-
-Smart Parking Management — Create a system that helps users discover, reserve, and efficiently manage available parking spaces.`,
+    description: 'Pioneer intelligent traffic management, emergency route optimization, real-time public transit tracking, and dynamic supply chain logistics to eliminate urban congestion.',
+    focusAreas: [
+      { title: 'Smart Traffic Management', desc: 'Develop a software solution to analyze traffic patterns and reduce congestion through intelligent routing.' },
+      { title: 'Emergency Vehicle Route Optimization', desc: 'Build a system that identifies the fastest route for ambulances, fire services, or other emergency vehicles.' },
+      { title: 'Public Transport Tracking', desc: 'Create a real-time platform for tracking buses or other public transportation and estimating arrival times.' },
+      { title: 'Smart Logistics & Delivery Optimization', desc: 'Develop a solution to optimize delivery routes, schedules, vehicle utilization, and operational costs.' },
+      { title: 'Supply Chain Visibility', desc: 'Build a platform that improves tracking and transparency of goods across the supply chain.' },
+      { title: 'Smart Parking Management', desc: 'Create a system that helps users discover, reserve, and efficiently manage available parking spaces.' }
+    ],
     stats: [
       { label: 'FLEET TELEMETRY', value: 'Sub-Second' },
       { label: 'ROUTE MATRIX', value: 'Dynamic Mesh' },
@@ -61,17 +59,15 @@ Smart Parking Management — Create a system that helps users discover, reserve,
     particleCount: 160,
     techStack: ['Rust', 'Go', 'Python', 'eBPF', 'Cryptography', 'SIEM / ELK'],
     quote: 'The Tesseract has awakened. It is on a little world, a human world.',
-    description: `Phishing & Scam Detection — Develop an intelligent system capable of identifying suspicious emails, messages, URLs, or websites.
-
-Digital Fraud Detection — Build a solution that identifies potentially fraudulent digital transactions or suspicious user behaviour.
-
-Secure Digital Identity — Create a secure identity-verification and authentication solution while protecting user privacy.
-
-Deepfake & Manipulated Content Detection — Develop a platform for identifying potentially manipulated images, videos, or digital content.
-
-Privacy-Preserving Data Sharing — Build a system that enables organizations or users to share information securely while protecting sensitive data.
-
-Cyber Threat Monitoring — Develop a dashboard that identifies, analyzes, and alerts users about suspicious security activities.`,
+    description: 'Engineer resilient digital trust architectures, intelligent phishing and fraud detection, secure digital identity verification, and proactive cyber threat defense.',
+    focusAreas: [
+      { title: 'Phishing & Scam Detection', desc: 'Develop an intelligent system capable of identifying suspicious emails, messages, URLs, or websites.' },
+      { title: 'Digital Fraud Detection', desc: 'Build a solution that identifies potentially fraudulent digital transactions or suspicious user behaviour.' },
+      { title: 'Secure Digital Identity', desc: 'Create a secure identity-verification and authentication solution while protecting user privacy.' },
+      { title: 'Deepfake & Manipulated Content Detection', desc: 'Develop a platform for identifying potentially manipulated images, videos, or digital content.' },
+      { title: 'Privacy-Preserving Data Sharing', desc: 'Build a system that enables organizations or users to share information securely while protecting sensitive data.' },
+      { title: 'Cyber Threat Monitoring', desc: 'Develop a dashboard that identifies, analyzes, and alerts users about suspicious security activities.' }
+    ],
     stats: [
       { label: 'LATENCY PROFILE', value: 'Sub-5ms Mesh' },
       { label: 'DEFENSE MATRIX', value: 'Post-Quantum' },
@@ -101,17 +97,15 @@ Cyber Threat Monitoring — Develop a dashboard that identifies, analyzes, and a
     particleCount: 220,
     techStack: ['TypeScript', 'React', 'Next.js', 'Node.js', 'PostgreSQL', 'Flutter'],
     quote: 'It turns matter into dark matter, reshaping physical reality at will.',
-    description: `Smart Public Grievance System — Build a platform where citizens can report civic problems and track their resolution.
-
-Government Scheme Discovery — Develop a system that helps citizens discover public schemes and services for which they may be eligible.
-
-Unified Citizen Service Platform — Create a single digital platform for accessing multiple public services.
-
-Smart Civic Issue Reporting — Develop a location-based platform for reporting issues such as damaged roads, waste, streetlights, or water problems.
-
-Public Service Transparency Dashboard — Build a platform for tracking service requests, progress, response times, and public-service performance.
-
-Digital Document Verification — Develop a secure system for verifying certificates, documents, or other public records.`,
+    description: 'Construct unified digital public infrastructure, smart civic grievance platforms, transparent governance dashboards, and verified digital citizen services.',
+    focusAreas: [
+      { title: 'Smart Public Grievance System', desc: 'Build a platform where citizens can report civic problems and track their resolution.' },
+      { title: 'Government Scheme Discovery', desc: 'Develop a system that helps citizens discover public schemes and services for which they may be eligible.' },
+      { title: 'Unified Citizen Service Platform', desc: 'Create a single digital platform for accessing multiple public services.' },
+      { title: 'Smart Civic Issue Reporting', desc: 'Develop a location-based platform for reporting issues such as damaged roads, waste, streetlights, or water problems.' },
+      { title: 'Public Service Transparency Dashboard', desc: 'Build a platform for tracking service requests, progress, response times, and public-service performance.' },
+      { title: 'Digital Document Verification', desc: 'Develop a secure system for verifying certificates, documents, or other public records.' }
+    ],
     stats: [
       { label: 'SERVICE REACH', value: 'Citizen Scale' },
       { label: 'STATE CONFLICT', value: 'Sub-30ms CRDT' },
@@ -141,17 +135,15 @@ Digital Document Verification — Develop a secure system for verifying certific
     particleCount: 200,
     techStack: ['Python', 'IoT / ESP32', 'React', 'MQTT', 'TensorFlow', 'FastAPI'],
     quote: 'It contains an energy that destroys all organic matter it touches.',
-    description: `Smart Waste Management — Develop a platform for improving waste collection, segregation, recycling, or disposal.
-
-Carbon Footprint Tracker — Build an application that estimates environmental impact and recommends ways to reduce carbon emissions.
-
-Energy Consumption Optimization — Develop a software system that analyzes energy usage and provides recommendations for reducing consumption.
-
-Water Conservation Platform — Build a solution that monitors water usage, identifies wastage, and encourages conservation.
-
-Smart Recycling Platform — Create a system connecting households, institutions, recyclers, and waste-collection services.
-
-Environmental Monitoring Dashboard — Develop a platform that analyzes environmental data such as pollution, water quality, temperature, or waste generation.`,
+    description: 'Develop sustainable clean technologies, intelligent waste and recycling systems, smart water conservation platforms, and real-time carbon footprint optimization.',
+    focusAreas: [
+      { title: 'Smart Waste Management', desc: 'Develop a platform for improving waste collection, segregation, recycling, or disposal.' },
+      { title: 'Carbon Footprint Tracker', desc: 'Build an application that estimates environmental impact and recommends ways to reduce carbon emissions.' },
+      { title: 'Energy Consumption Optimization', desc: 'Develop a software system that analyzes energy usage and provides recommendations for reducing consumption.' },
+      { title: 'Water Conservation Platform', desc: 'Build a solution that monitors water usage, identifies wastage, and encourages conservation.' },
+      { title: 'Smart Recycling Platform', desc: 'Create a system connecting households, institutions, recyclers, and waste-collection services.' },
+      { title: 'Environmental Monitoring Dashboard', desc: 'Develop a platform that analyzes environmental data such as pollution, water quality, temperature, or waste generation.' }
+    ],
     stats: [
       { label: 'BUS TELEMETRY', value: 'Microsecond' },
       { label: 'CARBON OFFSET', value: 'Real-Time' },
@@ -181,17 +173,15 @@ Environmental Monitoring Dashboard — Develop a platform that analyzes environm
     particleCount: 190,
     techStack: ['Python', 'LangChain', 'React', 'FastAPI', 'Node.js', 'PostgreSQL'],
     quote: 'Dormammu, I have come to bargain.',
-    description: `Personalized Learning Platform — Build a system that adapts learning content according to individual student performance and progress.
-
-AI Learning Assistant — Develop an intelligent assistant that helps students understand concepts, find resources, and resolve academic doubts.
-
-Smart Assessment System — Create a platform for conducting assessments and providing meaningful performance feedback.
-
-Student Performance Analytics — Develop a system that identifies learning gaps and students who may require additional academic support.
-
-Skill Gap & Career Recommendation — Build a platform that analyzes student skills and recommends learning paths or career opportunities.
-
-Accessible Education Platform — Develop software that makes digital learning more accessible for students with different learning or accessibility needs.`,
+    description: 'Architect personalized AI learning platforms, intelligent academic mentors, student performance analytics, and accessible assistive education tools.',
+    focusAreas: [
+      { title: 'Personalized Learning Platform', desc: 'Build a system that adapts learning content according to individual student performance and progress.' },
+      { title: 'AI Learning Assistant', desc: 'Develop an intelligent assistant that helps students understand concepts, find resources, and resolve academic doubts.' },
+      { title: 'Smart Assessment System', desc: 'Create a platform for conducting assessments and providing meaningful performance feedback.' },
+      { title: 'Student Performance Analytics', desc: 'Develop a system that identifies learning gaps and students who may require additional academic support.' },
+      { title: 'Skill Gap & Career Recommendation', desc: 'Build a platform that analyzes student skills and recommends learning paths or career opportunities.' },
+      { title: 'Accessible Education Platform', desc: 'Develop software that makes digital learning more accessible for students with different learning or accessibility needs.' }
+    ],
     stats: [
       { label: 'STUDENT REACH', value: 'Personalized' },
       { label: 'ORACLE HORIZON', value: 'Adaptive AI' },
@@ -221,17 +211,15 @@ Accessible Education Platform — Develop software that makes digital learning m
     particleCount: 180,
     techStack: ['Python', 'Flutter', 'FastAPI', 'OpenCV', 'PyTorch', 'PostgreSQL'],
     quote: 'A soul for a soul. Great technological impact demands great purpose.',
-    description: `Smart Healthcare Assistance — Develop a platform that helps patients access appropriate healthcare information and services.
-
-Remote Patient Monitoring — Build a software solution for recording, visualizing, and communicating patient health information to authorized caregivers.
-
-Emergency Healthcare Platform — Create a system connecting patients with nearby hospitals, emergency services, blood banks, or other critical resources.
-
-Medication Management — Develop an application for medication schedules, reminders, adherence tracking, and caregiver notifications.
-
-Healthcare Accessibility — Build an assistive technology solution that improves access to healthcare for elderly people or people with disabilities.
-
-Hospital Resource Management — Develop software for efficiently managing appointments, beds, queues, staff, or other hospital resources.`,
+    description: 'Advance transformative medical AI, remote patient diagnostic networks, emergency healthcare coordination, and accessible assistive health technologies.',
+    focusAreas: [
+      { title: 'Smart Healthcare Assistance', desc: 'Develop a platform that helps patients access appropriate healthcare information and services.' },
+      { title: 'Remote Patient Monitoring', desc: 'Build a software solution for recording, visualizing, and communicating patient health information to authorized caregivers.' },
+      { title: 'Emergency Healthcare Platform', desc: 'Create a system connecting patients with nearby hospitals, emergency services, blood banks, or other critical resources.' },
+      { title: 'Medication Management', desc: 'Develop an application for medication schedules, reminders, adherence tracking, and caregiver notifications.' },
+      { title: 'Healthcare Accessibility', desc: 'Build an assistive technology solution that improves access to healthcare for elderly people or people with disabilities.' },
+      { title: 'Hospital Resource Management', desc: 'Develop software for efficiently managing appointments, beds, queues, staff, or other hospital resources.' }
+    ],
     stats: [
       { label: 'COMMUNITY REACH', value: 'Global Impact' },
       { label: 'ETHICAL CORE', value: 'Privacy-Preserving' },

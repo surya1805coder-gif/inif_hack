@@ -51,12 +51,12 @@
     }
     window.scrollTo(0, 0);
   </script>
-  <script type="module" crossorigin src="/assets/main-D9kwIPTz.js"></script>
+  <script type="module" crossorigin src="/assets/main-DLEtnjE9.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
   <link rel="modulepreload" crossorigin href="/assets/three-vendor-D5YnKyrC.js">
   <link rel="modulepreload" crossorigin href="/assets/gsap-vendor-SFc2wnMY.js">
   <link rel="modulepreload" crossorigin href="/assets/ogl-vendor-CvCRX4L3.js">
-  <link rel="stylesheet" crossorigin href="/assets/main-r7ux_ROF.css">
+  <link rel="stylesheet" crossorigin href="/assets/main-D2OBbvRe.css">
 </head>
 
 <body class="theme-obsidian">
@@ -275,17 +275,12 @@
 
         <!-- Archival Lore & Description -->
         <div class="card-body">
-          <p class="card-description" id="card-desc">Smart Traffic Management — Develop a software solution to analyze traffic patterns and reduce congestion through intelligent routing.
-
-Emergency Vehicle Route Optimization — Build a system that identifies the fastest route for ambulances, fire services, or other emergency vehicles.
-
-Public Transport Tracking — Create a real-time platform for tracking buses or other public transportation and estimating arrival times.
-
-Smart Logistics &amp; Delivery Optimization — Develop a solution to optimize delivery routes, schedules, vehicle utilization, and operational costs.
-
-Supply Chain Visibility — Build a platform that improves tracking and transparency of goods across the supply chain.
-
-Smart Parking Management — Create a system that helps users discover, reserve, and efficiently manage available parking spaces.</p>
+          <p class="card-description" id="card-desc">Pioneer intelligent traffic management, emergency route optimization, real-time public transit tracking, and dynamic supply chain logistics to eliminate urban congestion.</p>
+          <button id="btn-view-focus-areas" class="btn-focus-areas-trigger" type="button" aria-haspopup="dialog" title="View the 6 key focus areas for this domain">
+            <span class="focus-sparkle">✦</span>
+            <span>EXPLORE FOCUS AREAS (6)</span>
+            <svg class="focus-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+          </button>
         </div>
 
         <!-- ONLY HERO ACTION: WIELD THIS STONE -->
@@ -1288,6 +1283,42 @@ Smart Parking Management — Create a system that helps users discover, reserve,
       <div class="modal-actions-row">
         <a href="/leader.html" class="btn-modal-primary" id="btn-go-leader">VIEW SQUAD PASS &amp; VERIFICATION &rarr;</a>
         <button class="btn-modal-secondary" id="btn-close-success">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MINI PAGE / MODAL: DOMAIN FOCUS AREAS MATRIX (6)
+       ========================================================================= -->
+  <div class="modal-backdrop focus-matrix-modal-backdrop" id="modal-focus-areas" aria-hidden="true">
+    <div class="modal-dialog focus-matrix-dialog" role="dialog" aria-modal="true" aria-labelledby="focus-modal-title">
+      <button class="modal-close-btn" id="btn-close-focus" aria-label="Close Focus Matrix">✕</button>
+
+      <div class="modal-header">
+        <div class="modal-badge-row">
+          <span class="focus-live-dot" id="focus-modal-dot" style="background: #ffd000; box-shadow: 0 0 10px #ffd000;"></span>
+          <span class="mono-label" id="focus-modal-badge" style="color: #ffd000;">MIND STONE // SPECIMEN 01</span>
+        </div>
+        <h2 class="modal-title" id="focus-modal-title">TRANSPORTATION &amp; LOGISTICS</h2>
+        <p class="modal-sub" id="focus-modal-tagline">Mobility • Supply Chain • Routing</p>
+      </div>
+
+      <div class="focus-matrix-intro">
+        <p id="focus-modal-overview" class="focus-matrix-para">
+          Pioneer intelligent traffic management, emergency route optimization, real-time public transit tracking, and dynamic supply chain logistics to eliminate urban congestion.
+        </p>
+      </div>
+
+      <div class="focus-matrix-grid" id="focus-matrix-grid">
+        <!-- Injected via JavaScript for the active stone -->
+      </div>
+
+      <div class="focus-matrix-actions">
+        <button type="button" class="btn-modal-primary" id="btn-focus-wield-now">
+          <span>WIELD THIS DOMAIN &amp; REGISTER</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <button type="button" class="btn-modal-secondary" id="btn-focus-close-alt">CLOSE</button>
       </div>
     </div>
   </div>
