@@ -795,7 +795,7 @@
         </div>
       </div>
 
-      <form id="form-registration" class="register-form">
+      <form id="form-registration" class="register-form" novalidate>
 
         <!-- STEP 1: SQUAD & DOMAIN DETAILS -->
         <div class="form-section">
@@ -1192,11 +1192,11 @@
         </div>
       </div>
 
-      <div class="modal-actions-row" style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
-        <button type="button" class="btn-modal-secondary" id="btn-back-edit" style="min-width: 130px; font-size: 0.76rem; letter-spacing: 0.06em;">
+      <div class="modal-actions-row confirm-actions-row">
+        <button type="button" class="btn-modal-secondary btn-confirm-back" id="btn-back-edit">
           ← EDIT DETAILS
         </button>
-        <button type="button" class="btn-modal-primary" id="btn-confirm-final" style="background: #ffd000; color: #000; font-weight: 800; min-width: 220px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem; letter-spacing: 0.06em;">
+        <button type="button" class="btn-modal-primary btn-confirm-submit" id="btn-confirm-final">
           <span id="conf-submit-text">CONFIRM &amp; LOCK SQUAD ✦</span>
           <span class="spinner" id="conf-submit-spinner" style="display: none; width: 14px; height: 14px; border-width: 2px;"></span>
         </button>

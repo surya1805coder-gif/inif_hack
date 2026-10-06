@@ -693,13 +693,12 @@ export function initRegistrationModule() {
         console.warn('OCR processing watchdog / fallback triggered:', err);
         isScanningReceipt = false;
 
-        // FAIL-SOFT FOR HACKATHONS: If image passed dimensions/magic bytes but OCR timed out
-        // or was inconclusive on budget mobile hardware, KEEP the receipt attached for organizer review
-        // and allow the student to manually provide their 12-digit UTR!
-        const isWatchdogTimeout = err.message && (err.message.includes('Timeout') || err.message.includes('OCR_WATCHDOG_TIMEOUT'));
-        const isOcrUnavailable = err.message && (err.message.includes('OCR not available') || err.message.includes('Worker'));
+        // FAIL-SOFT FOR MOBILE & HACKATHONS:
+        // If image passed dimensions/size, do NOT discard the file on mobile devices!
+        // Allow the participant to proceed by manually entering their 12-digit bank UTR!
+        const isTooSmall = err.message && err.message.startsWith('IMAGE_TOO_SMALL');
 
-        if ((isWatchdogTimeout || isOcrUnavailable) && file && file.size >= 10 * 1024) {
+        if (file && file.size >= MIN_FILE_SIZE && !isTooSmall) {
           isReceiptVerified = true;
           verifiedReceiptUtr = null;
           regScreenshot.classList.remove('is-invalid');
@@ -722,11 +721,11 @@ export function initRegistrationModule() {
 
         isReceiptVerified = false;
         verifiedReceiptUtr = null;
-        regScreenshot.value = ''; // Drop rejected file
+        regScreenshot.value = ''; // Drop rejected tiny file
         regScreenshot.classList.add('is-invalid');
 
         let msg = 'Could not verify image as an authentic payment receipt.';
-        if (err.message && err.message.startsWith('IMAGE_TOO_SMALL')) {
+        if (isTooSmall) {
           msg = 'Image dimensions are too small to be a payment receipt screenshot. Logos, icons, and small images are not accepted.';
         }
 
@@ -739,7 +738,7 @@ export function initRegistrationModule() {
           }
         }
         safePlayChime(220);
-        showError(`❌ ${msg}`);
+        showError(`❌ ${msg}`, regScreenshot);
       }
     });
   }
@@ -865,37 +864,42 @@ export function initRegistrationModule() {
 
       // 1. Mandatory Core Validation
       if (!teamName) {
-        showError('Please enter your Squad / Team Name.');
-        document.getElementById('reg-team-name')?.focus();
+        const el = document.getElementById('reg-team-name');
+        showError('Please enter your Squad / Team Name.', el);
+        el?.focus();
         return;
       }
       if (!college) {
-        showError('Please enter your College or Institution name.');
-        document.getElementById('reg-college')?.focus();
+        const el = document.getElementById('reg-college');
+        showError('Please enter your College or Institution name.', el);
+        el?.focus();
         return;
       }
       if (!leaderName) {
-        showError('Please enter Leader Full Name.');
-        document.getElementById('reg-leader-name')?.focus();
+        const el = document.getElementById('reg-leader-name');
+        showError('Please enter Leader Full Name.', el);
+        el?.focus();
         return;
       }
       if (!isValidEmail(leaderEmail)) {
-        showError('Please enter a valid Leader Email address (e.g. name@domain.com).');
         const el = document.getElementById('reg-leader-email');
         setInputError(el, 'Invalid email format');
+        showError('Please enter a valid Leader Email address (e.g. name@domain.com).', el);
         el?.focus();
         return;
       }
       if (!isValidPhone(leaderPhone)) {
-        showError('Please enter a valid 10-digit Leader Mobile Number.');
         const el = document.getElementById('reg-leader-phone');
         setInputError(el, 'Enter a valid 10-digit number');
+        showError('Please enter a valid 10-digit Leader Mobile Number.', el);
         el?.focus();
         return;
       }
       if (!teamPassword || teamPassword.length < 6) {
-        showError('Team Password must be at least 6 characters (used for Leader Portal login).');
-        document.getElementById('reg-team-password')?.focus();
+        const el = document.getElementById('reg-team-password');
+        setInputError(el, 'Minimum 6 characters');
+        showError('Team Password must be at least 6 characters (used for Leader Portal login).', el);
+        el?.focus();
         return;
       }
 
@@ -904,21 +908,23 @@ export function initRegistrationModule() {
       const m2Email = document.getElementById('reg-m2-email')?.value.trim();
       const m2Phone = document.getElementById('reg-m2-phone')?.value.trim();
       if (!m2Name) {
-        showError('Member 02 Full Name is required.');
-        document.getElementById('reg-m2-name')?.focus();
+        const el = document.getElementById('reg-m2-name');
+        setInputError(el, 'Member 02 name required');
+        showError('Member 02 Full Name is required.', el);
+        el?.focus();
         return;
       }
       if (!isValidEmail(m2Email)) {
-        showError('Member 02 has an invalid email format.');
         const el = document.getElementById('reg-m2-email');
         setInputError(el, 'Invalid email format');
+        showError('Member 02 has an invalid email format.', el);
         el?.focus();
         return;
       }
       if (!isValidPhone(m2Phone)) {
-        showError('Member 02 requires a valid 10-digit phone number.');
         const el = document.getElementById('reg-m2-phone');
         setInputError(el, 'Enter a valid 10-digit number');
+        showError('Member 02 requires a valid 10-digit phone number.', el);
         el?.focus();
         return;
       }
@@ -928,21 +934,23 @@ export function initRegistrationModule() {
       const m3Email = document.getElementById('reg-m3-email')?.value.trim();
       const m3Phone = document.getElementById('reg-m3-phone')?.value.trim();
       if (!m3Name) {
-        showError('Member 03 Full Name is required.');
-        document.getElementById('reg-m3-name')?.focus();
+        const el = document.getElementById('reg-m3-name');
+        setInputError(el, 'Member 03 name required');
+        showError('Member 03 Full Name is required.', el);
+        el?.focus();
         return;
       }
       if (!isValidEmail(m3Email)) {
-        showError('Member 03 has an invalid email format.');
         const el = document.getElementById('reg-m3-email');
         setInputError(el, 'Invalid email format');
+        showError('Member 03 has an invalid email format.', el);
         el?.focus();
         return;
       }
       if (!isValidPhone(m3Phone)) {
-        showError('Member 03 requires a valid 10-digit phone number.');
         const el = document.getElementById('reg-m3-phone');
         setInputError(el, 'Enter a valid 10-digit number');
+        showError('Member 03 requires a valid 10-digit phone number.', el);
         el?.focus();
         return;
       }
@@ -958,21 +966,23 @@ export function initRegistrationModule() {
         const m4Email = document.getElementById('reg-m4-email')?.value.trim();
         const m4Phone = document.getElementById('reg-m4-phone')?.value.trim();
         if (!m4Name) {
-          showError('Member 04 Full Name is required for 4-member squads.');
-          document.getElementById('reg-m4-name')?.focus();
+          const el = document.getElementById('reg-m4-name');
+          setInputError(el, 'Member 04 name required');
+          showError('Member 04 Full Name is required for 4-member squads.', el);
+          el?.focus();
           return;
         }
         if (!isValidEmail(m4Email)) {
-          showError('Member 04 has an invalid email format.');
           const el = document.getElementById('reg-m4-email');
           setInputError(el, 'Invalid email format');
+          showError('Member 04 has an invalid email format.', el);
           el?.focus();
           return;
         }
         if (!isValidPhone(m4Phone)) {
-          showError('Member 04 requires a valid 10-digit phone number.');
           const el = document.getElementById('reg-m4-phone');
           setInputError(el, 'Enter a valid 10-digit number');
+          showError('Member 04 requires a valid 10-digit phone number.', el);
           el?.focus();
           return;
         }
@@ -1000,8 +1010,8 @@ export function initRegistrationModule() {
         if (seenEmails.has(p.email)) {
           const prev = seenEmails.get(p.email);
           const msg = `Duplicate email '${p.email}' in squad (${prev} and ${p.role}). Every member must have a unique email.`;
-          showError(msg);
           setInputError(p.el, 'Duplicate email in squad');
+          showError(msg, p.el);
           p.el?.focus();
           return;
         }
@@ -1013,8 +1023,8 @@ export function initRegistrationModule() {
         if (seenPhones.has(p.phone)) {
           const prev = seenPhones.get(p.phone);
           const msg = `Duplicate mobile number in squad (${prev} and ${p.role}). Every member must have their own unique phone number.`;
-          showError(msg);
           setInputError(p.phoneEl, 'Duplicate phone in squad');
+          showError(msg, p.phoneEl);
           p.phoneEl?.focus();
           return;
         }
@@ -1023,38 +1033,49 @@ export function initRegistrationModule() {
 
       // 6. Payment & Receipt Verification
       if (isScanningReceipt) {
-        showError('⏳ AI OCR is currently analyzing your receipt screenshot. Please wait a moment...');
+        const el = document.getElementById('ocr-banner') || document.getElementById('reg-screenshot');
+        showError('⏳ AI OCR is currently analyzing your receipt screenshot. Please wait a moment...', el);
         return;
       }
 
       if (!screenshotFile) {
-        showError('Please upload your payment confirmation screenshot.');
-        document.getElementById('reg-screenshot')?.focus();
+        const el = document.getElementById('reg-screenshot');
+        setInputError(el, 'Payment screenshot required');
+        showError('Please upload your payment confirmation screenshot.', el);
+        el?.focus();
         return;
       }
 
       if (screenshotFile.size < MIN_FILE_SIZE) {
-        showError(`Image file too small (${(screenshotFile.size / 1024).toFixed(1)} KB). Logos, icons, and small images are not accepted. Please upload an authentic receipt screenshot.`);
-        document.getElementById('reg-screenshot')?.focus();
+        const el = document.getElementById('reg-screenshot');
+        setInputError(el, 'Image file too small');
+        showError(`Image file too small (${(screenshotFile.size / 1024).toFixed(1)} KB). Logos, icons, and small images are not accepted. Please upload an authentic receipt screenshot.`, el);
+        el?.focus();
         return;
       }
 
       if (screenshotFile.size > MAX_FILE_SIZE) {
         const sizeMb = (screenshotFile.size / (1024 * 1024)).toFixed(1);
-        showError(`Payment screenshot file size (${sizeMb} MB) exceeds the 20MB limit. Please upload an image under 20MB.`);
-        document.getElementById('reg-screenshot')?.focus();
+        const el = document.getElementById('reg-screenshot');
+        setInputError(el, 'File exceeds 20MB');
+        showError(`Payment screenshot file size (${sizeMb} MB) exceeds the 20MB limit. Please upload an image under 20MB.`, el);
+        el?.focus();
         return;
       }
 
       if (!isReceiptVerified) {
-        showError('❌ Valid Payment Receipt Required: The uploaded image was not verified as an authentic payment receipt. Logos, icons, and non-payment photos are not allowed. Please upload an authentic receipt from Google Pay, PhonePe, Paytm, or netbanking.');
-        document.getElementById('reg-screenshot')?.focus();
+        const el = document.getElementById('reg-screenshot');
+        setInputError(el, 'Valid receipt required');
+        showError('❌ Valid Payment Receipt Required: The uploaded image was not verified as an authentic payment receipt. Logos, icons, and non-payment photos are not allowed. Please upload an authentic receipt from Google Pay, PhonePe, Paytm, or netbanking.', el);
+        el?.focus();
         return;
       }
 
       if (!paymentUtr) {
-        showError('Please enter your payment bank UTR / transaction reference number.');
-        document.getElementById('reg-utr')?.focus();
+        const el = document.getElementById('reg-utr');
+        setInputError(el, '12-digit UTR required');
+        showError('Please enter your payment bank UTR / transaction reference number.', el);
+        el?.focus();
         return;
       }
 
@@ -1170,6 +1191,8 @@ export function initRegistrationModule() {
 
       // Open the confirmation window
       if (modalConfirm) {
+        const scrollArea = modalConfirm.querySelector('.confirm-details-scroll');
+        if (scrollArea) scrollArea.scrollTop = 0;
         modalConfirm.classList.add('is-open');
         modalConfirm.setAttribute('aria-hidden', 'false');
       }
@@ -1341,11 +1364,17 @@ export function initRegistrationModule() {
     });
   }
 
-  function showError(msg) {
+  function showError(msg, targetEl = null) {
     if (regErrorMsg) {
       regErrorMsg.textContent = msg;
       regErrorMsg.style.display = 'block';
       safePlayChime(220); // alert tone
+    }
+    const scrollTarget = targetEl || regErrorMsg;
+    if (scrollTarget) {
+      try {
+        scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch (_) {}
     }
   }
 
