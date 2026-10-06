@@ -2216,27 +2216,39 @@ function authHeaders(extra = {}) {
         }
         if (purgeStatus) purgeStatus.style.display = 'none';
         modalPurge.classList.add('is-open');
-        if (txtPurgeConfirm) txtPurgeConfirm.focus();
+        setTimeout(() => {
+          if (txtPurgeConfirm) txtPurgeConfirm.focus();
+        }, 100);
       });
 
       const closePurgeModal = () => modalPurge.classList.remove('is-open');
       if (btnClosePurge) btnClosePurge.addEventListener('click', closePurgeModal);
       if (btnCancelPurge) btnCancelPurge.addEventListener('click', closePurgeModal);
+      modalPurge.addEventListener('click', (e) => {
+        if (e.target === modalPurge) closePurgeModal();
+      });
 
       if (txtPurgeConfirm) {
         txtPurgeConfirm.addEventListener('input', () => {
-          const isValid = txtPurgeConfirm.value.trim() === 'ERASE';
+          const isValid = txtPurgeConfirm.value.trim().toUpperCase() === 'ERASE';
           if (btnConfirmPurge) {
             btnConfirmPurge.disabled = !isValid;
             btnConfirmPurge.style.opacity = isValid ? '1' : '0.5';
             btnConfirmPurge.style.cursor = isValid ? 'pointer' : 'not-allowed';
           }
         });
+
+        txtPurgeConfirm.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && btnConfirmPurge && !btnConfirmPurge.disabled) {
+            e.preventDefault();
+            btnConfirmPurge.click();
+          }
+        });
       }
 
       if (btnConfirmPurge) {
         btnConfirmPurge.addEventListener('click', async () => {
-          if (!txtPurgeConfirm || txtPurgeConfirm.value.trim() !== 'ERASE') return;
+          if (!txtPurgeConfirm || txtPurgeConfirm.value.trim().toUpperCase() !== 'ERASE') return;
           btnConfirmPurge.disabled = true;
           btnConfirmPurge.textContent = 'ERASING ALL DATA...';
           if (purgeStatus) {
