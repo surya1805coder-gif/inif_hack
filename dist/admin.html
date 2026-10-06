@@ -1085,6 +1085,32 @@
       box-shadow: 0 0 16px rgba(0, 210, 255, 0.4) !important;
     }
 
+    .btn-confirm-mail-all {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(5, 150, 105, 0.12) 100%) !important;
+      border: 1px solid #10b981 !important;
+      color: #34d399 !important;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-confirm-mail-all:hover {
+      background: #10b981 !important;
+      color: #000 !important;
+      box-shadow: 0 0 24px rgba(16, 185, 129, 0.5) !important;
+      transform: translateY(-1px);
+    }
+
+
     .btn-tbl-edit {
       padding: 6px 12px;
       border-radius: 6px;
@@ -1382,7 +1408,7 @@
       }
     }
   </style>
-  <script type="module" crossorigin src="/assets/admin-Cg9OdvMv.js"></script>
+  <script type="module" crossorigin src="/assets/admin-CgXAchfH.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
 </head>
 
@@ -1464,9 +1490,9 @@
           <span>📊</span>
           <span>EXPORT SQUADS TO EXCEL (.XLSX)</span>
         </a>
-        <button class="btn-ps-mgr btn-bulk-mail" id="btn-batch-mail" title="Send confirmation emails to all verified squads">
+        <button class="btn-confirm-mail-all" id="btn-batch-mail" title="Send Official Confirmation Pass (Domain, Room Allocation, Timings & Rules) to All Payment-Verified Squads">
           <span>✉️</span>
-          <span>MAIL VERIFIED SQUADS</span>
+          <span>SEND CONFIRMATION PASS TO ALL VERIFIED</span>
         </button>
         <button class="btn-ps-mgr" id="btn-open-ps-mgr">
           <span>🎯</span>

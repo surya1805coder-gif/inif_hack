@@ -2810,7 +2810,28 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
   const teamName = escapeEmailHtml(team.teamName);
   const college = escapeEmailHtml(team.college || 'N/A');
   const domain = escapeEmailHtml((team.preferredDomain || 'intelligence').toUpperCase());
-  const room = escapeEmailHtml(team.roomAllocated || 'Lab Block 3 (CS-301)');
+
+  // Domain-specific lab / arena mappings if roomAllocated is missing or TBA
+  const domainRooms = {
+    intelligence: 'Lab Block 3 (CS-301) — AI & Machine Learning Arena',
+    connectivity: 'Lab Block 3 (CS-302) — Cloud & Networks Wing',
+    space: 'Lab Block 3 (CS-302) — Cloud & Networks Wing',
+    digital: 'Lab Block 3 (CS-303) — Cyber Security & Systems Lab',
+    reality: 'Lab Block 3 (CS-303) — Cyber Security & Systems Lab',
+    power: 'Lab Block 2 (EC-201) — Hardware & IoT Innovation Deck',
+    automation: 'Lab Block 2 (EC-201) — Hardware & IoT Innovation Deck',
+    time: 'Lab Block 2 (EC-202) — Robotics & Automation Hall',
+    analytics: 'Lab Block 2 (EC-202) — Robotics & Automation Hall',
+    soul: 'Main Campus Innovation Arena — Open Track Hub',
+    impact: 'Main Campus Innovation Arena — Open Track Hub'
+  };
+
+  const prefDomainKey = (team.preferredDomain || '').trim().toLowerCase();
+  const defaultRoom = domainRooms[prefDomainKey] || 'Main Campus Innovation Arena (Lab Block 3)';
+  const rawRoom = (team.roomAllocated || '').trim();
+  const room = rawRoom && !rawRoom.startsWith('TBA') ? rawRoom : defaultRoom;
+  const roomEscaped = escapeEmailHtml(room);
+
   const utr = escapeEmailHtml(team.payment?.utr || 'VERIFIED');
   const amount = escapeEmailHtml(team.payment?.amount || (team.teamSize || 4) * 349);
   const size = escapeEmailHtml(team.teamSize || (teamMembers.length + 1));
@@ -2820,7 +2841,7 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
       <td style="padding:10px 14px; border-bottom:1px solid #e4e4e7; width:80px;">
         <span style="display:inline-block; padding:3px 8px; border-radius:4px; background:#09090b; color:#ffffff; font-size:9px; font-weight:800; letter-spacing:0.06em; font-family:monospace;">CAPTAIN</span>
       </td>
-      <td style="padding:10px 14px; border-bottom:1px solid #e4e4e7; color:#09090b; font-weight:600; font-size:13px;">
+      <td style="padding:10px 14px; border-bottom:1px solid #e4e4e7; color:#09090b; font-weight:700; font-size:13px;">
         ${escapeEmailHtml(leader.name || 'Captain')}
       </td>
       <td style="padding:10px 14px; border-bottom:1px solid #e4e4e7; color:#71717a; font-size:12px; font-family:monospace;">
@@ -2837,7 +2858,7 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
         <td style="padding:10px 14px; ${borderStyle} width:80px;">
           <span style="display:inline-block; padding:3px 8px; border-radius:4px; background:#f4f4f5; border:1px solid #e4e4e7; color:#52525b; font-size:9px; font-weight:700; letter-spacing:0.06em; font-family:monospace;">MEMBER</span>
         </td>
-        <td style="padding:10px 14px; ${borderStyle} color:#18181b; font-weight:500; font-size:13px;">
+        <td style="padding:10px 14px; ${borderStyle} color:#18181b; font-weight:600; font-size:13px;">
           ${escapeEmailHtml(m.name || 'Squad Member')}
         </td>
         <td style="padding:10px 14px; ${borderStyle} color:#71717a; font-size:12px; font-family:monospace;">
@@ -2847,7 +2868,7 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
     `;
   });
 
-  const subject = `✓ Official Squad Pass Issued — Infinity Hackathon 2026 | Squad ${team.teamName} [${team.id}]`;
+  const subject = `✓ Confirmed Squad Pass & Venue Allocation — Infinity Hackathon 2026 | Squad ${team.teamName} [${team.id}]`;
   const cleanAppUrl = (appUrl || 'https://infinity.akao.in').replace(/\/$/, '');
 
   const htmlContent = `<!DOCTYPE html>
@@ -2857,97 +2878,117 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${subject}</title>
 </head>
-<body style="margin:0; padding:0; background-color:#ffffff; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#09090b; -webkit-font-smoothing:antialiased;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f4f4f5; min-height:100vh; padding:36px 12px;">
+<body style="margin:0; padding:0; background-color:#f4f4f5; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#09090b; -webkit-font-smoothing:antialiased;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f4f4f5; min-height:100vh; padding:32px 12px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" style="max-width:580px; background-color:#ffffff; border:1px solid #e4e4e7; border-radius:10px; overflow:hidden; margin:0 auto; box-shadow:0 4px 16px rgba(0,0,0,0.04);" cellspacing="0" cellpadding="0" border="0">
+        <table role="presentation" width="100%" style="max-width:620px; background-color:#ffffff; border:1px solid #e4e4e7; border-radius:12px; overflow:hidden; margin:0 auto; box-shadow:0 8px 30px rgba(0,0,0,0.06);" cellspacing="0" cellpadding="0" border="0">
           
-          <!-- Header Section -->
+          <!-- Header Banner -->
           <tr>
-            <td style="padding:36px 28px 24px 28px; text-align:center; border-bottom:1px solid #f4f4f5;">
-              <div style="font-size:10px; font-weight:700; letter-spacing:0.22em; color:#71717a; text-transform:uppercase; margin-bottom:8px;">DEPARTMENT OF COMPUTER SCIENCE &amp; ENGINEERING</div>
-              <div style="font-size:18px; font-weight:800; letter-spacing:0.1em; color:#09090b; text-transform:uppercase; margin-bottom:16px;">INFINITY HACKATHON 2026</div>
+            <td style="padding:36px 32px 24px 32px; text-align:center; background:linear-gradient(180deg, #ffffff 0%, #fafafa 100%); border-bottom:1px solid #e4e4e7;">
+              <div style="font-size:10px; font-weight:800; letter-spacing:0.22em; color:#71717a; text-transform:uppercase; margin-bottom:8px;">DEPARTMENT OF COMPUTER SCIENCE &amp; ENGINEERING</div>
+              <div style="font-size:20px; font-weight:900; letter-spacing:0.08em; color:#09090b; text-transform:uppercase; margin-bottom:16px;">INFINITY HACKATHON 2026</div>
               
-              <!-- Verified Pass Badge -->
+              <!-- Verified Status Pill -->
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto 16px auto;">
                 <tr>
-                  <td style="padding:6px 14px; border-radius:9999px; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; font-size:10px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase;">
-                    ✓ PAYMENT VERIFIED &bull; OFFICIAL PASS ISSUED
+                  <td style="padding:7px 18px; border-radius:9999px; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; font-size:11px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase;">
+                    ✓ PAYMENT VERIFIED &bull; OFFICIAL SQUAD PASS ISSUED
                   </td>
                 </tr>
               </table>
 
-              <h1 style="margin:0 0 8px 0; font-size:24px; font-weight:800; color:#09090b; letter-spacing:-0.02em;">Squad ${teamName}</h1>
-              <p style="margin:0 auto; font-size:13px; color:#71717a; line-height:1.6; max-width:460px;">
-                Great news! Your payment has been verified. Squad <strong>${teamName}</strong> is officially confirmed for <strong>Infinity Hackathon 2026</strong>. Keep this email safe for coordinator entrance verification and hackathon check-in.
+              <h1 style="margin:0 0 10px 0; font-size:26px; font-weight:900; color:#09090b; letter-spacing:-0.03em;">Squad ${teamName}</h1>
+              <p style="margin:0 auto; font-size:14px; color:#52525b; line-height:1.6; max-width:480px;">
+                Congratulations! Your payment has been successfully verified. Squad <strong>${teamName}</strong> is officially confirmed for <strong>Infinity Hackathon 2026</strong>. Review your venue allocation, event timings, and mandatory rules below.
               </p>
             </td>
           </tr>
 
-          <!-- Ticket Pass Section -->
+          <!-- Official Pass & Allocation Summary -->
           <tr>
-            <td style="padding:24px 28px;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fafafa; border:1px solid #e4e4e7; border-radius:8px; overflow:hidden;">
+            <td style="padding:24px 28px 16px 28px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fafafa; border:1px solid #e4e4e7; border-radius:10px; overflow:hidden;">
+                
+                <!-- Ticket ID Bar -->
                 <tr>
-                  <td style="padding:14px 18px; border-bottom:1px solid #e4e4e7; background:#f4f4f5;">
+                  <td style="padding:14px 20px; border-bottom:1px solid #e4e4e7; background:#f4f4f5;">
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                       <tr>
                         <td align="left">
-                          <span style="font-size:10px; font-weight:600; color:#71717a; letter-spacing:0.14em; text-transform:uppercase;">OFFICIAL PASS ID</span>
-                          <div style="font-size:19px; font-weight:800; color:#09090b; font-family:monospace; margin-top:2px;">${teamId}</div>
+                          <span style="font-size:10px; font-weight:700; color:#71717a; letter-spacing:0.14em; text-transform:uppercase;">OFFICIAL SQUAD PASS ID</span>
+                          <div style="font-size:22px; font-weight:900; color:#09090b; font-family:monospace; margin-top:2px; letter-spacing:0.04em;">${teamId}</div>
                         </td>
                         <td align="right">
-                          <span style="display:inline-block; padding:4px 10px; border-radius:4px; background:#ffffff; border:1px solid #e4e4e7; color:#09090b; font-size:11px; font-weight:700; font-family:monospace;">${size} MEMBERS</span>
+                          <span style="display:inline-block; padding:5px 12px; border-radius:6px; background:#ffffff; border:1px solid #d4d4d8; color:#09090b; font-size:11px; font-weight:800; font-family:monospace;">${size} MEMBERS</span>
                         </td>
                       </tr>
                     </table>
                   </td>
                 </tr>
 
+                <!-- Venue & Domain Callout Highlight -->
                 <tr>
-                  <td style="padding:16px 18px;">
-                    <table role="presentation" width="100%" cellspacing="0" cellpadding="6" border="0" style="font-size:12px;">
+                  <td style="padding:16px 20px; background:#f0fdf4; border-bottom:1px solid #bbf7d0;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                       <tr>
-                        <td style="color:#71717a; font-weight:500; width:34%;">Payment Status</td>
-                        <td style="color:#047857; font-weight:700;">
-                          <span style="display:inline-block; padding:3px 8px; border-radius:4px; background:#ecfdf5; border:1px solid #a7f3d0;">✓ VERIFIED & APPROVED</span>
+                        <td style="width:28px; vertical-align:top; font-size:20px; line-height:1;">🏛️</td>
+                        <td style="padding-left:10px;">
+                          <div style="font-size:10px; font-weight:800; color:#15803d; letter-spacing:0.14em; text-transform:uppercase;">ALLOCATED VENUE &amp; LAB ROOM</div>
+                          <div style="font-size:16px; font-weight:800; color:#14532d; margin-top:3px;">${roomEscaped}</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Key Specs Grid -->
+                <tr>
+                  <td style="padding:16px 20px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="6" border="0" style="font-size:13px;">
+                      <tr>
+                        <td style="color:#71717a; font-weight:600; width:36%;">Team Name</td>
+                        <td style="color:#09090b; font-weight:800;">${teamName}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#71717a; font-weight:600;">Track / Domain</td>
+                        <td style="color:#09090b; font-weight:800;">
+                          <span style="display:inline-block; padding:3px 8px; border-radius:4px; background:#f4f4f5; border:1px solid #e4e4e7; font-family:monospace;">${domain}</span>
                         </td>
                       </tr>
                       <tr>
-                        <td style="color:#71717a; font-weight:500;">Institution</td>
+                        <td style="color:#71717a; font-weight:600;">Institution / College</td>
                         <td style="color:#09090b; font-weight:600;">${college}</td>
                       </tr>
                       <tr>
-                        <td style="color:#71717a; font-weight:500;">Track / Domain</td>
-                        <td style="color:#09090b; font-weight:700;">${domain}</td>
+                        <td style="color:#71717a; font-weight:600;">Payment Status</td>
+                        <td style="color:#047857; font-weight:800;">
+                          <span style="display:inline-block; padding:3px 8px; border-radius:4px; background:#ecfdf5; border:1px solid #a7f3d0;">✓ VERIFIED &bull; APPROVED</span>
+                        </td>
                       </tr>
                       <tr>
-                        <td style="color:#71717a; font-weight:500;">Venue Block</td>
-                        <td style="color:#09090b; font-weight:600;">${room}</td>
+                        <td style="color:#71717a; font-weight:600;">Bank UTR / Transaction Ref</td>
+                        <td style="color:#18181b; font-family:monospace; font-weight:700;">${utr}</td>
                       </tr>
                       <tr>
-                        <td style="color:#71717a; font-weight:500;">Bank UTR / Ref</td>
-                        <td style="color:#18181b; font-family:monospace;">${utr}</td>
+                        <td style="color:#71717a; font-weight:600;">Registration Fee Paid</td>
+                        <td style="color:#09090b; font-weight:800;">₹${amount}</td>
                       </tr>
                       <tr>
-                        <td style="color:#71717a; font-weight:500;">Total Fee Paid</td>
-                        <td style="color:#09090b; font-weight:700;">₹${amount}</td>
-                      </tr>
-                      <tr>
-                        <td style="color:#71717a; font-weight:500;">Leader Username</td>
+                        <td style="color:#71717a; font-weight:600;">Leader Email (Login ID)</td>
                         <td style="color:#09090b; font-family:monospace; font-weight:700;">${leaderEmail}</td>
                       </tr>
                       ${rawPassword ? `
                       <tr>
-                        <td style="color:#71717a; font-weight:500;">Team Password</td>
-                        <td style="color:#09090b; font-family:monospace; font-weight:700;">${escapeEmailHtml(rawPassword)}</td>
+                        <td style="color:#71717a; font-weight:600;">Team Password</td>
+                        <td style="color:#09090b; font-family:monospace; font-weight:800;">${escapeEmailHtml(rawPassword)}</td>
                       </tr>
                       ` : ''}
                       <tr>
-                        <td style="color:#71717a; font-weight:500;">Verification Link</td>
-                        <td style="color:#09090b; font-family:monospace; font-size:11px;">
-                          <a href="${cleanAppUrl}/leader?team=${teamId}" target="_blank" style="color:#09090b; text-decoration:underline;">${cleanAppUrl}/leader?team=${teamId}</a>
+                        <td style="color:#71717a; font-weight:600;">Leader Portal</td>
+                        <td style="color:#09090b; font-family:monospace; font-size:12px;">
+                          <a href="${cleanAppUrl}/leader?team=${teamId}" target="_blank" style="color:#09090b; font-weight:700; text-decoration:underline;">${cleanAppUrl}/leader?team=${teamId}</a>
                         </td>
                       </tr>
                     </table>
@@ -2957,11 +2998,11 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
             </td>
           </tr>
 
-          <!-- Roster Section -->
+          <!-- Squad Roster Table -->
           <tr>
-            <td style="padding:0 28px 24px 28px;">
-              <div style="font-size:10px; font-weight:700; letter-spacing:0.14em; color:#71717a; text-transform:uppercase; margin-bottom:8px;">
-                CONFIRMED SQUAD ROSTER
+            <td style="padding:8px 28px 20px 28px;">
+              <div style="font-size:11px; font-weight:800; letter-spacing:0.14em; color:#71717a; text-transform:uppercase; margin-bottom:8px;">
+                CONFIRMED SQUAD ROSTER (${size} PARTICIPANTS)
               </div>
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fafafa; border:1px solid #e4e4e7; border-radius:8px; overflow:hidden;">
                 ${rosterRows}
@@ -2969,23 +3010,169 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
             </td>
           </tr>
 
-          <!-- Check-In Guidelines Note -->
+          <!-- Event Timing & Schedule Table -->
           <tr>
-            <td style="padding:0 28px 24px 28px;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fafafa; border:1px solid #e4e4e7; border-radius:8px; padding:16px 18px;">
+            <td style="padding:0 28px 20px 28px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; overflow:hidden;">
                 <tr>
-                  <td>
-                    <div style="font-size:10px; font-weight:700; color:#71717a; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:8px;">
-                      On-Site Check-in Guidelines
-                    </div>
-                    <ul style="margin:0; padding-left:16px; color:#52525b; font-size:12px; line-height:1.6;">
-                      <li>Reporting time: <strong style="color:#09090b;">08:30 AM</strong> at the Main Campus Innovation Arena.</li>
-                      <li>Present your <strong style="color:#09090b;">Pass ID (${teamId})</strong> at the Coordinator Entrance desk for verification.</li>
-                      <li>Bring original college ID cards, personal laptops, and chargers.</li>
-                      <li>Problem statements will unlock on your Leader Portal on hackathon morning.</li>
-                    </ul>
+                  <td style="padding:14px 18px; background:#f1f5f9; border-bottom:1px solid #cbd5e1;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td style="width:24px; vertical-align:middle; font-size:18px;">⏰</td>
+                        <td style="padding-left:8px; vertical-align:middle;">
+                          <span style="font-size:11px; font-weight:800; color:#334155; letter-spacing:0.12em; text-transform:uppercase;">
+                            EVENT TIMINGS &amp; HACKATHON SCHEDULE
+                          </span>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
+                <tr>
+                  <td style="padding:14px 18px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="6" border="0" style="font-size:12px;">
+                      <tr>
+                        <td style="color:#475569; font-weight:700; width:34%; font-family:monospace;">08:30 AM – 09:15 AM</td>
+                        <td style="color:#0f172a; font-weight:600;">Campus Arrival, Security Pass Check &amp; Desk Allocation</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#475569; font-weight:700; font-family:monospace;">09:15 AM – 09:30 AM</td>
+                        <td style="color:#0f172a; font-weight:600;">Desk Setup at Allocated Room: <strong>${roomEscaped}</strong></td>
+                      </tr>
+                      <tr>
+                        <td style="color:#475569; font-weight:700; font-family:monospace;">09:30 AM – 10:00 AM</td>
+                        <td style="color:#0f172a; font-weight:600;">Inauguration Ceremony &amp; Problem Statements Release</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#475569; font-weight:700; font-family:monospace;">10:00 AM (Day 1)</td>
+                        <td style="color:#047857; font-weight:800;">🚀 24-Hour Hackathon Development Sprint Begins</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#475569; font-weight:700; font-family:monospace;">03:00 PM (Day 1)</td>
+                        <td style="color:#0f172a; font-weight:600;">Review Round 01 — System Architecture &amp; Feasibility Check</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#475569; font-weight:700; font-family:monospace;">10:00 PM (Day 1)</td>
+                        <td style="color:#0f172a; font-weight:600;">Review Round 02 — Working Prototype &amp; Core APIs Mentoring</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#475569; font-weight:700; font-family:monospace;">07:30 AM (Day 2)</td>
+                        <td style="color:#0f172a; font-weight:600;">Review Round 03 — Feature Freeze &amp; Code Polish</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#475569; font-weight:700; font-family:monospace;">10:00 AM (Day 2)</td>
+                        <td style="color:#0f172a; font-weight:800;">🏆 Final Jury Pitches, Rubric Evaluation &amp; Grand Valedictory</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Mandatory Rules & Guidelines Highlighted with Icons -->
+          <tr>
+            <td style="padding:0 28px 24px 28px;">
+              <div style="font-size:11px; font-weight:800; letter-spacing:0.14em; color:#71717a; text-transform:uppercase; margin-bottom:10px;">
+                MANDATORY RULES &amp; PARTICIPATION GUIDELINES
+              </div>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#ffffff; border:1px solid #e4e4e7; border-radius:10px; overflow:hidden;">
+                
+                <!-- Rule 1: Own Laptops & Chargers -->
+                <tr>
+                  <td style="padding:14px 16px; border-bottom:1px solid #f4f4f5; background:#fafafa;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td style="width:36px; vertical-align:top; font-size:22px; line-height:1;">💻</td>
+                        <td style="padding-left:12px;">
+                          <div style="font-size:13px; font-weight:800; color:#09090b; margin-bottom:3px;">
+                            Bring Your Own Laptops &amp; Original Chargers
+                          </div>
+                          <div style="font-size:12px; color:#52525b; line-height:1.5;">
+                            Every participant must bring their own personal laptop and dedicated power charger. Ensure code editors, compilers, package managers, and runtime SDKs are installed before arriving on campus.
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Rule 2: Charging Ports & Electric Spikes / Extension Boards -->
+                <tr>
+                  <td style="padding:14px 16px; border-bottom:1px solid #f4f4f5; background:#fafafa;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td style="width:36px; vertical-align:top; font-size:22px; line-height:1;">🔌</td>
+                        <td style="padding-left:12px;">
+                          <div style="font-size:13px; font-weight:800; color:#09090b; margin-bottom:3px;">
+                            Charging Ports &amp; Electric Spikes (Multi-Plug Boards)
+                          </div>
+                          <div style="font-size:12px; color:#52525b; line-height:1.5;">
+                            Each squad must carry at least one <strong>3-pin / 4-pin electric spike extension strip (multi-plug board)</strong>. This guarantees that all team members can power their laptops and mobile devices simultaneously at your assigned desk without socket congestion.
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Rule 3: Zero Tolerance for Misbehavior -->
+                <tr>
+                  <td style="padding:14px 16px; border-bottom:1px solid #f4f4f5; background:#fff1f2;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td style="width:36px; vertical-align:top; font-size:22px; line-height:1;">🚫</td>
+                        <td style="padding-left:12px;">
+                          <div style="font-size:13px; font-weight:800; color:#be123c; margin-bottom:3px;">
+                            Strict Zero-Tolerance for Misbehavior &amp; Indiscipline
+                          </div>
+                          <div style="font-size:12px; color:#9f1239; line-height:1.5;">
+                            Any abusive language, indiscipline, damage to lab equipment or college infrastructure, harassment, or unauthorized exit from the campus is strictly forbidden. Any violation results in <strong>IMMEDIATE DISQUALIFICATION of the entire squad</strong> and escalation to campus security.
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Rule 4: Anti-Plagiarism & Authentic Code -->
+                <tr>
+                  <td style="padding:14px 16px; border-bottom:1px solid #f4f4f5; background:#fafafa;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td style="width:36px; vertical-align:top; font-size:22px; line-height:1;">🛡️</td>
+                        <td style="padding-left:12px;">
+                          <div style="font-size:13px; font-weight:800; color:#09090b; margin-bottom:3px;">
+                            Original Code Only &bull; Anti-Plagiarism Policy
+                          </div>
+                          <div style="font-size:12px; color:#52525b; line-height:1.5;">
+                            All source code must be developed strictly during the 24-hour sprint. Pre-built applications, cloned templates, or copy-pasted projects will be caught by automated Git commit inspections and will lead to instant disqualification.
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Rule 5: College ID Cards -->
+                <tr>
+                  <td style="padding:14px 16px; background:#fafafa;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td style="width:36px; vertical-align:top; font-size:22px; line-height:1;">🪪</td>
+                        <td style="padding-left:12px;">
+                          <div style="font-size:13px; font-weight:800; color:#09090b; margin-bottom:3px;">
+                            Mandatory Physical College ID Cards
+                          </div>
+                          <div style="font-size:12px; color:#52525b; line-height:1.5;">
+                            Every participant must carry their original college photo identity card. You must present your College ID and this Official Pass ID (<strong>${teamId}</strong>) at entrance security and coordinator check-in.
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
               </table>
             </td>
           </tr>
@@ -2996,8 +3183,8 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto;">
                 <tr>
                   <td align="center" style="border-radius:6px; background:#09090b;">
-                    <a href="${cleanAppUrl}/leader?team=${teamId}" target="_blank" rel="noopener noreferrer" style="display:inline-block; padding:13px 34px; font-size:12px; font-weight:700; color:#ffffff; text-decoration:none; text-transform:uppercase; letter-spacing:0.08em;">
-                      VIEW SQUAD PASS &amp; VERIFICATION &rarr;
+                    <a href="${cleanAppUrl}/leader?team=${teamId}" target="_blank" rel="noopener noreferrer" style="display:inline-block; padding:14px 38px; font-size:13px; font-weight:800; color:#ffffff; text-decoration:none; text-transform:uppercase; letter-spacing:0.08em;">
+                      ACCESS SQUAD PORTAL &amp; PASS &rarr;
                     </a>
                   </td>
                 </tr>
@@ -3011,7 +3198,7 @@ export async function sendPaymentVerifiedEmail({ team, appUrl = 'https://infinit
           <!-- Footer -->
           <tr>
             <td style="background-color:#f4f4f5; padding:20px 24px; text-align:center; border-top:1px solid #e4e4e7; font-size:11px; color:#71717a; line-height:1.6;">
-              <p style="margin:0 0 4px 0; color:#52525b; font-weight:500;">Infinity Hackathon 2026 &bull; Department of Computer Science &amp; Engineering</p>
+              <p style="margin:0 0 4px 0; color:#52525b; font-weight:600;">Infinity Hackathon 2026 &bull; Department of Computer Science &amp; Engineering</p>
               <p style="margin:0;">Need assistance? Contact <a href="mailto:support@infinity.akao.in" style="color:#09090b; text-decoration:underline;">support@infinity.akao.in</a></p>
             </td>
           </tr>

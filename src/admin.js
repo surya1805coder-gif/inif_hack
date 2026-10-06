@@ -1288,7 +1288,7 @@ function authHeaders(extra = {}) {
       }
     });
 
-    // BULK SEND VERIFICATION MAILS TO ALL VERIFIED SQUADS
+    // BULK SEND CONFIRMATION PASSES TO ALL VERIFIED SQUADS
     const btnBatchMail = document.getElementById('btn-batch-mail');
     if (btnBatchMail) {
       btnBatchMail.addEventListener('click', async () => {
@@ -1296,29 +1296,31 @@ function authHeaders(extra = {}) {
         const unmailedTeams = verifiedTeams.filter(t => !t.payment?.mailSent);
 
         if (verifiedTeams.length === 0) {
-          alert('No verified squads found. Please verify squad payments before sending confirmation emails.');
+          alert('No verified squads found. Please verify squad payments before sending official confirmation passes.');
           return;
         }
 
         let force = false;
         let targetCount = unmailedTeams.length;
 
+        const mailDetails = `The email includes:\n• Assigned Track Domain & Lab Room Allocation\n• Official Pass ID & Team Name\n• Hackathon Schedule & Round Timings (08:30 AM arrival)\n• Mandatory Rules: Own Laptops & Chargers, Electric Spikes (Multi-Plug Boards), Zero Tolerance for Misbehavior, and Original College IDs.`;
+
         if (targetCount === 0) {
-          if (confirm(`All ${verifiedTeams.length} verified squad(s) have already received confirmation emails.\n\nDo you want to FORCE re-send to ALL ${verifiedTeams.length} verified squads?`)) {
+          if (confirm(`All ${verifiedTeams.length} verified squad(s) have already received confirmation passes.\n\nDo you want to FORCE re-send to ALL ${verifiedTeams.length} verified squads?\n\n${mailDetails}`)) {
             force = true;
             targetCount = verifiedTeams.length;
           } else {
             return;
           }
         } else {
-          if (!confirm(`Dispatch official payment verification emails to ${targetCount} verified squad(s) that haven't received mail yet?`)) {
+          if (!confirm(`Dispatch Official Confirmation Passes to ${targetCount} verified squad(s) that haven't received their pass yet?\n\n(${verifiedTeams.length - unmailedTeams.length} already sent, ${targetCount} pending)\n\n${mailDetails}`)) {
             return;
           }
         }
 
         btnBatchMail.disabled = true;
         const originalContent = btnBatchMail.innerHTML;
-        btnBatchMail.innerHTML = '<span>⏳</span><span>DISPATCHING EMAILS...</span>';
+        btnBatchMail.innerHTML = `<span>⏳</span><span>DISPATCHING PASSES (${targetCount})...</span>`;
 
         try {
           const res = await fetch('/api/admin/send-all-verification-mails', {
@@ -1330,15 +1332,15 @@ function authHeaders(extra = {}) {
           if (data.success) {
             await loadData();
             if (data.simulated) {
-              alert(`⚡ [SIMULATION MODE]\nProcessed ${data.sentCount} squad emails!\n\n(Configure RESEND_API_KEY in .env.local to send live emails via Resend's free tier).`);
+              alert(`⚡ [SIMULATION MODE]\nProcessed ${data.sentCount} squad passes!\n\n(Configure RESEND_API_KEY in .env.local to send live emails via Resend).`);
             } else {
-              alert(`✅ Verification emails sent: ${data.sentCount} squads notified successfully (${data.failCount || 0} failed).`);
+              alert(`✅ Official Confirmation Passes Dispatched!\n\n${data.sentCount} verified squads notified with their room allocation, event timings, and rules (${data.failCount || 0} failed).`);
             }
           } else {
-            alert('Failed to send batch emails: ' + (data.error || 'Unknown error'));
+            alert('Failed to send batch confirmation passes: ' + (data.error || 'Unknown error'));
           }
         } catch (err) {
-          alert('Error sending batch emails: ' + err.message);
+          alert('Error sending batch confirmation passes: ' + err.message);
         } finally {
           btnBatchMail.disabled = false;
           btnBatchMail.innerHTML = originalContent;
