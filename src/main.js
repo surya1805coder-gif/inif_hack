@@ -15,6 +15,8 @@ import { TechText } from './techText.js';
 import { initCinematicPreloader } from './cinematicPreloader.js';
 import { initMoltenMetal } from './moltenMetal.js';
 import { initScrollReveal } from './scrollReveal.js';
+import { LightspeedEffect } from './lightspeedEffect.js';
+import { ScrollPortalEffect } from './scrollPortalEffect.js';
 
 class InfinityScrollShowcase {
   constructor() {
@@ -350,6 +352,17 @@ class InfinityScrollShowcase {
 
     this.starfield = new THREE.Points(starGeo, starMat);
     this.scene.add(this.starfield);
+
+    // Initialize Native React Bits: Lightspeed Hyperspace Streak Engine
+    this.lightspeed = new LightspeedEffect(this.scene, {
+      isMobile: this.isMobile(),
+      initialColor: STONES[0].colorHex
+    });
+
+    // Initialize Native React Bits: Scroll Portal Nested Frames System
+    this.scrollPortal = new ScrollPortalEffect(this.scene, {
+      isMobile: this.isMobile()
+    });
   }
 
   /* --------------------------------------------------------------------------
@@ -448,6 +461,18 @@ class InfinityScrollShowcase {
           const hits = raycaster.intersectObjects([currentStone.gemMesh, currentStone.coreMesh], true);
           if (hits.length > 0) {
             this.pulseCurrentStone();
+          } else {
+            // Click on empty cosmos: Trigger interactive Lightspeed warp streak pulse!
+            if (this.lightspeed) {
+              audioEngine.playEnergyPulse();
+              const stoneData = STONES[this.currentIndex];
+              this.lightspeed.triggerWarp({
+                colorHex: stoneData ? stoneData.colorHex : '#ffffff',
+                speedMultiplier: 22.0,
+                lengthMultiplier: 24.0,
+                duration: 1.05
+              });
+            }
           }
         }
       }
@@ -1175,6 +1200,19 @@ class InfinityScrollShowcase {
         ease: 'power2.out'
       });
 
+      // React Bits Pro: Native Lightspeed Hyperspace Warp & Scroll Portal Fly-Through
+      if (this.lightspeed) {
+        this.lightspeed.triggerWarp({
+          colorHex: stoneData.colorHex,
+          speedMultiplier: 16.0,
+          lengthMultiplier: 20.0,
+          duration: 0.95
+        });
+      }
+      if (this.scrollPortal) {
+        this.scrollPortal.flyToPortal(index);
+      }
+
       // Outgoing Stone
       if (prevStone && prevIndex !== index) {
         gsap.to(prevStone.group.scale, {
@@ -1233,6 +1271,12 @@ class InfinityScrollShowcase {
         st.group.position.set(0, 0, 0);
         st.group.scale.set(i === index ? targetScale : 0.001, i === index ? targetScale : 0.001, i === index ? targetScale : 0.001);
       });
+      if (this.lightspeed) {
+        this.lightspeed.setThemeColor(stoneData.colorHex, 0.2);
+      }
+      if (this.scrollPortal) {
+        this.scrollPortal.flyToPortal(index);
+      }
       this.isTransitioning = false;
     }
   }
@@ -1287,6 +1331,14 @@ class InfinityScrollShowcase {
 
     if (playSound) {
       audioEngine.playConvergenceChord();
+    }
+
+    if (this.lightspeed) {
+      this.lightspeed.triggerWarp({
+        speedMultiplier: 26.0,
+        lengthMultiplier: 24.0,
+        duration: 2.2
+      });
     }
 
     // Pull camera out smoothly to showcase all 6 stones in orbit
@@ -1763,6 +1815,14 @@ class InfinityScrollShowcase {
     // Subtle drift of starfield
     if (this.starfield) {
       this.starfield.rotation.y = elapsedTime * 0.006;
+    }
+
+    // React Bits Pro: Native Lightspeed & Scroll Portal Engines
+    if (this.lightspeed) {
+      this.lightspeed.update(delta, elapsedTime);
+    }
+    if (this.scrollPortal) {
+      this.scrollPortal.update(delta, elapsedTime);
     }
 
     // Update active stone animations
