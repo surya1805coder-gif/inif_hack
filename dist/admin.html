@@ -1408,7 +1408,7 @@
       }
     }
   </style>
-  <script type="module" crossorigin src="/assets/admin-CgXAchfH.js"></script>
+  <script type="module" crossorigin src="/assets/admin-4ykGZuI_.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
 </head>
 
@@ -1509,6 +1509,10 @@
         <button class="btn-ps-mgr btn-reg-toggle open" id="btn-toggle-reg" title="Toggle Public Registrations Open / Closed">
           <span id="reg-status-icon">🟢</span>
           <span id="reg-status-text">REGISTRATION: OPEN</span>
+        </button>
+        <button class="btn-ps-mgr btn-danger-purge" id="btn-open-purge" title="Permanently Purge All Squad Data">
+          <span>🗑️</span>
+          <span>PURGE SQUADS</span>
         </button>
       </div>
 
@@ -1908,7 +1912,44 @@
           </button>
         </div>
       </div>
-    </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       DANGER PURGE DATA MODAL
+       ========================================================================= -->
+  <div class="admin-modal" id="modal-purge">
+    <div class="admin-dialog purge-dialog">
+      <button class="modal-close" id="btn-close-purge">✕</button>
+
+      <div class="purge-warning-icon">⚠️</div>
+      <h3 class="purge-title">PERMANENTLY PURGE ALL SQUADS</h3>
+      <p class="purge-sub">
+        This destructive action will permanently erase all registered squads, leader accounts, payment proofs, reviews, and judge score allocations from the database.
+      </p>
+
+      <div class="purge-alert-box" style="margin-bottom: 20px;">
+        <strong>⚠️ IRREVERSIBLE ACTION:</strong> Once deleted, squad records cannot be recovered unless restored from an administrative backup file.
+      </div>
+
+      <div style="margin-bottom: 20px; text-align: left;">
+        <label style="display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; font-family: 'JetBrains Mono', monospace;">
+          Type <strong style="color:var(--red);">ERASE</strong> to confirm:
+        </label>
+        <input type="text" id="txt-purge-confirm" class="form-input font-mono" placeholder="Type ERASE" style="text-align: center; font-weight: 800; letter-spacing: 0.1em; color: var(--red);">
+      </div>
+
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <button type="button" class="modal-cancel-btn" id="btn-cancel-purge" style="padding: 10px 20px; border-radius: 8px;">CANCEL</button>
+        <button type="button" class="btn-danger-confirm" id="btn-confirm-purge" disabled style="opacity: 0.5; cursor: not-allowed;">
+          🗑️ PERMANENTLY ERASE ALL DATA
+        </button>
+      </div>
+
+      <div id="purge-status" style="margin-top: 14px; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; display: none;"></div>
+    </div>
+  </div>
+
 </body>
 
 </html>

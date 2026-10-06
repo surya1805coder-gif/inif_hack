@@ -2193,4 +2193,85 @@ function authHeaders(extra = {}) {
           alert('Error: ' + err.message);
         }
       });
+    }
+
+    // ==========================================
+    // DANGER ZONE: PURGE ALL SQUADS MODAL
+    // ==========================================
+    const modalPurge = document.getElementById('modal-purge');
+    const btnOpenPurge = document.getElementById('btn-open-purge');
+    const btnClosePurge = document.getElementById('btn-close-purge');
+    const btnCancelPurge = document.getElementById('btn-cancel-purge');
+    const txtPurgeConfirm = document.getElementById('txt-purge-confirm');
+    const btnConfirmPurge = document.getElementById('btn-confirm-purge');
+    const purgeStatus = document.getElementById('purge-status');
+
+    if (btnOpenPurge && modalPurge) {
+      btnOpenPurge.addEventListener('click', () => {
+        if (txtPurgeConfirm) txtPurgeConfirm.value = '';
+        if (btnConfirmPurge) {
+          btnConfirmPurge.disabled = true;
+          btnConfirmPurge.style.opacity = '0.5';
+          btnConfirmPurge.style.cursor = 'not-allowed';
+        }
+        if (purgeStatus) purgeStatus.style.display = 'none';
+        modalPurge.classList.add('is-open');
+        if (txtPurgeConfirm) txtPurgeConfirm.focus();
+      });
+
+      const closePurgeModal = () => modalPurge.classList.remove('is-open');
+      if (btnClosePurge) btnClosePurge.addEventListener('click', closePurgeModal);
+      if (btnCancelPurge) btnCancelPurge.addEventListener('click', closePurgeModal);
+
+      if (txtPurgeConfirm) {
+        txtPurgeConfirm.addEventListener('input', () => {
+          const isValid = txtPurgeConfirm.value.trim() === 'ERASE';
+          if (btnConfirmPurge) {
+            btnConfirmPurge.disabled = !isValid;
+            btnConfirmPurge.style.opacity = isValid ? '1' : '0.5';
+            btnConfirmPurge.style.cursor = isValid ? 'pointer' : 'not-allowed';
+          }
+        });
+      }
+
+      if (btnConfirmPurge) {
+        btnConfirmPurge.addEventListener('click', async () => {
+          if (!txtPurgeConfirm || txtPurgeConfirm.value.trim() !== 'ERASE') return;
+          btnConfirmPurge.disabled = true;
+          btnConfirmPurge.textContent = 'ERASING ALL DATA...';
+          if (purgeStatus) {
+            purgeStatus.style.display = 'block';
+            purgeStatus.style.color = 'var(--gold)';
+            purgeStatus.textContent = 'Purging squad database on Cloudflare R2...';
+          }
+
+          try {
+            const res = await fetch('/api/admin/purge-data', {
+              method: 'POST',
+              headers: authHeaders({ 'Content-Type': 'application/json' }),
+              body: JSON.stringify({ confirm: 'ERASE' })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+              throw new Error(data.error || 'Failed to purge data.');
+            }
+
+            allTeams = [];
+            renderTable();
+            updateKPIs();
+            closePurgeModal();
+            alert(`✓ Purge complete! ${data.purgedCount} squad(s) have been permanently deleted from the database.`);
+          } catch (err) {
+            if (purgeStatus) {
+              purgeStatus.style.display = 'block';
+              purgeStatus.style.color = 'var(--red)';
+              purgeStatus.textContent = `Error: ${err.message}`;
+            }
+            alert(`Error purging data: ${err.message}`);
+          } finally {
+            btnConfirmPurge.disabled = false;
+            btnConfirmPurge.textContent = '🗑️ PERMANENTLY ERASE ALL DATA';
+          }
+        });
+      }
     }
