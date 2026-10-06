@@ -16,7 +16,7 @@ import { initCinematicPreloader } from './cinematicPreloader.js';
 import { initMoltenMetal } from './moltenMetal.js';
 import { initScrollReveal } from './scrollReveal.js';
 import { LightspeedEffect } from './lightspeedEffect.js';
-import { ScrollPortalEffect } from './scrollPortalEffect.js';
+
 
 class InfinityScrollShowcase {
   constructor() {
@@ -357,11 +357,6 @@ class InfinityScrollShowcase {
     this.lightspeed = new LightspeedEffect(this.scene, {
       isMobile: this.isMobile(),
       initialColor: STONES[0].colorHex
-    });
-
-    // Initialize Native React Bits: Scroll Portal Nested Frames System
-    this.scrollPortal = new ScrollPortalEffect(this.scene, {
-      isMobile: this.isMobile()
     });
   }
 
@@ -1200,7 +1195,7 @@ class InfinityScrollShowcase {
         ease: 'power2.out'
       });
 
-      // React Bits Pro: Native Lightspeed Hyperspace Warp & Scroll Portal Fly-Through
+      // React Bits Pro: Native Lightspeed Hyperspace Warp
       if (this.lightspeed) {
         this.lightspeed.triggerWarp({
           colorHex: stoneData.colorHex,
@@ -1208,9 +1203,6 @@ class InfinityScrollShowcase {
           lengthMultiplier: 20.0,
           duration: 0.95
         });
-      }
-      if (this.scrollPortal) {
-        this.scrollPortal.flyToPortal(index);
       }
 
       // Outgoing Stone
@@ -1273,9 +1265,6 @@ class InfinityScrollShowcase {
       });
       if (this.lightspeed) {
         this.lightspeed.setThemeColor(stoneData.colorHex, 0.2);
-      }
-      if (this.scrollPortal) {
-        this.scrollPortal.flyToPortal(index);
       }
       this.isTransitioning = false;
     }
@@ -1817,12 +1806,9 @@ class InfinityScrollShowcase {
       this.starfield.rotation.y = elapsedTime * 0.006;
     }
 
-    // React Bits Pro: Native Lightspeed & Scroll Portal Engines
+    // React Bits Pro: Native Lightspeed Hyperspace Engine
     if (this.lightspeed) {
       this.lightspeed.update(delta, elapsedTime);
-    }
-    if (this.scrollPortal) {
-      this.scrollPortal.update(delta, elapsedTime);
     }
 
     // Update active stone animations
