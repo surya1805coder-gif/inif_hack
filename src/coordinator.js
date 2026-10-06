@@ -288,18 +288,21 @@ let allTeams = [];
 
         html += `
           <tr data-team-id="${escapeHTML(t.id)}">
-            <td>
-              <div class="team-cell-title">${escapeHTML(t.teamName)} <span class="font-mono" style="color:var(--cyan); font-size:0.7rem;">(${escapeHTML(t.id)})</span></div>
+            <td class="col-team">
+              <div class="team-cell-title">
+                <span>${escapeHTML(t.teamName)}</span>
+                <span class="font-mono team-id-badge" style="color:var(--cyan); font-size:0.7rem;">(${escapeHTML(t.id)})</span>
+              </div>
               <div class="team-cell-sub">${escapeHTML(t.college)} • Leader: ${escapeHTML(t.leader?.name || 'N/A')} (${escapeHTML(t.leader?.phone || '')})</div>
             </td>
-            <td>
+            <td class="col-domain">
               <span class="portal-badge">${escapeHTML((t.preferredDomain || 'MIND').toUpperCase())}</span>
-              <div class="team-cell-sub">${escapeHTML(t.roomAllocated || 'Lab Block 3')}</div>
+              <div class="team-cell-sub lab-location">📍 ${escapeHTML(t.roomAllocated || 'Lab Block 3')}</div>
             </td>
-            <td>
+            <td class="col-food">
               ${mealsHtml}
             </td>
-            <td>
+            <td class="col-reviews">
               <div class="chip-group">
                 <label class="check-chip ${rev.r1?.attended ? 'checked' : ''}">
                   <input type="checkbox" data-team="${escapeHTML(t.id)}" data-type="review" data-key="r1" ${rev.r1?.attended ? 'checked' : ''}>

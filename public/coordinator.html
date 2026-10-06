@@ -75,6 +75,35 @@
       color: #fff;
     }
 
+    .brand-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 10px rgba(255, 208, 0, 0.5));
+      flex-shrink: 0;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-sub {
+      font-size: 0.60rem;
+      color: #00d2ff;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
     .pulse-dot {
       width: 8px;
       height: 8px;
@@ -102,6 +131,12 @@
     }
 
     .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-links {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -342,6 +377,17 @@
       font-weight: 700;
     }
 
+    .mono-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--gold);
+      display: inline-flex;
+      align-items: center;
+      margin-right: 4px;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
     /* Teams Operations Table */
     .table-container {
       background: var(--bg-surface);
@@ -564,76 +610,345 @@
         min-width: 0;
         width: 100%;
       }
-
-      .filter-pills {
-        overflow-x: auto;
-        flex-wrap: nowrap;
-        padding-bottom: 4px;
-      }
     }
 
     @media (max-width: 768px) {
       .portal-nav {
-        padding: 12px 16px;
-        flex-wrap: wrap;
+        padding: 12px 14px;
+        flex-direction: column;
+        align-items: stretch;
         gap: 10px;
       }
 
       .brand-group {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         gap: 8px;
-        flex-wrap: wrap;
       }
 
       .brand-title {
         font-size: 0.95rem;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.06em;
+      }
+
+      .brand-sub {
+        font-size: 0.55rem;
       }
 
       .portal-badge {
-        font-size: 0.6rem;
-        padding: 2px 6px;
+        font-size: 0.62rem;
+        padding: 3px 8px;
         white-space: nowrap;
+        flex-shrink: 0;
       }
 
       .nav-actions {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
         gap: 10px;
+      }
+
+      .btn-refresh {
+        padding: 7px 12px;
+        font-size: 0.72rem;
       }
 
       .btn-return {
         font-size: 0.72rem;
+        white-space: nowrap;
       }
 
       .dashboard-layout {
-        margin: 16px auto;
-        padding: 0 12px;
+        margin: 14px auto;
+        padding: 0 10px;
+      }
+
+      .kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 16px;
       }
 
       .kpi-card {
-        padding: 14px;
+        padding: 12px 14px;
+        border-radius: 10px;
       }
 
       .kpi-val {
-        font-size: 1.4rem;
+        font-size: 1.45rem;
       }
 
       .kpi-lbl {
         font-size: 0.6rem;
       }
 
-      .table-container {
-        border-radius: 12px;
+      /* Touch-friendly horizontal scrolling filters */
+      .filter-pills {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 4px;
         -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        width: 100%;
       }
 
-      th,
-      td {
-        padding: 10px 12px;
-        font-size: 0.75rem;
+      .filter-pills::-webkit-scrollbar {
+        display: none;
       }
 
-      .check-chip {
-        padding: 5px 8px;
-        font-size: 0.64rem;
+      .f-pill {
+        flex-shrink: 0;
+        padding: 7px 13px;
+        font-size: 0.72rem;
+      }
+
+      #meal-filters {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        width: 100%;
+        margin-top: 4px;
+      }
+
+      #meal-filters::-webkit-scrollbar {
+        display: none;
+      }
+
+      #meal-filters .mono-label {
+        flex-shrink: 0;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        color: var(--gold);
+        font-weight: 700;
+        margin-right: 4px;
+      }
+
+      /* TRANSFORM TABLE TO RESPONSIVE CARDS */
+      .table-container {
+        background: transparent;
+        border: none;
+        overflow-x: visible;
+        border-radius: 0;
+      }
+
+      table {
+        display: block;
+        width: 100%;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tbody {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        width: 100%;
+      }
+
+      tbody tr {
+        display: flex;
+        flex-direction: column;
+        background: rgba(14, 14, 22, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+        transition: border-color 0.2s;
+      }
+
+      tbody tr:hover,
+      tbody tr:focus-within {
+        border-color: rgba(0, 210, 255, 0.35);
+      }
+
+      tbody tr td {
+        display: block;
+        width: 100%;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      tbody tr td:first-child {
+        padding-top: 0;
+      }
+
+      tbody tr td:last-child {
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+
+      .team-cell-title {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 4px;
+      }
+
+      .team-cell-title .team-id-badge {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+        color: var(--cyan);
+        background: rgba(0, 210, 255, 0.12);
+        border: 1px solid rgba(0, 210, 255, 0.3);
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-weight: 700;
+      }
+
+      .team-cell-sub {
+        font-size: 0.76rem;
+        color: #a8a8b2;
+        line-height: 1.45;
+      }
+
+      /* Lab Location & Domain metadata row */
+      .col-domain {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 0 !important;
+        margin: 2px 0 6px 0;
+      }
+
+      .col-domain .portal-badge {
+        font-size: 0.68rem;
+        padding: 3px 8px;
+        letter-spacing: 0.05em;
+      }
+
+      .col-domain .lab-location {
+        font-size: 0.76rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 600;
+        color: var(--cyan);
+      }
+
+      /* Food Check-in Section */
+      .col-food::before {
+        content: "FOOD CHECK-IN (TAP TO MARK)";
+        display: block;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.62rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        letter-spacing: 0.08em;
+        margin-bottom: 8px;
+      }
+
+      .food-meals-list {
+        min-width: 0 !important;
+        width: 100%;
+        gap: 8px;
+      }
+
+      .meal-check-group {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 8px 10px;
+        background: rgba(255, 255, 255, 0.025);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+      }
+
+      .meal-header {
+        min-width: 85px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .meal-name {
+        font-size: 0.76rem;
+        font-weight: 700;
+        color: #f0f0f5;
+      }
+
+      .btn-meal-all .meal-count-badge {
+        font-size: 0.68rem;
+        padding: 3px 8px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      .meal-members-chips {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .member-food-chip {
+        min-width: 38px;
+        min-height: 38px;
+        padding: 6px 10px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        border-radius: 6px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* Milestone Reviews Section */
+      .col-reviews::before {
+        content: "MILESTONE REVIEWS";
+        display: block;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.62rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        letter-spacing: 0.08em;
+        margin-bottom: 8px;
+      }
+
+      .col-reviews .chip-group {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+      }
+
+      .col-reviews .check-chip {
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 9px 8px;
+        min-height: 40px;
+        font-size: 0.74rem;
+        border-radius: 8px;
+        font-weight: 700;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        text-align: center;
       }
 
       .login-container {
@@ -651,20 +966,66 @@
         font-size: 0.86rem;
       }
 
+      .brand-sub {
+        font-size: 0.52rem;
+      }
+
+      .portal-badge {
+        font-size: 0.58rem;
+        padding: 2px 6px;
+      }
+
       .btn-return {
         font-size: 0.68rem;
       }
 
+      .dashboard-layout {
+        padding: 0 8px;
+        margin: 12px auto;
+      }
+
       .kpi-row {
         gap: 8px;
+        margin-bottom: 12px;
       }
 
       .kpi-card {
-        padding: 12px 10px;
+        padding: 10px 12px;
       }
 
       .kpi-val {
-        font-size: 1.25rem;
+        font-size: 1.3rem;
+      }
+
+      .kpi-lbl {
+        font-size: 0.56rem;
+      }
+
+      tbody tr {
+        padding: 12px 14px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+      }
+
+      .meal-check-group {
+        padding: 7px 8px;
+      }
+
+      .meal-name {
+        font-size: 0.72rem;
+      }
+
+      .member-food-chip {
+        min-width: 36px;
+        min-height: 36px;
+        padding: 5px 8px;
+        font-size: 0.74rem;
+      }
+
+      .col-reviews .check-chip {
+        min-height: 38px;
+        padding: 7px 4px;
+        font-size: 0.68rem;
       }
     }
   </style>
@@ -674,12 +1035,16 @@
 
   <!-- Top Navbar -->
   <header class="portal-nav">
-    <a href="/" class="brand-group" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
-      <img src="/logo.png" alt="Infinity Crest"
-        style="width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(255, 208, 0, 0.5));">
-      <span class="brand-title">INFINITY HACKATHON</span>
+    <div class="brand-group">
+      <a href="/" class="brand-left">
+        <img src="/logo.png" alt="Infinity Crest" class="brand-logo">
+        <div class="brand-text">
+          <span class="brand-title">INFINITY HACKATHON</span>
+          <span class="brand-sub">GVPCDPGC (A) • CSE &amp; CSE-AIML</span>
+        </div>
+      </a>
       <span class="portal-badge">COORDINATOR DESK</span>
-    </a>
+    </div>
     <div class="nav-actions">
       <button id="btn-refresh" class="btn-refresh" title="Refresh Live Check-in & Review Feeds">
         <svg class="refresh-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
@@ -690,9 +1055,11 @@
         </svg>
         <span>REFRESH</span>
       </button>
-      <a href="/" class="btn-return">← 3D GEMSTONE ENGINE</a>
-      <button id="btn-logout" class="btn-return"
-        style="background:none; border:none; cursor:pointer; display:none;">LOGOUT</button>
+      <div class="nav-links">
+        <a href="/" class="btn-return">← 3D ENGINE</a>
+        <button id="btn-logout" class="btn-return"
+          style="background:none; border:none; cursor:pointer; display:none;">LOGOUT</button>
+      </div>
     </div>
   </header>
 
@@ -725,11 +1092,11 @@
       </div>
       <div class="kpi-card">
         <div class="kpi-val" id="kpi-r1-attended">0</div>
-        <div class="kpi-lbl">REVIEW 1 ATTENDED</div>
+        <div class="kpi-lbl">R1: IDEA (1 PM)</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-val" id="kpi-r2-attended">0</div>
-        <div class="kpi-lbl">REVIEW 2 ATTENDED</div>
+        <div class="kpi-lbl">R2: PROTOTYPE (5 PM)</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-val" id="kpi-meals-served">0</div>
@@ -750,8 +1117,8 @@
         <button class="f-pill" data-domain="time">TIME</button>
         <button class="f-pill" data-domain="soul">SOUL</button>
       </div>
-      <div class="filter-pills" id="meal-filters" style="margin-top: 8px;">
-        <span class="mono-label" style="font-size: 0.68rem; color: var(--gold); display: inline-flex; align-items: center; margin-right: 4px;">MEAL FOCUS:</span>
+      <div class="filter-pills" id="meal-filters">
+        <span class="mono-label">MEAL FOCUS:</span>
         <button class="f-pill active" data-meal="all">ALL MEALS</button>
         <button class="f-pill" data-meal="dinner">DINNER</button>
         <button class="f-pill" data-meal="breakfast">BREAKFAST</button>
@@ -767,7 +1134,7 @@
             <th>TEAM / COLLEGE</th>
             <th>DOMAIN / LAB</th>
             <th>FOOD CHECK-IN (PER-MEMBER MARKS)</th>
-            <th>REVIEW CHECK-IN (TAP TO MARK)</th>
+            <th>REVIEWS (R1 IDEA 1PM | R2 PROTO 5PM | R3 MVP 2AM)</th>
           </tr>
         </thead>
         <tbody id="teams-tbody">

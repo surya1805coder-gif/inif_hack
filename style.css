@@ -3838,10 +3838,10 @@ body.timeline-unlocked #sponsors-section {
    -------------------------------------------------------------------------- */
 .host-campus-strip {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   min-height: 92px;
-  padding: 18px 26px;
+  padding: 20px 26px;
   background: rgba(12, 12, 18, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 16px;
@@ -3859,7 +3859,7 @@ body.timeline-unlocked #sponsors-section {
 
 .host-strip-left {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 18px;
 }
 
@@ -3876,6 +3876,7 @@ body.timeline-unlocked #sponsors-section {
   overflow: hidden;
   padding: 2px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  margin-top: 3px;
 }
 
 .host-crest-img {
@@ -3893,9 +3894,9 @@ body.timeline-unlocked #sponsors-section {
 
 .host-strip-title-row {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
 }
 
 .host-strip-badge {
@@ -3921,23 +3922,45 @@ body.timeline-unlocked #sponsors-section {
 
 .host-strip-accreditations {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 5px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 10px;
   font-family: var(--font-body);
-  font-size: 0.76rem;
-  color: #94949e;
-  line-height: 1.4;
-}
-
-.accred-item {
-  color: #8e8e99;
+  font-size: 0.8rem;
+  color: #a1a1aa;
+  line-height: 1.45;
 }
 
 .accred-sep {
-  color: rgba(255, 255, 255, 0.22);
-  font-size: 0.7rem;
+  display: none;
+}
+
+.accred-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  color: #a1a1aa;
+  transition: color 0.2s ease;
+}
+
+.accred-item:hover {
+  color: #ffffff;
+}
+
+.accred-item.accred-highlight {
+  color: #ffd000;
+  font-weight: 700;
+}
+
+.accred-item::before {
+  content: '•';
+  color: #ffd000;
+  font-size: 0.95rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-right: 2px;
 }
 
 .host-strip-right {
@@ -3945,6 +3968,7 @@ body.timeline-unlocked #sponsors-section {
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
+  margin-top: 4px;
 }
 
 .host-chip-clean {
@@ -5387,10 +5411,159 @@ body.timeline-unlocked #sponsors-section {
   margin-top: 14px;
 }
 
+/* Registration Review & Confirmation Modal */
+.modal-confirm-dialog {
+  max-width: 640px;
+  width: 94vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  background: rgba(14, 14, 20, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(255, 208, 0, 0.08);
+}
+
+.confirm-details-scroll {
+  overflow-y: auto;
+  max-height: 58vh;
+  padding-right: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.confirm-details-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.confirm-details-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.confirm-section-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.confirm-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.confirm-section-title {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #a1a1aa;
+  text-transform: uppercase;
+}
+
+.confirm-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 16px;
+}
+
+@media (max-width: 560px) {
+  .confirm-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.confirm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.confirm-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  color: #71717a;
+  text-transform: uppercase;
+}
+
+.confirm-value {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #ffffff;
+  word-break: break-word;
+}
+
+.confirm-roster-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  gap: 10px;
+}
+
+.confirm-roster-item:last-child {
+  margin-bottom: 0;
+}
+
+.confirm-member-role-badge {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(255, 208, 0, 0.12);
+  color: #ffd000;
+  border: 1px solid rgba(255, 208, 0, 0.25);
+  flex-shrink: 0;
+}
+
+.confirm-member-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.confirm-member-name {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.confirm-member-meta {
+  font-family: var(--font-mono);
+  font-size: 0.70rem;
+  color: #a1a1aa;
+}
+
 /* Success Modal Dialog */
 .modal-success-dialog {
-  max-width: 520px;
+  max-width: 580px;
+  width: 94vw;
+  max-height: 90vh;
+  overflow-y: auto;
   text-align: center;
+}
+
+.modal-success-dialog::-webkit-scrollbar {
+  width: 5px;
+}
+
+.modal-success-dialog::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
 }
 
 .success-icon-wrap {
@@ -5413,8 +5586,61 @@ body.timeline-unlocked #sponsors-section {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  margin: 20px 0;
+  margin: 16px 0;
   text-align: left;
+}
+
+.suc-member-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  text-align: left;
+  gap: 8px;
+}
+
+.suc-member-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.suc-member-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.suc-member-badge {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: rgba(255, 208, 0, 0.15);
+  color: #ffd000;
+  border: 1px solid rgba(255, 208, 0, 0.3);
+  flex-shrink: 0;
+}
+
+.suc-member-badge.member {
+  background: rgba(255, 255, 255, 0.06);
+  color: #a1a1aa;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.suc-member-meta {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: #888894;
+  margin-top: 1px;
 }
 
 .summary-row {
@@ -6122,6 +6348,137 @@ body.webgl-fallback-active .stone-stage-overlay {
     transform: none !important;
     transition: none !important;
   }
+}
+
+/* =======================================================
+   COMMAND POST ADMIN: PAYMENT VERIFICATION MAIL BUTTONS
+   ======================================================= */
+.btn-tbl-mail {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 6px 12px !important;
+  min-height: 28px !important;
+  line-height: 1 !important;
+  border-radius: 6px !important;
+  background: rgba(0, 210, 255, 0.12) !important;
+  border: 1px solid #00d2ff !important;
+  color: #00d2ff !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 0 10px rgba(0, 210, 255, 0.2) !important;
+  outline: none !important;
+  user-select: none !important;
+  vertical-align: middle !important;
+}
+
+.btn-tbl-mail:hover {
+  background: #00d2ff !important;
+  color: #06060c !important;
+  box-shadow: 0 0 16px rgba(0, 210, 255, 0.5) !important;
+  transform: translateY(-1px);
+}
+
+.btn-tbl-mail:active {
+  transform: translateY(0);
+}
+
+.btn-tbl-mail.is-sent {
+  background: rgba(0, 255, 136, 0.14) !important;
+  border: 1px solid #00ff88 !important;
+  color: #00ff88 !important;
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.25) !important;
+}
+
+.btn-tbl-mail.is-sent:hover {
+  background: #00ff88 !important;
+  color: #06060c !important;
+  box-shadow: 0 0 16px rgba(0, 255, 136, 0.55) !important;
+  transform: translateY(-1px);
+}
+
+.btn-tbl-mail:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  transform: none !important;
+}
+
+.btn-bulk-mail {
+  background: rgba(0, 210, 255, 0.1) !important;
+  border-color: rgba(0, 210, 255, 0.4) !important;
+  color: #00d2ff !important;
+}
+
+.btn-bulk-mail:hover {
+  background: #00d2ff !important;
+  color: #000 !important;
+  box-shadow: 0 0 16px rgba(0, 210, 255, 0.4) !important;
+}
+
+/* Public Registration Closed Notice */
+.reg-closed-card {
+  padding: 40px 24px;
+  text-align: center;
+  background: rgba(255, 42, 75, 0.08);
+  border: 1px solid rgba(255, 42, 75, 0.35);
+  border-radius: 14px;
+  margin: 20px 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.reg-closed-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 0 15px rgba(255, 42, 75, 0.6));
+}
+
+.reg-closed-headline {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.reg-closed-message {
+  font-size: 0.9rem;
+  color: #d0d0d8;
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0 auto 18px auto;
+}
+
+.reg-closed-help {
+  font-size: 0.82rem;
+  color: #ff99a8;
+  border-top: 1px solid rgba(255, 42, 75, 0.2);
+  padding-top: 14px;
+}
+
+.reg-closed-help a {
+  color: #ffd000;
+  text-decoration: underline;
+}
+
+.hud-btn-register.reg-nav-closed {
+  background: rgba(255, 42, 75, 0.15) !important;
+  border-color: rgba(255, 42, 75, 0.5) !important;
+  color: #ff6b81 !important;
+}
+
+.hud-btn-register.reg-nav-closed:hover {
+  background: rgba(255, 42, 75, 0.28) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 20px rgba(255, 42, 75, 0.5) !important;
 }
 
 

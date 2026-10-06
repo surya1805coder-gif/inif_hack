@@ -127,6 +127,11 @@ function authHeaders(extra = {}) {
     const stoneAreasStatus = document.getElementById('stone-areas-status');
     const chkSyncExistingTeams = document.getElementById('chk-sync-existing-teams');
 
+    let registrationOpen = true;
+    const btnToggleReg = document.getElementById('btn-toggle-reg');
+    const regStatusIcon = document.getElementById('reg-status-icon');
+    const regStatusText = document.getElementById('reg-status-text');
+
     async function doAdminLogin(password, isSilent = false) {
       if (!isSilent && loginErr) loginErr.style.display = 'none';
 
@@ -228,6 +233,12 @@ function authHeaders(extra = {}) {
 
         allTeams = teamsData.teams || [];
         allDomains = domainsData.domains || [];
+
+        if (teamsData.settings && typeof teamsData.settings.registrationOpen === 'boolean') {
+          updateRegistrationUI(teamsData.settings.registrationOpen);
+        } else if (domainsData && typeof domainsData.registrationOpen === 'boolean') {
+          updateRegistrationUI(domainsData.registrationOpen);
+        }
 
         const btnExcel = document.querySelector('.btn-excel');
         if (btnExcel && !btnExcel.dataset.bound) {
@@ -605,6 +616,9 @@ function authHeaders(extra = {}) {
                   <option value="pending" ${payStatus === 'pending' ? 'selected' : ''}>⏳ PENDING</option>
                   <option value="rejected" ${payStatus === 'rejected' ? 'selected' : ''}>✕ REJECTED</option>
                 </select>
+                <button class="btn-tbl-mail ${pay.mailSent ? 'is-sent' : ''}" data-mail-id="${escapeHTML(t.id)}" title="${pay.mailSent ? 'Confirmation email sent ' + (pay.mailSentAt ? new Date(pay.mailSentAt).toLocaleString() : '') + '. Click to re-send.' : (payStatus === 'verified' ? 'Send official payment verified email to leader and roster' : 'Send verification email (will mark payment verified)')}">
+                  ${pay.mailSent ? '<span>✓</span><span>MAILED</span>' : '<span>✉</span><span>MAIL</span>'}
+                </button>
                 <button class="btn-tbl-edit" data-edit-id="${escapeHTML(t.id)}">EDIT</button>
                 <button class="btn-tbl-del" data-del-id="${escapeHTML(t.id)}">DEL</button>
               </div>
@@ -649,6 +663,71 @@ function authHeaders(extra = {}) {
           } catch (err) {
             alert('Error updating payment status: ' + err.message);
             renderTable();
+          }
+        });
+      });
+
+      // Bind Quick Send Verification Mail Buttons
+      tbody.querySelectorAll('.btn-tbl-mail').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const tId = btn.getAttribute('data-mail-id');
+          const targetTeam = allTeams.find(t => t.id === tId);
+          if (!targetTeam) return;
+
+          const currentStatus = targetTeam.payment?.status || 'pending';
+          const isAlreadyMailed = Boolean(targetTeam.payment?.mailSent);
+          const recipient = targetTeam.leader?.email || 'N/A';
+
+          let confirmMsg = `Send official payment verification email to squad "${targetTeam.teamName}" (${recipient})?`;
+          if (currentStatus !== 'verified') {
+            confirmMsg = `Squad "${targetTeam.teamName}" payment is currently "${currentStatus.toUpperCase()}".\n\nMark payment as VERIFIED and dispatch confirmation email to ${recipient}?`;
+          } else if (isAlreadyMailed) {
+            const sentTime = targetTeam.payment?.mailSentAt ? new Date(targetTeam.payment.mailSentAt).toLocaleString() : 'earlier';
+            confirmMsg = `Confirmation email was already sent on ${sentTime}.\n\nRe-send verification email to ${recipient}?`;
+          }
+
+          if (!confirm(confirmMsg)) return;
+
+          btn.disabled = true;
+          const originalText = btn.textContent;
+          btn.textContent = '⏳ SENDING...';
+
+          try {
+            const res = await fetch('/api/admin/send-verification-mail', {
+              method: 'POST',
+              headers: authHeaders({ 'Content-Type': 'application/json' }),
+              body: JSON.stringify({ teamId: tId })
+            });
+            const data = await res.json();
+            if (data.success) {
+              const idx = allTeams.findIndex(t => t.id === tId);
+              if (idx >= 0 && data.team) {
+                allTeams[idx] = data.team;
+              } else if (idx >= 0) {
+                allTeams[idx].payment = {
+                  ...allTeams[idx].payment,
+                  status: 'verified',
+                  mailSent: true,
+                  mailSentAt: data.mailSentAt || new Date().toISOString()
+                };
+              }
+              renderTable();
+              updateKPIs();
+
+              if (data.simulated) {
+                alert(`⚡ [SIMULATION MODE]\nPayment verification email logged for "${targetTeam.teamName}" (${recipient})!\n\nTo send live emails, configure RESEND_API_KEY in .env.local.`);
+              } else {
+                alert(`✅ Verification email sent successfully to ${recipient}!`);
+              }
+            } else {
+              alert('Failed to send verification email: ' + (data.error || 'Unknown error'));
+              btn.disabled = false;
+              btn.textContent = originalText;
+            }
+          } catch (err) {
+            alert('Network error sending verification email: ' + err.message);
+            btn.disabled = false;
+            btn.textContent = originalText;
           }
         });
       });
@@ -729,6 +808,66 @@ function authHeaders(extra = {}) {
       document.getElementById('edt-pay-status').value = pay.status || 'pending';
       document.getElementById('edt-pay-utr').value = pay.utr || '';
       document.getElementById('edt-pay-amount').value = pay.amount || (editingTeam.teamSize || 4) * 349;
+
+      const isMailed = Boolean(pay.mailSent);
+      const mailStatusEl = document.getElementById('edt-mail-status');
+      if (mailStatusEl) {
+        if (isMailed) {
+          mailStatusEl.textContent = `SENT (${pay.mailSentAt ? new Date(pay.mailSentAt).toLocaleString() : 'YES'})`;
+          mailStatusEl.style.color = 'var(--green)';
+        } else {
+          mailStatusEl.textContent = 'NOT SENT';
+          mailStatusEl.style.color = 'var(--gold)';
+        }
+      }
+
+      const btnEdtSendMail = document.getElementById('btn-edt-send-mail');
+      if (btnEdtSendMail) {
+        btnEdtSendMail.onclick = async () => {
+          if (!editingTeam) return;
+          const recipient = editingTeam.leader?.email || 'N/A';
+          if (!confirm(`Dispatch official payment verification email to squad "${editingTeam.teamName}" (${recipient})?`)) return;
+
+          btnEdtSendMail.disabled = true;
+          const originalText = btnEdtSendMail.textContent;
+          btnEdtSendMail.textContent = '⏳ SENDING...';
+
+          try {
+            const res = await fetch('/api/admin/send-verification-mail', {
+              method: 'POST',
+              headers: authHeaders({ 'Content-Type': 'application/json' }),
+              body: JSON.stringify({ teamId: editingTeam.id })
+            });
+            const data = await res.json();
+            if (data.success) {
+              if (data.team) {
+                editingTeam = data.team;
+                const idx = allTeams.findIndex(t => t.id === editingTeam.id);
+                if (idx >= 0) allTeams[idx] = data.team;
+              }
+              document.getElementById('edt-pay-status').value = 'verified';
+              if (mailStatusEl) {
+                mailStatusEl.textContent = `SENT (${new Date().toLocaleString()})`;
+                mailStatusEl.style.color = 'var(--green)';
+              }
+              renderTable();
+              updateKPIs();
+              if (data.simulated) {
+                alert(`⚡ [SIMULATION MODE]\nPayment verification email logged for "${editingTeam.teamName}" (${recipient})!\n\nTo send live emails, configure RESEND_API_KEY in .env.local.`);
+              } else {
+                alert(`✅ Verification email sent successfully to ${recipient}!`);
+              }
+            } else {
+              alert('Failed to send verification email: ' + (data.error || 'Unknown error'));
+            }
+          } catch (err) {
+            alert('Network error sending verification email: ' + err.message);
+          } finally {
+            btnEdtSendMail.disabled = false;
+            btnEdtSendMail.textContent = originalText;
+          }
+        };
+      }
 
       const food = editingTeam.food || {};
       const elDin = document.getElementById('edt-food-din');
@@ -930,6 +1069,64 @@ function authHeaders(extra = {}) {
         alert('Error updating team: ' + err.message);
       }
     });
+
+    // BULK SEND VERIFICATION MAILS TO ALL VERIFIED SQUADS
+    const btnBatchMail = document.getElementById('btn-batch-mail');
+    if (btnBatchMail) {
+      btnBatchMail.addEventListener('click', async () => {
+        const verifiedTeams = allTeams.filter(t => t.payment?.status === 'verified');
+        const unmailedTeams = verifiedTeams.filter(t => !t.payment?.mailSent);
+
+        if (verifiedTeams.length === 0) {
+          alert('No verified squads found. Please verify squad payments before sending confirmation emails.');
+          return;
+        }
+
+        let force = false;
+        let targetCount = unmailedTeams.length;
+
+        if (targetCount === 0) {
+          if (confirm(`All ${verifiedTeams.length} verified squad(s) have already received confirmation emails.\n\nDo you want to FORCE re-send to ALL ${verifiedTeams.length} verified squads?`)) {
+            force = true;
+            targetCount = verifiedTeams.length;
+          } else {
+            return;
+          }
+        } else {
+          if (!confirm(`Dispatch official payment verification emails to ${targetCount} verified squad(s) that haven't received mail yet?`)) {
+            return;
+          }
+        }
+
+        btnBatchMail.disabled = true;
+        const originalContent = btnBatchMail.innerHTML;
+        btnBatchMail.innerHTML = '<span>⏳</span><span>DISPATCHING EMAILS...</span>';
+
+        try {
+          const res = await fetch('/api/admin/send-all-verification-mails', {
+            method: 'POST',
+            headers: authHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ force })
+          });
+          const data = await res.json();
+          if (data.success) {
+            await loadData();
+            if (data.simulated) {
+              alert(`⚡ [SIMULATION MODE]\nProcessed ${data.sentCount} squad emails!\n\n(Configure RESEND_API_KEY in .env.local to send live emails via Resend's free tier).`);
+            } else {
+              alert(`✅ Verification emails sent: ${data.sentCount} squads notified successfully (${data.failCount || 0} failed).`);
+            }
+          } else {
+            alert('Failed to send batch emails: ' + (data.error || 'Unknown error'));
+          }
+        } catch (err) {
+          alert('Error sending batch emails: ' + err.message);
+        } finally {
+          btnBatchMail.disabled = false;
+          btnBatchMail.innerHTML = originalContent;
+        }
+      });
+    }
 
     // PROBLEM STATEMENTS MANAGER
     btnOpenPsMgr.addEventListener('click', () => {
@@ -1714,3 +1911,53 @@ function authHeaders(extra = {}) {
         }
       });
     }
+
+    // ==========================================
+    // REGISTRATION STATUS TOGGLE
+    // ==========================================
+    function updateRegistrationUI(isOpen) {
+      registrationOpen = Boolean(isOpen);
+      if (!btnToggleReg) return;
+      if (registrationOpen) {
+        btnToggleReg.classList.remove('closed');
+        btnToggleReg.classList.add('open');
+        if (regStatusIcon) regStatusIcon.textContent = '🟢';
+        if (regStatusText) regStatusText.textContent = 'REGISTRATION: OPEN';
+        btnToggleReg.title = 'Public registrations are currently OPEN. Click to CLOSE.';
+      } else {
+        btnToggleReg.classList.remove('open');
+        btnToggleReg.classList.add('closed');
+        if (regStatusIcon) regStatusIcon.textContent = '🔴';
+        if (regStatusText) regStatusText.textContent = 'REGISTRATION: CLOSED';
+        btnToggleReg.title = 'Public registrations are currently CLOSED. Click to OPEN.';
+      }
+    }
+
+    if (btnToggleReg) {
+      btnToggleReg.addEventListener('click', async () => {
+        const targetState = !registrationOpen;
+        const promptMsg = targetState
+          ? 'Are you sure you want to OPEN public registrations?'
+          : 'Are you sure you want to CLOSE public registrations? No new squads will be able to register.';
+        if (!confirm(promptMsg)) return;
+
+        try {
+          btnToggleReg.style.opacity = '0.6';
+          const res = await fetch('/api/admin/toggle-registration', {
+            method: 'POST',
+            headers: authHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ registrationOpen: targetState })
+          });
+          const data = await res.json();
+          btnToggleReg.style.opacity = '1';
+          if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Failed to update registration status.');
+          }
+          updateRegistrationUI(data.registrationOpen);
+          showAdminToast(data.message || (data.registrationOpen ? 'Registrations are now OPEN.' : 'Registrations are now CLOSED.'));
+        } catch (err) {
+          btnToggleReg.style.opacity = '1';
+          alert('Error: ' + err.message);
+        }
+      });
+    }
