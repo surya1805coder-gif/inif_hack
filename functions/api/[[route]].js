@@ -585,11 +585,12 @@ async function verifyTeamToken(token, expectedTeamId, secret) {
 }
 
 async function generatePasswordResetToken(teamId, secret) {
+  const safeSecret = (secret && secret.trim()) || 'infinity-hackathon-2026-auth-salt';
   const ts = Date.now().toString();
   const encoder = new TextEncoder();
   const key = await crypto.subtle.importKey(
     'raw',
-    encoder.encode(secret),
+    encoder.encode(safeSecret),
     { name: 'HMAC', hash: 'SHA-256' },
     false,
     ['sign']
@@ -602,6 +603,7 @@ async function generatePasswordResetToken(teamId, secret) {
 async function verifyPasswordResetToken(token, secret) {
   if (!token) return null;
   try {
+    const safeSecret = (secret && secret.trim()) || 'infinity-hackathon-2026-auth-salt';
     const decoded = atob(token);
     const [purpose, teamId, ts, sigHex] = decoded.split(':');
     if (purpose !== 'reset' || !teamId || !ts || !sigHex || sigHex.length !== 64) return null;
@@ -612,7 +614,7 @@ async function verifyPasswordResetToken(token, secret) {
     const encoder = new TextEncoder();
     const key = await crypto.subtle.importKey(
       'raw',
-      encoder.encode(secret),
+      encoder.encode(safeSecret),
       { name: 'HMAC', hash: 'SHA-256' },
       false,
       ['verify']
@@ -634,12 +636,11 @@ function isValidEmail(email) {
 }
 
 function normalizePhone(phone) {
-  if (!phone || typeof phone !== 'string') return '';
-  let digits = phone.replace(/\D/g, '');
-  if (digits.length === 12 && digits.startsWith('91')) {
-    digits = digits.slice(2);
-  } else if (digits.length === 11 && digits.startsWith('0')) {
-    digits = digits.slice(1);
+  if (!phone) return '';
+  const str = String(phone).trim();
+  let digits = str.replace(/\D/g, '');
+  if (digits.length >= 10) {
+    return digits.slice(-10);
   }
   return digits;
 }
@@ -1069,7 +1070,7 @@ export async function onRequest(context) {
     });
   }
 
-  const ADMIN_SECRET = env.ADMIN_SECRET || '';
+  const ADMIN_SECRET = (env.ADMIN_SECRET && env.ADMIN_SECRET.trim()) || 'infinity-hackathon-2026-auth-salt';
   const COORDINATOR_PASS = env.COORDINATOR_PASS || '';
   const JUDGES_PASS = env.JUDGES_PASS || '';
   const PUBLIC_DOMAIN = env.CLOUDFLARE_R2_PUBLIC_DOMAIN || 'https://pub-aa1b426e7ec64c31a70bdd49676fdec1.r2.dev';
@@ -1603,16 +1604,16 @@ export async function onRequest(context) {
       }
 
       const { email, phone, utr } = await request.json();
-      if (!email || !phone || !utr) {
+      if (!email || (!phone && !utr)) {
         return jsonResponse({
           success: false,
-          error: 'Leader email, phone number, and payment UTR are required.'
+          error: 'Leader email and at least one verification factor (Phone Number or Payment UTR / Team ID) are required.'
         }, 400);
       }
 
       const cleanEmail = String(email).trim().toLowerCase();
-      const cleanPhone = normalizePhone(phone);
-      const cleanUtr = String(utr).trim().toLowerCase();
+      const cleanPhone = phone ? normalizePhone(phone) : '';
+      const cleanUtr = utr ? String(utr).trim().toLowerCase() : '';
 
       const db = await loadDb(env);
       const team = db.teams.find((t) => {
@@ -1621,11 +1622,17 @@ export async function onRequest(context) {
         if (tEmail !== cleanEmail) return false;
 
         const tPhone = normalizePhone(t.leader.phone);
-        if (tPhone !== cleanPhone) return false;
+        const tPaymentPhone = t.payment?.phone ? normalizePhone(t.payment.phone) : '';
+        const phoneMatch = cleanPhone && (
+          (tPhone && (tPhone === cleanPhone || tPhone.endsWith(cleanPhone) || cleanPhone.endsWith(tPhone))) ||
+          (tPaymentPhone && (tPaymentPhone === cleanPhone || tPaymentPhone.endsWith(cleanPhone) || cleanPhone.endsWith(tPaymentPhone)))
+        );
 
         const tUtr = String(t.payment?.utr || '').trim().toLowerCase();
         const tId = String(t.id || '').trim().toLowerCase();
-        return tUtr === cleanUtr || tId === cleanUtr;
+        const utrMatch = cleanUtr && (tUtr === cleanUtr || tId === cleanUtr);
+
+        return Boolean(phoneMatch || utrMatch);
       });
 
       if (!team) {
@@ -1695,7 +1702,7 @@ export async function onRequest(context) {
           throw new Error('Team not found.');
         }
 
-        team.teamPassword = hashPassword(newPassword.trim());
+        team.teamPassword = await hashPassword(newPassword.trim());
         team.updatedAt = new Date().toISOString();
       });
 

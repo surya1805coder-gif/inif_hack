@@ -418,9 +418,9 @@ let currentTeam = null;
         const phone = document.getElementById('fgt-phone')?.value?.trim();
         const utr = document.getElementById('fgt-utr')?.value?.trim();
 
-        if (!email || !phone || !utr) {
+        if (!email || (!phone && !utr)) {
           if (fgtVerifyErr) {
-            fgtVerifyErr.textContent = 'All verification fields are required.';
+            fgtVerifyErr.textContent = 'Please enter your registered leader email and either your phone number or payment UTR / Team ID.';
             fgtVerifyErr.style.display = 'block';
           }
           return;
@@ -519,7 +519,7 @@ let currentTeam = null;
           const txtEmail = document.getElementById('txt-email');
           const txtPassword = document.getElementById('txt-password');
           if (txtEmail && verifiedEmail) txtEmail.value = verifiedEmail;
-          if (txtPassword) txtPassword.value = '';
+          if (txtPassword) txtPassword.value = newPassword;
         } catch (err) {
           if (fgtResetErr) {
             fgtResetErr.textContent = err.message;
