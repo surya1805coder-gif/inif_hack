@@ -8,6 +8,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import * as XLSX from 'xlsx';
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import nodemailer from 'nodemailer';
 
 // Load .env.local first, fallback to .env
 if (fs.existsSync('.env.local')) {
@@ -1893,7 +1894,7 @@ app.post('/api/coordinator/login', (req, res) => {
   }
 
   const { password } = req.body || {};
-  const secret = process.env.COORDINATOR_PASS || 'coord123';
+  const secret = process.env.COORDINATOR_PASS || 'coord2026';
   if (!password) {
     return res.status(400).json({ success: false, error: 'Passcode is required.' });
   }
@@ -2005,7 +2006,7 @@ app.post('/api/judges/login', (req, res) => {
   }
 
   const { password } = req.body || {};
-  const secret = process.env.JUDGES_PASS || 'judge123';
+  const secret = process.env.JUDGES_PASS || 'judge2026';
   if (!password) {
     return res.status(400).json({ success: false, error: 'Passcode is required.' });
   }
@@ -2468,12 +2469,79 @@ export function escapeEmailHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
-async function dispatchEmailTransport({ to, cc = [], subject, html, env = process.env, team = {}, debugLabel = 'Email' }) {
+export function htmlToPlainText(html) {
+  if (!html) return '';
+  return html
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<br\s*[\/]?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<\/tr>/gi, '\n')
+    .replace(/<\/td>/gi, '  ')
+    .replace(/<\/div>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&bull;/g, '•')
+    .replace(/\n\s*\n\s*\n/g, '\n\n')
+    .trim();
+}
+
+async function dispatchEmailTransport({ to, cc = [], subject, html, text, env = process.env, team = {}, debugLabel = 'Email' }) {
+  const smtpUser = (env.SMTP_USER || process.env?.SMTP_USER || '').trim();
+  const smtpPass = (env.SMTP_PASS || process.env?.SMTP_PASS || '').trim();
+  const smtpHost = (env.SMTP_HOST || process.env?.SMTP_HOST || 'smtp.gmail.com').trim();
+  const smtpPort = Number(env.SMTP_PORT || process.env?.SMTP_PORT || 587);
+
   const resendApiKey = (env.RESEND_API_KEY || process.env?.RESEND_API_KEY || '').trim();
   const brevoApiKey = (env.BREVO_API_KEY || process.env?.BREVO_API_KEY || '').trim();
-  const emailFrom = (env.EMAIL_FROM || process.env?.EMAIL_FROM || 'Infinity Hackathon 2026 <hackathon@infinity.akao.in>').trim();
+  const emailFrom = (env.EMAIL_FROM || process.env?.EMAIL_FROM || (smtpUser ? `Infinity Hackathon 2026 <${smtpUser}>` : 'Infinity Hackathon 2026 <hackathon@infinity.akao.in>')).trim();
+  const plainText = text || htmlToPlainText(html);
 
-  // 1. Resend API (Recommended)
+  // 1. Gmail / Google Workspace SMTP (Primary - 2,000 emails/day)
+  if (smtpUser && smtpPass) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465,
+        auth: {
+          user: smtpUser,
+          pass: smtpPass
+        }
+      });
+
+      const mailOptions = {
+        from: emailFrom,
+        to,
+        ...(cc.length > 0 ? { cc } : {}),
+        replyTo: 'infinity.hackathon@gvpcdpgc.edu.in',
+        subject,
+        text: plainText,
+        html,
+        headers: {
+          'X-Priority': '3',
+          'X-Mailer': 'Infinity-Hackathon-Notification-System'
+        }
+      };
+
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`[SMTP SUCCESS] Sent email to ${to} (MessageId: ${info.messageId})`);
+      return { success: true, provider: 'smtp', id: info.messageId };
+    } catch (smtpErr) {
+      console.error(`[SMTP ERROR] Failed to send email via SMTP (${smtpUser}):`, smtpErr.message);
+      // Fallback to Resend or Brevo if configured, otherwise throw error
+      if (!resendApiKey && !brevoApiKey) {
+        throw new Error(`Gmail SMTP dispatch failed: ${smtpErr.message}`);
+      }
+      console.log(`[SMTP FALLBACK] Falling back to alternative provider...`);
+    }
+  }
+
+  // 2. Resend API (Secondary)
   if (resendApiKey) {
     const payload = {
       from: emailFrom,

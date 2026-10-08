@@ -2,7 +2,7 @@
 // INFINITY HACKATHON 2026 — SERVICE WORKER (PWA & OFFLINE VENUE RESILIENCE)
 // ==============================================================================
 
-const CACHE_NAME = 'infinity-hackathon-v1';
+const CACHE_NAME = 'infinity-hackathon-v2';
 const CORE_SHELL_ASSETS = [
   '/',
   '/index.html',
@@ -33,7 +33,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch Strategy: Safe Stale-While-Revalidate & Network-First for Read APIs
+// Fetch Strategy: Safe Stale-While-Revalidate & Network-First for Read APIs & HTML
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -64,7 +64,24 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 3. Static assets & bundles: Cache-first with network background revalidation
+  // 3. HTML Pages & Navigations: Network-First with cache fallback (prevents stale portal UI)
+  const isHtml = request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html');
+  if (isHtml) {
+    event.respondWith(
+      fetch(request)
+        .then((networkRes) => {
+          if (networkRes && networkRes.status === 200) {
+            const clone = networkRes.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return networkRes;
+        })
+        .catch(() => caches.match(request).then((cached) => cached || caches.match('/index.html')))
+    );
+    return;
+  }
+
+  // 4. Static assets & bundles: Cache-first with network background revalidation
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) {
@@ -83,11 +100,6 @@ self.addEventListener('fetch', (event) => {
           caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
         }
         return networkRes;
-      }).catch(() => {
-        // If offline and requesting an HTML document, fallback to index.html
-        if (request.headers.get('accept')?.includes('text/html')) {
-          return caches.match('/index.html');
-        }
       });
     })
   );

@@ -742,7 +742,13 @@ function getImageDimensions(data) {
         const b1 = bytes[21], b2 = bytes[22], b3 = bytes[23], b4 = bytes[24];
         const width = 1 + (((b2 & 0x3f) << 8) | b1);
         const height = 1 + (((b4 & 0x0f) << 10) | (b3 << 2) | ((b2 & 0xc0) >> 6));
-        return { width, height };
+        return { width, height, format: 'webp', mimeType: 'image/webp' };
+      }
+      // VP8X (extended WebP — common for Android screenshots with alpha / ICC)
+      if (bytes[12] === 0x56 && bytes[13] === 0x50 && bytes[14] === 0x38 && bytes[15] === 0x58 && bytes.length >= 30) {
+        const width = 1 + (bytes[24] | (bytes[25] << 8) | (bytes[26] << 16));
+        const height = 1 + (bytes[27] | (bytes[28] << 8) | (bytes[29] << 16));
+        return { width, height, format: 'webp', mimeType: 'image/webp' };
       }
     }
   } catch (_) {}
