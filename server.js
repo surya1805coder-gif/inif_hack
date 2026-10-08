@@ -3476,6 +3476,28 @@ app.get('/leader', (req, res) => res.sendFile(path.join(__dirname, 'leader.html'
 app.get('/coordinator', (req, res) => res.sendFile(path.join(__dirname, 'coordinator.html')));
 app.get('/judges', (req, res) => res.sendFile(path.join(__dirname, 'judges.html')));
 
+// Global Express Error Handler
+app.use((err, req, res, next) => {
+  console.error('[Global Express Error Handler]:', err);
+  if (res.headersSent) {
+    return next(err);
+  }
+  const statusCode = err.statusCode || err.status || 500;
+  res.status(statusCode).json({
+    success: false,
+    error: err.message || 'Internal Server Error'
+  });
+});
+
+// Process-level unhandled exception / rejection safety nets to prevent server crash
+process.on('uncaughtException', (err) => {
+  console.error('[UNCAUGHT EXCEPTION]:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[UNHANDLED REJECTION]:', reason);
+});
+
 app.listen(PORT, () => {
   console.log(`[Infinity Hackathon 2026] Backend running on http://localhost:${PORT}`);
 });
