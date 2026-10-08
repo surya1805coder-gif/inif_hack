@@ -149,17 +149,20 @@ export function initMoltenMetal(container, options = {}) {
     mouseStrength = 0.3,
     opacity = 1.0,
     backgroundColor = '#030305',
-    lightMode = false
+    lightMode = false,
+    dpr = null
   } = options;
 
   let renderer;
+  const isMobile = window.innerWidth <= 1024 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const effectiveDpr = dpr !== null ? dpr : (isMobile ? 0.85 : Math.min(window.devicePixelRatio || 1, 1.5));
   try {
     renderer = new Renderer({
       webgl: 2,
       alpha: true,
       premultipliedAlpha: true,
       antialias: false,
-      dpr: Math.min(window.devicePixelRatio || 1, 1.5)
+      dpr: effectiveDpr
     });
   } catch (err) {
     console.warn('WebGL2 not supported or failed for MoltenMetal:', err);
