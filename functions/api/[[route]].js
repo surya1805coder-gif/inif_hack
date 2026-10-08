@@ -2557,7 +2557,7 @@ export async function onRequest(context) {
 
       fgtRateLimiter.reset(authKey);
 
-      await updateDbWithRetry(env, async (db) => {
+      await updateDb(env, async (db) => {
         const team = db.teams.find((t) => t.id === teamId);
         if (!team) {
           throw new Error('Team not found.');
